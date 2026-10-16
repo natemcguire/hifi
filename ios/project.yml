@@ -1,0 +1,63 @@
+name: HIFI
+options:
+  deploymentTarget:
+    iOS: '26.0'
+    macOS: '15.0'
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    DEVELOPMENT_TEAM: 42Y5ADDZL2
+    CODE_SIGN_STYLE: Manual
+    MARKETING_VERSION: '0.2'
+    CURRENT_PROJECT_VERSION: '2'
+    PRODUCT_NAME: HIFI
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_CFBundleDisplayName: HIFI
+    INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.music
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+targets:
+  HIFI:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+      - Resources/Assets.xcassets
+      - path: ../stations.json
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.natesoftware.hifi
+        PROVISIONING_PROFILE_SPECIFIER: HIFI iPhone Development
+        TARGETED_DEVICE_FAMILY: '1,2'
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    info:
+      path: Config/Info.plist
+      properties:
+        UIBackgroundModes: [audio]
+        CFBundleDisplayName: HIFI
+        UILaunchScreen: {}
+        UIStatusBarStyle: UIStatusBarStyleDarkContent
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ITSAppUsesNonExemptEncryption: false
+  HIFI-Mac:
+    type: application
+    platform: macOS
+    sources:
+      - Sources
+      - Resources/Assets.xcassets
+      - path: ../stations.json
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.natesoftware.hifi.mac
+        ENABLE_APP_SANDBOX: NO
+        ENABLE_HARDENED_RUNTIME: NO

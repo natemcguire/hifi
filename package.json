@@ -1,0 +1,15 @@
+{
+  "name": "nsw-hifi",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "dev": "npm run build && wrangler dev",
+    "release": "node scripts/release-site.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.99.0"
+  },
+  "main": "index.html"
+}

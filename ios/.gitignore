@@ -1,0 +1,4 @@
+build/
+HIFI.xcodeproj/
+Config/
+scripts/devices.local

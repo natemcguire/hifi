@@ -1,0 +1,70 @@
+/* Original skins, not copies of third-party Winamp artwork. Geometry stays fluid. */
+.skin-controls { display:flex;align-items:center;gap:12px;justify-content:space-between;padding:5px 8px 9px;color:#dce0ec;font-size:11px; }
+.skin-controls label { flex:none;font-weight:bold; }
+.skin-controls select { font:inherit;min-width:0;max-width:76%;min-height:34px;padding:5px 7px;color:#edf0f7;background:#171b2b;border:1px solid #878da2; }
+.skin-controls select:focus-visible { outline:2px solid #fff09d;outline-offset:3px; }
+body[data-theme='acid-lab'] { --case:#244a25;--ink:#07140d;color:#e4ffc7;background:radial-gradient(ellipse at 30% 15%,#375129,transparent 60%),#0a1711; }
+body[data-theme='acid-lab'] .deck { position:relative;border:3px solid #a5cc54;border-radius:30px 9px 30px 9px;padding:10px;background:radial-gradient(ellipse at top left,#83a63c88,transparent 55%),repeating-linear-gradient(110deg,#264925 0 14px,#224423 14px 16px);box-shadow:inset 0 0 0 3px #304414,inset 0 0 30px #c8ff7433,5px 6px 0 #04130b; }
+body[data-theme='acid-lab'] .titlebar { padding-left:10px;padding-right:6px; }
+body[data-theme='acid-lab'] .titlebar h1 { color:#e5ff8a;letter-spacing:3px; }
+body[data-theme='acid-lab'] .titlebar h1 span { color:#b9dc95; }
+body[data-theme='acid-lab'] .title-lines { height:12px;border-radius:50%;background:repeating-linear-gradient(90deg,#101f0c 0 3px,#a0c252 3px 5px,transparent 5px 8px);box-shadow:0 1px #c9df80; }
+body[data-theme='acid-lab'] .receiver { border:1px solid #a5bd64;border-radius:20px 6px 20px 6px;background:#132f1a99;box-shadow:inset 2px 2px 8px #061808; }
+body[data-theme='acid-lab'] .screen { border-radius:16px 5px 14px 5px;border-color:#020904 #81a55c #81a55c #020904;background:linear-gradient(160deg,#182b13,#05110b 70%);box-shadow:inset 0 0 18px #000; }
+body[data-theme='acid-lab'] button:where(:not(#clock)) { color:#13210a;border:2px solid;border-color:#dcff90 #14270b #14270b #dcff90;border-radius:18px;background:linear-gradient(#c8ea74,#81aa37 55%,#b3d461);box-shadow:inset 0 0 0 1px #4c6a27; }
+body[data-theme='acid-lab'] button:where(:not(#clock)):hover { background:#d5f996; }
+body[data-theme='acid-lab'] button:where(:not(#clock)):active { border-color:#14270b #dcff90 #dcff90 #14270b; }
+body[data-theme='acid-lab'] .visual-panel,body[data-theme='acid-lab'] .playlist { border:1px solid #91ab58;border-radius:16px 4px 16px 4px;background:#14291caa;padding:7px; }
+body[data-theme='acid-lab'] .module-title { border-radius:9px 2px 9px 2px;background:linear-gradient(90deg,#111c0c,#526e2c);border-bottom:1px solid #9bbc55; }
+body[data-theme='acid-lab'] .module-title h2 { color:#edffbd; }
+body[data-theme='acid-lab'] .module-title>span { color:#dfedc5; }
+body[data-theme='acid-lab'] .visual { border-radius:8px;border-color:#020904 #81a55c #81a55c #020904;overflow:hidden; }
+body[data-theme='acid-lab'] nav { background:#091b10;border-radius:9px;padding:5px; }
+body[data-theme='acid-lab'] nav button { border-radius:5px 15px 5px 15px;background:#243f28;color:#d8edb4;border-color:#678646;box-shadow:none; }
+body[data-theme='acid-lab'] nav button span { color:#cbdbaf; }
+body[data-theme='acid-lab'] nav button[aria-pressed=true] { background:#bfe66c;color:#13210a;border-color:#e5ffb5; }
+body[data-theme='acid-lab'] nav button[aria-pressed=true] span { color:#253c10; }
+body[data-theme='acid-lab'] .rotation { border-radius:5px 5px 14px 5px;border-color:#020904 #81a55c #81a55c #020904; }
+body[data-theme='acid-lab'] .skin-controls,body[data-theme='acid-lab'] .station-note,body[data-theme='acid-lab'] footer,body[data-theme='acid-lab'] .gate p,body[data-theme='acid-lab'] .controls output { color:#dbe9bd; }
+body[data-theme='acid-lab'] select { color:#e7ffb3;background:#152b17;border-color:#9bb565;border-radius:6px; }
+body[data-theme='acid-lab'] .controls input { accent-color:#c7f563; }
+body[data-theme='acid-lab'] #provider, body[data-theme='acid-lab'] #playlist { color:#e1ffab; }
+
+body[data-theme='solar-transit'] { --case:#e6dcc3;--ink:#201a13;color:#33281c;background:repeating-linear-gradient(0deg,#d3c8b0 0 1px,#ddd3be 1px 5px); }
+body[data-theme='solar-transit'] .deck { padding:10px;border:3px solid;border-color:#fff5d9 #60412c #60412c #fff5d9;border-radius:18px;background:linear-gradient(90deg,#ef7024 0 8px,#e8ddc3 8px calc(100% - 8px),#ef7024 calc(100% - 8px));box-shadow:6px 7px 0 #614a3466,inset 0 0 0 2px #a24921; }
+body[data-theme='solar-transit'] .titlebar { padding:3px 8px 6px;border-bottom:3px solid #ea6922;margin-bottom:5px; }
+body[data-theme='solar-transit'] .titlebar h1 { color:#33251a;font-size:14px;letter-spacing:3px; }
+body[data-theme='solar-transit'] .titlebar h1 span { color:#8c3c18;font-weight:bold; }
+body[data-theme='solar-transit'] .title-lines { background:repeating-linear-gradient(0deg,#624b37 0 2px,transparent 2px 4px);height:18px; }
+body[data-theme='solar-transit'] .receiver { padding:9px;border:1px solid #aa9274;border-radius:10px;background:#d1c5a9;box-shadow:inset 1px 2px 4px #6f583955; }
+body[data-theme='solar-transit'] .screen { border:4px solid #4c3424;border-radius:12px;background:linear-gradient(120deg,#392c17,#171710);box-shadow:0 1px #fff7db,inset 0 2px 10px #000; }
+body[data-theme='solar-transit'] button:where(:not(#clock)) { color:#382414;border:2px solid;border-color:#fff7e0 #806448 #806448 #fff7e0;border-radius:4px;background:linear-gradient(#fff7df,#c7b99a);box-shadow:0 2px 0 #766147; }
+body[data-theme='solar-transit'] button:where(:not(#clock)):hover { background:#fff6db; }
+body[data-theme='solar-transit'] button:where(:not(#clock)):active { box-shadow:none;border-color:#806448 #fff7e0 #fff7e0 #806448; }
+body[data-theme='solar-transit'] #power { color:#fff8e8;background:linear-gradient(#ed7b2d,#a84013);border-color:#ffbd7c #77330e #77330e #ffbd7c; }
+body[data-theme='solar-transit'] .visual-panel,body[data-theme='solar-transit'] .playlist { border:1px solid #9a8263;border-radius:8px;background:#f2e8cf;padding:7px; }
+body[data-theme='solar-transit'] .module-title { background:#db6124;border:1px solid #7f3516;border-radius:3px;padding:4px 7px; }
+body[data-theme='solar-transit'] .module-title h2 { color:#fff9e9;letter-spacing:.6px;text-shadow:0 1px #743412; }
+body[data-theme='solar-transit'] .module-title>span { color:#fff8df; }
+body[data-theme='solar-transit'] .visual { border:3px solid #4c3424;border-radius:5px;overflow:hidden; }
+body[data-theme='solar-transit'] nav { background:#d6c9ac;border:1px solid #b8a17d;border-radius:4px;padding:5px;gap:5px; }
+body[data-theme='solar-transit'] nav button { color:#46321f;background:#f4e9cf;border-color:#fff7e0 #aa9270 #aa9270 #fff7e0;box-shadow:0 1px #887256; }
+body[data-theme='solar-transit'] nav button span { color:#735537; }
+body[data-theme='solar-transit'] nav button[aria-pressed=true] { color:#fff8e8;background:#954113;border-color:#532710 #cf854a #cf854a #532710;box-shadow:inset 0 1px 3px #4b210e; }
+body[data-theme='solar-transit'] nav button[aria-pressed=true] span { color:#ffddac; }
+body[data-theme='solar-transit'] .rotation { border:3px solid #4c3424;border-radius:4px; }
+body[data-theme='solar-transit'] .skin-controls,body[data-theme='solar-transit'] .station-note,body[data-theme='solar-transit'] footer,body[data-theme='solar-transit'] .gate p,body[data-theme='solar-transit'] .controls output { color:#493621; }
+body[data-theme='solar-transit'] select { color:#372817;background:#fff7df;border:1px solid #816544;border-radius:3px; }
+body[data-theme='solar-transit'] .controls input { accent-color:#b84a17; }
+body[data-theme='solar-transit'] #provider, body[data-theme='solar-transit'] #playlist { color:#763012; }
+body[data-theme='solar-transit'] :is(button,input,a,select):focus-visible { outline-color:#1326a6; }
+/* Respect the host's transparent embedding contract for every skin. */
+html.compact body[data-theme] { background:transparent; }
+@media(max-width:400px) {
+  .skin-controls { gap:6px;padding:5px 4px 8px; }
+  .skin-controls select { max-width:73%;font-size:10px; }
+  body[data-theme='acid-lab'] .deck,body[data-theme='solar-transit'] .deck { padding:7px; }
+  body[data-theme='solar-transit'] .receiver { padding:5px; }
+}
+
+html.embedded body[data-theme] .titlebar { padding-right:96px; }

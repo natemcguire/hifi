@@ -1,0 +1,16 @@
+name = "nsw-hifi"
+account_id = "4219a576830c72b0e6e4ca358e61473a"
+main = "worker.js"
+compatibility_date = "2026-06-16"
+workers_dev = false
+preview_urls = false
+routes = [
+  { pattern = "hifi.nates-software.com", custom_domain = true },
+  { pattern = "hifi.nates-software.com/*", zone_name = "nates-software.com" }
+]
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+run_worker_first = true
+html_handling = "none"
+not_found_handling = "none"

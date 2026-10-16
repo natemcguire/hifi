@@ -1,0 +1,443 @@
+{
+  "epoch": 0,
+  "catalog": "Original synthesized instrumental catalog with four preserved owner-supplied AI-generated seed recordings. HIFI Studio is a project credit; seed artist names are fictional aliases. Live radio is provided by Radio Paradise and SomaFM (listener-supported; streamed directly, never rehosted).",
+  "stations": [
+    {
+      "id": "radio-paradise",
+      "name": "RADIO PARADISE",
+      "band": "radio",
+      "frequency": "01",
+      "tagline": "Independent, listener-supported radio. Live from Radio Paradise.",
+      "genre": "LIVE / ECLECTIC MIX",
+      "color": "#e8c2ff",
+      "stream": "https://stream.radioparadise.com/mp3-128",
+      "website": "https://radioparadise.com",
+      "nowPlaying": "/api/now-playing?station=radio-paradise",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2
+    },
+    {
+      "id": "boot-liquor",
+      "name": "BOOT LIQUOR",
+      "band": "radio",
+      "frequency": "02",
+      "tagline": "Americana roots and alt-country. Live from SomaFM, listener-supported.",
+      "genre": "LIVE / AMERICANA · COUNTRY",
+      "color": "#f0b27a",
+      "stream": "https://ice6.somafm.com/bootliquor-128-mp3",
+      "website": "https://somafm.com/bootliquor/",
+      "provider": "SomaFM",
+      "providerLabel": "Boot Liquor on SomaFM.com ↗",
+      "support": "https://somafm.com/support/",
+      "nowPlaying": "/api/now-playing?station=boot-liquor",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2
+    },
+    {
+      "id": "sonic-universe",
+      "name": "SONIC UNIVERSE",
+      "band": "radio",
+      "frequency": "03",
+      "tagline": "Late-night jazz, cool and atmospheric. Live from SomaFM, listener-supported.",
+      "genre": "LIVE / CHILL JAZZ",
+      "color": "#8fd8d2",
+      "stream": "https://ice6.somafm.com/sonicuniverse-128-mp3",
+      "website": "https://somafm.com/sonicuniverse/",
+      "provider": "SomaFM",
+      "providerLabel": "Sonic Universe on SomaFM.com ↗",
+      "support": "https://somafm.com/support/",
+      "nowPlaying": "/api/now-playing?station=sonic-universe",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2
+    },
+    {
+      "id": "indie-pop-rocks",
+      "name": "INDIE POP ROCKS!",
+      "band": "radio",
+      "frequency": "04",
+      "tagline": "New and classic indie pop. Live from SomaFM, listener-supported.",
+      "genre": "LIVE / INDIE MIX",
+      "color": "#ff9fb2",
+      "stream": "https://ice6.somafm.com/indiepop-128-mp3",
+      "website": "https://somafm.com/indiepop/",
+      "provider": "SomaFM",
+      "providerLabel": "Indie Pop Rocks! on SomaFM.com ↗",
+      "support": "https://somafm.com/support/",
+      "nowPlaying": "/api/now-playing?station=indie-pop-rocks",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2
+    },
+    {
+      "id": "taylor-swift",
+      "name": "TAYLOR SWIFT RADIO",
+      "band": "radio",
+      "frequency": "05",
+      "tagline": "All Taylor, all the time, every era. Live from Exclusive Radio.",
+      "genre": "LIVE / TAYLOR SWIFT",
+      "color": "#c9a0dc",
+      "stream": "https://streaming.exclusive.radio/er/taylorswift/icecast.audio",
+      "website": "https://www.exclusive.radio/",
+      "provider": "Exclusive Radio",
+      "providerLabel": "Exclusively Taylor Swift on Exclusive.Radio ↗",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2
+    },
+    {
+      "id": "dial-up",
+      "name": "DIAL-UP",
+      "band": "synth",
+      "frequency": "01",
+      "tagline": "Connected at 56k. Stay a while.",
+      "genre": "LO-FI / SOFT BREAKS",
+      "color": "#b5ed88",
+      "tracks": [
+        {
+          "src": "tracks/dial-up-track-1.mp3",
+          "title": "Packets in the Rain",
+          "artist": "Cache Terrace",
+          "duration": 29.94,
+          "bitrate": 160,
+          "sampleRate": 32000,
+          "channels": 1,
+          "provenance": "Owner-supplied AI-generated audio",
+          "license": "owner-approved-commercial"
+        },
+        {
+          "src": "tracks/dial-up-track-2.mp3",
+          "title": "Your Download Is Dreaming",
+          "artist": "Floppy Habitat",
+          "duration": 29.94,
+          "bitrate": 160,
+          "sampleRate": 32000,
+          "channels": 1,
+          "provenance": "Owner-supplied AI-generated audio",
+          "license": "owner-approved-commercial"
+        },
+        {
+          "src": "tracks/dial-up-track-3.mp3",
+          "title": "After the Modem Sleeps",
+          "artist": "HIFI Studio",
+          "duration": 144.487804878,
+          "bitrate": 160,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/dial-up-track-4.mp3",
+          "title": "Window Seat at 2 AM",
+          "artist": "HIFI Studio",
+          "duration": 126.076906,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/dial-up-track-5.mp3",
+          "title": "Waiting for the Green Light",
+          "artist": "HIFI Studio",
+          "duration": 114.627906,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/dial-up-track-6.mp3",
+          "title": "A Folder Full of Rain",
+          "artist": "HIFI Studio",
+          "duration": 132.729719,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/dial-up-track-7.mp3",
+          "title": "Soft Return",
+          "artist": "HIFI Studio",
+          "duration": 131.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/dial-up-track-8.mp3",
+          "title": "Someone Left the Radio On",
+          "artist": "HIFI Studio",
+          "duration": 123.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        }
+      ]
+    },
+    {
+      "id": "shareware-summer",
+      "name": "SHAREWARE SUMMER",
+      "band": "synth",
+      "frequency": "02",
+      "tagline": "An endless trial of the good life.",
+      "genre": "SYNTH FUNK / SUNSHINE",
+      "color": "#ffcb7e",
+      "tracks": [
+        {
+          "src": "tracks/shareware-summer-track-1.mp3",
+          "title": "Poolside Installation",
+          "artist": "Apricot Directory",
+          "duration": 29.94,
+          "bitrate": 160,
+          "sampleRate": 32000,
+          "channels": 1,
+          "provenance": "Owner-supplied AI-generated audio",
+          "license": "owner-approved-commercial"
+        },
+        {
+          "src": "tracks/shareware-summer-track-2.mp3",
+          "title": "Sunset Setup Wizard",
+          "artist": "HIFI Studio",
+          "duration": 114.769230769,
+          "bitrate": 160,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/shareware-summer-track-3.mp3",
+          "title": "Free Trial of a Perfect Day",
+          "artist": "HIFI Studio",
+          "duration": 127.444438,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/shareware-summer-track-4.mp3",
+          "title": "Palm Trees in the Taskbar",
+          "artist": "HIFI Studio",
+          "duration": 118.862063,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/shareware-summer-track-5.mp3",
+          "title": "The Afternoon Is Yours",
+          "artist": "HIFI Studio",
+          "duration": 118.199969,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/shareware-summer-track-6.mp3",
+          "title": "Lemonade on the Desktop",
+          "artist": "HIFI Studio",
+          "duration": 123.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/shareware-summer-track-7.mp3",
+          "title": "Golden Hour, No Expiry",
+          "artist": "HIFI Studio",
+          "duration": 132.23075,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        }
+      ]
+    },
+    {
+      "id": "night-build",
+      "name": "NIGHT BUILD",
+      "band": "synth",
+      "frequency": "03",
+      "tagline": "The city sleeps. The build runs.",
+      "genre": "DARK AMBIENT / AFTER HOURS",
+      "color": "#a5c9ff",
+      "tracks": [
+        {
+          "src": "tracks/night-build-track-1.mp3",
+          "title": "Exit Code: Moonlight",
+          "artist": "Null Observatory",
+          "duration": 29.94,
+          "bitrate": 160,
+          "sampleRate": 32000,
+          "channels": 1,
+          "provenance": "Owner-supplied AI-generated audio",
+          "license": "owner-approved-commercial"
+        },
+        {
+          "src": "tracks/night-build-track-2.mp3",
+          "title": "The Quiet Compile",
+          "artist": "HIFI Studio",
+          "duration": 164,
+          "bitrate": 160,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/night-build-track-3.mp3",
+          "title": "Blue Light Beyond the Glass",
+          "artist": "HIFI Studio",
+          "duration": 123.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/night-build-track-4.mp3",
+          "title": "An Empty Terminal",
+          "artist": "HIFI Studio",
+          "duration": 112.714281,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/night-build-track-5.mp3",
+          "title": "Satellites Above the Server Room",
+          "artist": "HIFI Studio",
+          "duration": 129.315781,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/night-build-track-6.mp3",
+          "title": "No One Is Typing",
+          "artist": "HIFI Studio",
+          "duration": 115.941156,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/night-build-track-7.mp3",
+          "title": "The Last Process Goes to Sleep",
+          "artist": "HIFI Studio",
+          "duration": 131.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        }
+      ]
+    },
+    {
+      "id": "pixel-drift",
+      "name": "PIXEL DRIFT",
+      "band": "synth",
+      "frequency": "04",
+      "tagline": "One more level. No quarters required.",
+      "genre": "CHIPTUNE / ARCADE",
+      "color": "#f2a8df",
+      "tracks": [
+        {
+          "src": "tracks/pixel-drift-track-1.mp3",
+          "title": "Insert Another Afternoon",
+          "artist": "HIFI Studio",
+          "duration": 131.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/pixel-drift-track-2.mp3",
+          "title": "Save Point by the Sea",
+          "artist": "HIFI Studio",
+          "duration": 123.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/pixel-drift-track-3.mp3",
+          "title": "Clouds Above Level Seven",
+          "artist": "HIFI Studio",
+          "duration": 123.0,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/pixel-drift-track-4.mp3",
+          "title": "A Friendly Final Boss",
+          "artist": "HIFI Studio",
+          "duration": 126.870938,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/pixel-drift-track-5.mp3",
+          "title": "Pocket-Sized Horizon",
+          "artist": "HIFI Studio",
+          "duration": 119.363625,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        },
+        {
+          "src": "tracks/pixel-drift-track-6.mp3",
+          "title": "Continue Without Coins",
+          "artist": "HIFI Studio",
+          "duration": 118.862063,
+          "bitrate": 128,
+          "sampleRate": 32000,
+          "channels": 2,
+          "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
+          "license": "Original project audio; no third-party samples"
+        }
+      ]
+    }
+  ]
+}

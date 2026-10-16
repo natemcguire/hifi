@@ -1,0 +1,5 @@
+# Copy to devices.local (not committed) and fill in your iPhones.
+# HIFI_IPHONES: space-separated Label:UDID pairs (find UDIDs with `xcrun devicectl list devices`).
+# HIFI_RELAY_HOST: optional SSH host of another Mac that installs phones not paired with this one.
+HIFI_IPHONES="Phone:00000000-0000000000000000"
+HIFI_RELAY_HOST=""
