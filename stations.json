@@ -72,17 +72,17 @@
       "channels": 2
     },
     {
-      "id": "taylor-swift",
-      "name": "TAYLOR SWIFT RADIO",
+      "id": "pop-girl",
+      "name": "POP GIRL RADIO",
       "band": "radio",
       "frequency": "05",
-      "tagline": "All Taylor, all the time, every era. Live from Exclusive Radio.",
-      "genre": "LIVE / TAYLOR SWIFT",
+      "tagline": "Big choruses, every era, all day. Live from Exclusive Radio.",
+      "genre": "LIVE / POP",
       "color": "#c9a0dc",
       "stream": "https://streaming.exclusive.radio/er/taylorswift/icecast.audio",
       "website": "https://www.exclusive.radio/",
       "provider": "Exclusive Radio",
-      "providerLabel": "Exclusively Taylor Swift on Exclusive.Radio ↗",
+      "providerLabel": "Live on Exclusive.Radio ↗",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2

@@ -4,7 +4,7 @@ a new private key, an Apple Development certificate for it, a development
 profile for com.natesoftware.hifi on the iPhones in devices.local, and a dedicated
 hifi-build keychain that codesign can use without prompts.
 
-Run as: withkeys <python with pyjwt> ios/scripts/make-signing.py [--mac]
+Run as: withkeys <python with pyjwt> ios/scripts/make-signing.py [--mac | --store]
 Needs ASC_API_KEY_ID, ASC_API_KEY_ISSUER_ID, ASC_API_KEY_PATH. Prints only IDs.
 """
 import base64, json, os, plistlib, secrets, subprocess, sys, time, urllib.error, urllib.request
@@ -142,4 +142,42 @@ def mac():
     print("mac identity sha1:", sha1)
 
 
-mac() if "--mac" in sys.argv else main()
+def store():
+    """Adds an Apple Distribution certificate for the same key and an App Store
+    profile, for archives uploaded to App Store Connect (scripts/upload-appstore.sh)."""
+    key, cer = DIR / "dev.key", DIR / "dist.cer"
+    if not cer.exists():
+        csr = DIR / "dist.csr"
+        run("openssl", "req", "-new", "-key", str(key), "-out", str(csr), "-subj", "/CN=HIFI Distribution/O=Nate's Software/C=US")
+        csr_body = "".join(l for l in csr.read_text().splitlines() if "CERTIFICATE REQUEST" not in l)
+        created = api("POST", "/v1/certificates", {"data": {"type": "certificates", "attributes": {
+            "certificateType": os.environ.get("HIFI_DIST_TYPE", "DISTRIBUTION"), "csrContent": csr_body}}})
+        cer.write_bytes(base64.b64decode(created["data"]["attributes"]["certificateContent"]))
+        (DIR / "dist-certificate-id").write_text(created["data"]["id"])
+        print("distribution certificate created:", created["data"]["id"])
+    pw = (DIR / "keychain-password").read_text()
+    run("security", "unlock-keychain", "-p", pw, str(KEYCHAIN))
+    subprocess.run(["security", "import", str(cer), "-k", str(KEYCHAIN), "-T", "/usr/bin/codesign"], capture_output=True)
+    sha1 = run("openssl", "x509", "-inform", "DER", "-in", str(cer), "-noout", "-fingerprint", "-sha1").stdout.decode().split("=")[1].strip().replace(":", "")
+    (DIR / "dist-identity").write_text(sha1)
+    print("distribution identity sha1:", sha1)
+
+    name = "HIFI App Store"
+    bundle = next(b for b in api("GET", f"/v1/bundleIds?filter[identifier]={BUNDLE_ID}&limit=20")["data"]
+                  if b["attributes"]["identifier"] == BUNDLE_ID)
+    for old in api("GET", f"/v1/profiles?filter[name]={urllib.request.quote(name)}")["data"]:
+        api("DELETE", f"/v1/profiles/{old['id']}")
+    profile = api("POST", "/v1/profiles", {"data": {"type": "profiles",
+        "attributes": {"name": name, "profileType": "IOS_APP_STORE"},
+        "relationships": {
+            "bundleId": {"data": {"type": "bundleIds", "id": bundle["id"]}},
+            "certificates": {"data": [{"type": "certificates", "id": (DIR / "dist-certificate-id").read_text().strip()}]}}}})["data"]
+    content = base64.b64decode(profile["attributes"]["profileContent"])
+    uuid = profile["attributes"]["uuid"]
+    for folder in (HOME / "Library/Developer/Xcode/UserData/Provisioning Profiles", HOME / "Library/MobileDevice/Provisioning Profiles"):
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / f"{uuid}.mobileprovision").write_bytes(content)
+    print("profile:", name, uuid)
+
+
+mac() if "--mac" in sys.argv else store() if "--store" in sys.argv else main()
