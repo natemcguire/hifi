@@ -10,7 +10,7 @@ import AppKit
 // on every screen: stacked (screen over wheel) when tall, side by side when wide.
 
 enum Page: Hashable {
-    case main, band(String), nowPlaying, settings, about
+    case main, band(String), playlists, nowPlaying, settings, about
 }
 
 enum WheelRegion: Equatable {
@@ -27,6 +27,8 @@ private struct Row {
 
 struct IPodView: View {
     @EnvironmentObject private var radio: Radio
+    @ObservedObject private var spotify = SpotifyAccount.shared
+    @Environment(\.openURL) private var openURL
     @AppStorage("clicker") private var clicker = true
     @AppStorage("backlight") private var backlight = 30  // seconds; 0 = always on
     @State private var stack: [Page] = [.main]
@@ -82,7 +84,20 @@ struct IPodView: View {
         .focusable()
         .focused($focused)
         .focusEffectDisabled()
-        .onAppear { focused = true }
+        .onAppear {
+            focused = true
+            #if DEBUG
+            // App Store screenshots: `-screenshot radio|synth|nowPlaying|settings` opens that page.
+            switch UserDefaults.standard.string(forKey: "screenshot") {
+            case "radio": stack = [.main, .band("radio")]
+            case "synth": stack = [.main, .band("synth")]
+            case "nowPlaying": radio.start(); stack = [.main, .nowPlaying]
+            case "settings": stack = [.main, .settings]
+            case "playlists": stack = [.main, .playlists]
+            default: break
+            }
+            #endif
+        }
         .onKeyPress(.upArrow) { key(nil) { rotate(-1) } }
         .onKeyPress(.downArrow) { key(nil) { rotate(1) } }
         .onKeyPress(.leftArrow) { key(.previous) { radio.skip(-1) } }
@@ -91,6 +106,9 @@ struct IPodView: View {
         .onKeyPress(.escape) { key(.menu) { menu() } }
         .onKeyPress(.delete) { key(.menu) { menu() } }
         .onKeyPress(.space) { key(.play) { radio.toggle() } }
+        .task(id: page) {
+            if page == .playlists { await spotify.refreshPlaylists() }
+        }
         // While a station list is open, keep its song lines current.
         .task(id: page) {
             guard case .band = page else { return }
@@ -100,6 +118,19 @@ struct IPodView: View {
                 try? await Task.sleep(for: .seconds(20))
             }
         }
+        #if os(iOS)
+        .fullScreenCover(isPresented: $spotify.showConnect) { SpotifyConnectView(spotify: spotify) }
+        #else
+        // The Mac gets the same full white page, filling the whole window.
+        .overlay {
+            if spotify.showConnect {
+                SpotifyConnectView(spotify: spotify)
+                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                    .onExitCommand { spotify.showConnect = false }
+            }
+        }
+        .animation(.easeOut(duration: 0.25), value: spotify.showConnect)
+        #endif
         #if os(iOS)
         .background { ShuffleHost(radio: radio).frame(width: 120, height: 120).allowsHitTesting(false) }
         #endif
@@ -223,6 +254,7 @@ struct IPodView: View {
         switch page {
         case .main: "HIFI"
         case .band(let band): band == "synth" ? "Synth Sounds" : "Radio"
+        case .playlists: "Playlists"
         case .nowPlaying: "Now Playing"
         case .settings: "Settings"
         case .about: "About"
@@ -304,20 +336,26 @@ struct IPodView: View {
 
     // MARK: Menu model
 
-    private static let mainPages: [Page] = [.nowPlaying, .band("radio"), .band("synth"), .settings, .about]
+    private static let mainPages: [Page] = [.nowPlaying, .band("radio"), .band("synth"), .playlists, .settings, .about]
 
     private var rows: [Row] {
         switch page {
         case .main:
             return [Row(title: "Now Playing", playing: radio.isPlaying), Row(title: "Radio"),
-                    Row(title: "Synth Sounds"), Row(title: "Settings"), Row(title: "About")]
+                    Row(title: "Synth Sounds"), Row(title: "Playlists"), Row(title: "Settings"), Row(title: "About")]
         case .band(let band):
             return stations(band).map { Row(title: $0.name.capitalized, chevron: false,
                                             playing: radio.isPlaying && $0.id == radio.station.id,
                                             subtitle: songLine($0)) }
+        case .playlists:
+            // Nate's Software's playlist first, then the listener's own.
+            var list = playlistRows.map { Row(title: $0.name, chevron: false, subtitle: $0.detail) }
+            if !spotify.isConnected { list.append(Row(title: "Connect Spotify", chevron: false, subtitle: "See your own playlists here")) }
+            return list
         case .settings:
             _ = shuffleTick
-            var list = [Row(title: "Backlight", chevron: false, value: backlight == 0 ? "Always On" : "\(backlight) Seconds")]
+            var list = [Row(title: "Backlight", chevron: false, value: backlight == 0 ? "Always On" : "\(backlight) Seconds"),
+                        Row(title: "Spotify", chevron: false, value: spotify.isConnected ? "Connected" : "Connect")]
             #if os(iOS)
             list.insert(Row(title: "Clicker", chevron: false, value: clicker ? "On" : "Off"), at: 0)
             if ShufflePlayer.shared.isSupported {
@@ -330,6 +368,8 @@ struct IPodView: View {
             return []
         }
     }
+
+    private var playlistRows: [SpotifyPlaylist] { [spotify.natePlaylist].compactMap { $0 } + spotify.playlists }
 
     private func stations(_ band: String) -> [Station] { radio.stations.filter { $0.band == band } }
 
@@ -399,9 +439,13 @@ struct IPodView: View {
             guard list.indices.contains(index) else { return }
             radio.tune(list[index])
             push(.nowPlaying)
+        case .playlists:
+            // Spotify plays its own music: a playlist opens in the Spotify app.
+            if let playlist = playlistRows[safe: index] { openURL(playlist.url) } else { spotify.showConnect = true }
         case .settings:
             switch rows[safe: index]?.title {
             case "Clicker": clicker.toggle()
+            case "Spotify": if spotify.isConnected { spotify.disconnect() } else { spotify.showConnect = true }
             #if os(iOS)
             case "Mini Shuffle": ShufflePlayer.shared.toggle()
             case "Shuffle on Home": ShufflePlayer.shared.automatic.toggle(); shuffleTick += 1
@@ -435,6 +479,7 @@ private extension Array {
 
 private struct NowPlaying: View {
     @EnvironmentObject private var radio: Radio
+    @ObservedObject private var spotify = SpotifyAccount.shared
     let rowHeight: CGFloat
     let showVolume: Bool
 
@@ -457,10 +502,13 @@ private struct NowPlaying: View {
                         .id(radio.station.id)
                         .transition(.asymmetric(insertion: .scale(scale: 0.85).combined(with: .opacity), removal: .opacity))
                     VStack(alignment: .leading, spacing: rowHeight * 0.12) {
-                        Text(radio.displayTitle)
-                            .font(.system(size: rowHeight * 0.5, weight: .bold))
-                            .lineLimit(3)
-                            .contentTransition(.opacity)
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text(radio.displayTitle)
+                                .font(.system(size: rowHeight * 0.5, weight: .bold))
+                                .lineLimit(3)
+                                .contentTransition(.opacity)
+                            if radio.heartable { heart }
+                        }
                         Text(radio.displayArtist)
                             .font(.system(size: rowHeight * 0.42, weight: .semibold))
                             .foregroundStyle(Color(hex: "#333"))
@@ -470,7 +518,7 @@ private struct NowPlaying: View {
                             .font(.system(size: rowHeight * 0.38))
                             .foregroundStyle(Color(hex: "#555"))
                             .lineLimit(1)
-                        if let problem = radio.problem {
+                        if let problem = radio.problem ?? spotify.problem {
                             Text(problem).font(.system(size: rowHeight * 0.32)).foregroundStyle(.orange)
                         }
                     }
@@ -489,6 +537,27 @@ private struct NowPlaying: View {
             .animation(.easeInOut(duration: 0.3), value: radio.station.id)
             .animation(.easeInOut(duration: 0.4), value: radio.displayTitle)
             .animation(.spring(duration: 0.4), value: radio.isPlaying)
+        }
+    }
+
+    // ♥ saves the live song to the listener's Spotify Liked Songs.
+    private var heart: some View {
+        let liked = spotify.isLiked(trackId: radio.spotifyTrackId, artist: radio.displayArtist, title: radio.displayTitle)
+        return Button {
+            Feedback.click()
+            spotify.toggleHeart(trackId: radio.spotifyTrackId, artist: radio.displayArtist, title: radio.displayTitle)
+        } label: {
+            Image(systemName: liked ? "heart.fill" : "heart")
+                .font(.system(size: rowHeight * 0.5, weight: .semibold))
+                .foregroundStyle(liked ? Color(hex: "#e5484d") : Color(hex: "#555"))
+                .contentTransition(.symbolEffect(.replace))
+                .padding(4)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(liked ? "Remove from Liked Songs" : "Save to Liked Songs on Spotify")
+        .task(id: radio.displayTitle) {
+            await spotify.check(trackId: radio.spotifyTrackId, artist: radio.displayArtist, title: radio.displayTitle)
         }
     }
 

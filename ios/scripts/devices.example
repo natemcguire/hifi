@@ -3,3 +3,5 @@
 # HIFI_RELAY_HOST: optional SSH host of another Mac that installs phones not paired with this one.
 HIFI_IPHONES="Phone:00000000-0000000000000000"
 HIFI_RELAY_HOST=""
+# HIFI_BUILD_HOST: optional SSH host that compiles builds (build-remote.sh); defaults to HIFI_RELAY_HOST.
+HIFI_BUILD_HOST=""

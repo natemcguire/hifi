@@ -19,7 +19,7 @@ No build tools needed just to hack on the player: `python3 -m http.server 8080`,
 
 ## What it does
 
-- **Radio** tab: Radio Paradise, three SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!) and Exclusive Radio's Taylor Swift station, streamed straight from their servers. Nothing is proxied or rehosted.
+- **Radio** tab: Radio Paradise, three SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!) and Pop Girl Radio from Exclusive Radio, streamed straight from their servers. Nothing is proxied or rehosted.
 - **Synth Sounds** tab: Dial-Up, Shareware Summer, Night Build and Pixel Drift, procedurally composed MP3s in `tracks/`. Each one plays like a broadcast: the current track is picked from wall-clock time, so everyone hears the same thing.
 - Spectrum and scope views use the real audio analyser. **HIFI TV** (`tv.js`) draws a VHS-style music video on a canvas for the synth stations.
 - `worker.js` serves the site and `/api/now-playing` (relays SomaFM's current song, 20s cache).

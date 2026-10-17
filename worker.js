@@ -153,6 +153,7 @@ export default {
     if (url.pathname === '/player/') return Response.redirect(url.origin + '/player' + url.search, 308);
     if (url.pathname === '/') url.pathname = '/landing.html';
     else if (url.pathname === '/player') url.pathname = '/index.html';
+    else if (url.pathname === '/privacy') url.pathname = '/privacy.html';
     let response = await env.ASSETS.fetch(new Request(url, request));
     // Browsers asking for a missing page get a readable Win95 dialog, not an empty 404.
     if (response.status === 404 && (request.headers.get('Accept') || '').includes('text/html')) response = new Response(request.method === 'HEAD' ? null : notFoundPage, { status: 404, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });

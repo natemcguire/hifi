@@ -5,6 +5,7 @@ struct LiveSong: Decodable, Equatable {
     let artist: String?
     let title: String?
     let spotify: String?
+    let trackId: String?
     let poll: Double?
 }
 
@@ -281,6 +282,11 @@ final class Radio: ObservableObject {
         if station.isLive { return liveSong?.title ?? station.name }
         return track?.title ?? station.name
     }
+
+    // The Spotify track for the live song, when the station names one. Synth
+    // stations play our own music, which isn't on Spotify.
+    var heartable: Bool { station.isLive && liveSong?.title?.isEmpty == false }
+    var spotifyTrackId: String? { station.isLive ? liveSong?.trackId : nil }
 
     var displayArtist: String {
         if station.isLive { return liveSong?.artist ?? station.genre }
