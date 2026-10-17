@@ -39,6 +39,7 @@ struct IPodView: View {
     @State private var flash: WheelRegion?
     @State private var flashTask: Task<Void, Never>?
     @State private var songTick = 0  // re-reads synth rotations while a list is open
+    @State private var shuffleTick = 0  // redraws Settings after a shuffle toggle
     @FocusState private var focused: Bool
     @Namespace private var highlight
 
@@ -99,6 +100,9 @@ struct IPodView: View {
                 try? await Task.sleep(for: .seconds(20))
             }
         }
+        #if os(iOS)
+        .background { ShuffleHost(radio: radio).frame(width: 120, height: 120).allowsHitTesting(false) }
+        #endif
         // Backlight: the screen dims after a quiet spell, like the iPod's timer.
         .task(id: lastTouch) {
             guard backlight > 0 else { return }
@@ -312,9 +316,14 @@ struct IPodView: View {
                                             playing: radio.isPlaying && $0.id == radio.station.id,
                                             subtitle: songLine($0)) }
         case .settings:
+            _ = shuffleTick
             var list = [Row(title: "Backlight", chevron: false, value: backlight == 0 ? "Always On" : "\(backlight) Seconds")]
             #if os(iOS)
             list.insert(Row(title: "Clicker", chevron: false, value: clicker ? "On" : "Off"), at: 0)
+            if ShufflePlayer.shared.isSupported {
+                list.append(Row(title: "Mini Shuffle", chevron: false, value: ShufflePlayer.shared.isActive ? "Showing" : "Open"))
+                list.append(Row(title: "Shuffle on Home", chevron: false, value: ShufflePlayer.shared.automatic ? "On" : "Off"))
+            }
             #endif
             return list
         default:
@@ -393,6 +402,10 @@ struct IPodView: View {
         case .settings:
             switch rows[safe: index]?.title {
             case "Clicker": clicker.toggle()
+            #if os(iOS)
+            case "Mini Shuffle": ShufflePlayer.shared.toggle()
+            case "Shuffle on Home": ShufflePlayer.shared.automatic.toggle(); shuffleTick += 1
+            #endif
             case "Backlight":
                 let options = [10, 30, 60, 0]
                 backlight = options[((options.firstIndex(of: backlight) ?? 1) + 1) % options.count]
