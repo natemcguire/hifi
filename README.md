@@ -45,7 +45,6 @@ host and loopback are accepted. The bridge never starts playback.
 npm run release    # clean commit required; builds, deploys the nsw-hifi Worker, checks live bytes
 ```
 
-- Take the agent-inbox `release:hifi` lease before you release.
 - If the post-deploy check fails, look at what's live before you deploy again.
 - `wrangler.toml` routes the production hostname hifi.nates-software.com.
 
