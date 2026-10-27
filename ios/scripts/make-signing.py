@@ -4,7 +4,7 @@ a new private key, an Apple Development certificate for it, a development
 profile for com.natesoftware.hifi on the iPhones in devices.local, and a dedicated
 hifi-build keychain that codesign can use without prompts.
 
-Run as: withkeys <python with pyjwt> ios/scripts/make-signing.py [--mac | --store]
+Run as: withkeys <python with pyjwt> ios/scripts/make-signing.py [--mac | --store | --developer-id]
 Needs ASC_API_KEY_ID, ASC_API_KEY_ISSUER_ID, ASC_API_KEY_PATH. Prints only IDs.
 """
 import base64, json, os, plistlib, secrets, subprocess, sys, time, urllib.error, urllib.request
@@ -48,7 +48,9 @@ def api(method, path, body=None):
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
         detail = json.loads(e.read() or b"{}").get("errors", [{}])[0]
-        sys.exit(f"{method} {path.split('?')[0]} -> {e.code}: {detail.get('title')} {detail.get('detail')}")
+        # Apple lists the real reasons for a refusal under associatedErrors.
+        reasons = [f"\n  - {x.get('detail') or x.get('title')}" for group in (detail.get("meta", {}).get("associatedErrors") or {}).values() for x in group]
+        sys.exit(f"{method} {path.split('?')[0]} -> {e.code}: {detail.get('title')} {detail.get('detail')}" + "".join(reasons))
 
 
 def run(*args, **kw):
@@ -180,4 +182,36 @@ def store():
     print("profile:", name, uuid)
 
 
-mac() if "--mac" in sys.argv else store() if "--store" in sys.argv else main()
+def developer_id():
+    """Adds a Developer ID Application certificate for the same key, for Mac builds
+    handed out on the web outside the App Store (scripts/build-dmg.sh). No profile:
+    the Mac app uses no restricted entitlements. Apple may allow only the Account
+    Holder's key to create this kind of certificate."""
+    key, cer = DIR / "dev.key", DIR / "devid.cer"
+    if not cer.exists():
+        kind = os.environ.get("HIFI_DEVID_TYPE", "DEVELOPER_ID_APPLICATION_G2")
+        existing = api("GET", f"/v1/certificates?filter[certificateType]={kind}&limit=50")["data"]
+        print(f"existing {kind} certificates on the account:", len(existing))
+        csr = DIR / "devid.csr"
+        run("openssl", "req", "-new", "-key", str(key), "-out", str(csr), "-subj", "/CN=HIFI Developer ID/O=Nate's Software/C=US")
+        csr_body = "".join(l for l in csr.read_text().splitlines() if "CERTIFICATE REQUEST" not in l)
+        created = api("POST", "/v1/certificates", {"data": {"type": "certificates", "attributes": {
+            "certificateType": kind, "csrContent": csr_body}}})
+        cer.write_bytes(base64.b64decode(created["data"]["attributes"]["certificateContent"]))
+        (DIR / "devid-certificate-id").write_text(created["data"]["id"])
+        print("developer id certificate created:", created["data"]["id"])
+    pw = (DIR / "keychain-password").read_text()
+    run("security", "unlock-keychain", "-p", pw, str(KEYCHAIN))
+    subprocess.run(["security", "import", str(cer), "-k", str(KEYCHAIN), "-T", "/usr/bin/codesign"], capture_output=True)
+    # codesign needs Apple's Developer ID intermediate to build the chain.
+    for ca in ("DeveloperIDG2CA.cer", "DeveloperIDCA.cer"):
+        ca_file = DIR / ca
+        if not ca_file.exists():
+            urllib.request.urlretrieve(f"https://www.apple.com/certificateauthority/{ca}", ca_file)
+        subprocess.run(["security", "import", str(ca_file), "-k", str(KEYCHAIN)], capture_output=True)
+    sha1 = run("openssl", "x509", "-inform", "DER", "-in", str(cer), "-noout", "-fingerprint", "-sha1").stdout.decode().split("=")[1].strip().replace(":", "")
+    (DIR / "devid-identity").write_text(sha1)
+    print("developer id identity sha1:", sha1)
+
+
+mac() if "--mac" in sys.argv else store() if "--store" in sys.argv else developer_id() if "--developer-id" in sys.argv else main()

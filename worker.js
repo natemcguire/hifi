@@ -114,18 +114,24 @@ async function track(env, id) {
     return new Response(JSON.stringify({ error: 'Spotify lookup unavailable' }), { status: 502, headers: { ...headers, 'Cache-Control': 'no-store' } });
   }
 }
-// Nate's curated "Nate's Software" playlist, published by nates-software.com once connected.
-let playlistCache = null;
-async function natePlaylist() {
-  if (playlistCache && Date.now() - playlistCache.at < 300000) return playlistCache.url;
-  let url = playlistCache?.url ?? null;
+// Nate's curated "Nate's Software" playlist and the shared Spotify Client ID
+// (public; listeners sign in with PKCE), published by nates-software.com.
+let configCache = null;
+async function spotifyConfig() {
+  if (configCache && Date.now() - configCache.at < 300000) return configCache;
+  let { playlist = null, clientId = null } = configCache ?? {};
   try {
     const response = await fetch('https://nates-software.com/api/hifi-spotify', { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(4000) });
-    if (response.ok) { const data = await response.json(); url = typeof data?.playlist === 'string' && data.playlist.startsWith('https://open.spotify.com/playlist/') ? data.playlist : null; }
-  } catch { /* keep the last known value */ }
-  playlistCache = { at: Date.now(), url };
-  return url;
+    if (response.ok) {
+      const data = await response.json();
+      playlist = typeof data?.playlist === 'string' && data.playlist.startsWith('https://open.spotify.com/playlist/') ? data.playlist : null;
+      clientId = typeof data?.clientId === 'string' && /^[0-9a-f]{32}$/i.test(data.clientId) ? data.clientId : null;
+    }
+  } catch { /* keep the last known values */ }
+  configCache = { at: Date.now(), playlist, clientId };
+  return configCache;
 }
+const natePlaylist = async () => (await spotifyConfig()).playlist;
 async function nowPlaying(url, env) {
   const headers = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
   const station = url.searchParams.get('station');
@@ -149,19 +155,26 @@ export default {
     const url = new URL(request.url);
     if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', {status:405,headers:{Allow:'GET, HEAD'}});
     if (url.pathname === '/api/now-playing') return nowPlaying(url, env);
+    if (url.pathname === '/api/spotify-config') {
+      const { playlist, clientId } = await spotifyConfig();
+      return new Response(JSON.stringify({ playlist, clientId }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60', 'X-Content-Type-Options': 'nosniff' } });
+    }
     if (url.pathname.startsWith('/api/track/')) return track(env, url.pathname.slice('/api/track/'.length));
     if (url.pathname === '/player/') return Response.redirect(url.origin + '/player' + url.search, 308);
     if (url.pathname === '/') url.pathname = '/landing.html';
     else if (url.pathname === '/player') url.pathname = '/index.html';
     else if (url.pathname === '/privacy') url.pathname = '/privacy.html';
+    else if (url.pathname === '/spotify') url.pathname = '/spotify.html';
+    else if (url.pathname === '/download') url.pathname = '/download/HIFI.dmg';
     let response = await env.ASSETS.fetch(new Request(url, request));
     // Browsers asking for a missing page get a readable Win95 dialog, not an empty 404.
     if (response.status === 404 && (request.headers.get('Accept') || '').includes('text/html')) response = new Response(request.method === 'HEAD' ? null : notFoundPage, { status: 404, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
     const headers = new Headers(response.headers);
     headers.set('X-Content-Type-Options','nosniff');
     headers.set('Referrer-Policy','strict-origin-when-cross-origin');
-    headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' https://*.radioparadise.com https://*.somafm.com https://streaming.exclusive.radio; connect-src 'self' https://*.radioparadise.com https://*.somafm.com; frame-src 'self'; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'");
+    headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' https://*.radioparadise.com https://*.somafm.com https://streaming.exclusive.radio; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self'; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'");
     if (headers.get('Content-Type')?.includes('text/html')) headers.set('Cache-Control','no-cache');
+    if (url.pathname.endsWith('.dmg') && response.ok) headers.set('Content-Disposition', 'attachment; filename="HIFI.dmg"');
     return new Response(response.body,{status:response.status,headers});
   }
 };
