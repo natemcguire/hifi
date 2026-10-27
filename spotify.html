@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex"><meta name="theme-color" content="#ffffff"><title>Connect Spotify — HIFI</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    main{min-height:100vh;min-height:100dvh;max-width:420px;margin:auto;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    svg{width:72px;height:72px;fill:#e5484d;margin-bottom:24px}.done svg{animation:beat 1.8s ease-in-out infinite}@keyframes beat{50%{transform:scale(1.08)}}
+    h1{margin:0 0 12px;font-size:28px;font-weight:800;line-height:1.1}p{margin:0 0 28px;font-size:17px;line-height:1.4;color:#555}
+    a{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 32px;border-radius:999px;background:#1db954;color:#fff;font-size:18px;font-weight:700;text-decoration:none}
+  </style>
+</head>
+<body>
+  <main><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.6-4.7-9.4-9.4C1.3 8.1 3.6 4.5 7.2 4.5c2.1 0 3.6 1.1 4.8 2.9 1.2-1.8 2.7-2.9 4.8-2.9 3.6 0 5.9 3.6 4.6 7.1C19.6 16.3 12 21 12 21z"/></svg>
+    <h1 id="heading">Connecting Spotify…</h1><p id="note" role="status">One moment.</p><a id="back" href="/player">Back to HIFI</a></main>
+  <script type="module" src="spotify.js"></script>
+</body>
+</html>

@@ -26,8 +26,8 @@ BUNDLE_ID = "com.natesoftware.hifi"
 SHOTS = HERE.parent / "Screenshots"
 LISTING = {
     "subtitle": "Little radio, very big mood",
-    "promotionalText": "Original synth stations and live indie, jazz, Americana and eclectic radio, played on a click wheel.",
-    "keywords": "radio,internet radio,lofi,synth,chiptune,ambient,focus,jazz,indie,somafm,radio paradise,retro",
+    "promotionalText": "Heart a song on the radio and it lands in your Spotify Liked Songs. Free, no ads.",
+    "keywords": "internet radio,lofi,synth,chiptune,ambient,focus,jazz,indie,pop,spotify,somafm,retro,click wheel",
     "description": """HIFI is a little internet radio with a click wheel.
 
 Spin the wheel to pick a station, press the center to tune in, and the music is already playing. Our original stations run on a shared clock, so tuning in drops you into the rotation wherever it is right now, like real radio.
@@ -38,15 +38,19 @@ SYNTH SOUNDS: four stations of original instrumental music for working, coding a
 • Night Build: dark ambient for after hours
 • Pixel Drift: bright chiptune
 
-RADIO: live internet radio from Radio Paradise, SomaFM and Exclusive Radio, with the song that's playing right now.
+RADIO: live internet radio from Radio Paradise, SomaFM and Exclusive Radio, with the song that's playing right now. Including POP GIRL RADIO: big choruses, every era, all day.
+
+HEART IT: tap the heart next to a song on the radio and it's saved to your Spotify Liked Songs.
+
+PLAYLISTS: connect Spotify and your playlists show up right on the click wheel, with the Nate's Software HIFI playlist up top.
 
 • Skip between songs with the wheel, the lock screen or your headphones
 • Song, artist and station on the lock screen, drawn like a classic Now Playing screen
 • Picture in Picture: go home and HIFI shrinks into a tiny clip-on player you can park in a corner
 • Plays in the background
-• No account, no ads, no tracking
+• No ads, no tracking. Spotify is optional; the radio needs no account
 
-Free to listen. Bring your own headphones.""",
+Free, made for fun by Nate's Software. Bring your own headphones.""",
     "supportUrl": "https://github.com/natemcguire/hifi/issues",
     "marketingUrl": "https://hifi.nates-software.com/",
 }
@@ -64,6 +68,24 @@ def local(key):
         if row.startswith(key + "="):
             return row.split("=", 1)[1].strip().strip('"')
     sys.exit(f"missing {key} (set it in ios/scripts/devices.local)")
+
+
+def contact(app):
+    """The review contact: HIFI_REVIEW_* if set, else the one on this team's most recent other app."""
+    keys = {"contactFirstName": "HIFI_REVIEW_FIRST", "contactLastName": "HIFI_REVIEW_LAST",
+            "contactEmail": "HIFI_REVIEW_EMAIL", "contactPhone": "HIFI_REVIEW_PHONE"}
+    try:
+        return {field: local(key) for field, key in keys.items()}
+    except SystemExit:
+        pass
+    for other in api("GET", "/v1/apps?limit=50")["data"]:
+        if other["id"] == app["id"]:
+            continue
+        for v in api("GET", f"/v1/apps/{other['id']}/appStoreVersions?limit=5")["data"]:
+            d = api("GET", f"/v1/appStoreVersions/{v['id']}/appStoreReviewDetail").get("data")
+            if d and all(d["attributes"].get(f) for f in keys):
+                return {f: d["attributes"][f] for f in keys}
+    sys.exit("No review contact: set HIFI_REVIEW_* in scripts/devices.local")
 
 
 def patch(kind, id, attributes):
@@ -97,7 +119,7 @@ def main():
         "alcoholTobaccoOrDrugUseOrReferences": none, "contests": none, "gamblingSimulated": none,
         "horrorOrFearThemes": none, "matureOrSuggestiveThemes": none, "medicalOrTreatmentInformation": none,
         "profanityOrCrudeHumor": "INFREQUENT_OR_MILD", "sexualContentGraphicAndNudity": none,
-        "sexualContentOrNudity": none, "violenceCartoonOrFantasy": none, "violenceRealistic": none,
+        "sexualContentOrNudity": none, "gunsOrOtherWeapons": none, "violenceCartoonOrFantasy": none, "violenceRealistic": none,
         "violenceRealisticProlongedGraphicOrSadistic": none, "gambling": False, "unrestrictedWebAccess": False,
         "lootBox": False, "messagingAndChat": False, "parentalControls": False, "ageAssurance": False,
         "userGeneratedContent": False, "advertising": False, "healthOrWellnessTopics": False,
@@ -116,6 +138,23 @@ def main():
                       "relationships": {"appPricePoint": {"data": {"type": "appPricePoints", "id": free["id"]}}}}]})
     print("price: free")
 
+    # Available in every territory, and in new ones as Apple adds them.
+    try:
+        existing = api("GET", f"/v1/apps/{app['id']}/appAvailabilityV2").get("data")
+    except SystemExit:
+        existing = None
+    if existing:
+        print("availability: already set")
+    else:
+        territories = [t["id"] for t in api("GET", "/v1/territories?limit=200")["data"]]
+        api("POST", "/v2/appAvailabilities", {
+            "data": {"type": "appAvailabilities", "attributes": {"availableInNewTerritories": True}, "relationships": {
+                "app": {"data": {"type": "apps", "id": app["id"]}},
+                "territoryAvailabilities": {"data": [{"type": "territoryAvailabilities", "id": f"${{{t}}}"} for t in territories]}}},
+            "included": [{"type": "territoryAvailabilities", "id": f"${{{t}}}", "attributes": {"available": True},
+                          "relationships": {"territory": {"data": {"type": "territories", "id": t}}}} for t in territories]})
+        print(f"availability: {len(territories)} territories")
+
     # The 1.0 version: copyright, listing text, screenshots, review contact.
     version = next(v for v in api("GET", f"/v1/apps/{app['id']}/appStoreVersions?filter[platform]=IOS")["data"]
                    if v["attributes"]["appStoreState"] in ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED"))
@@ -125,12 +164,13 @@ def main():
     print("listing text set for", version["attributes"]["versionString"])
     screenshots(loc["id"])
 
-    detail = {"contactFirstName": local("HIFI_REVIEW_FIRST"), "contactLastName": local("HIFI_REVIEW_LAST"),
-              "contactEmail": local("HIFI_REVIEW_EMAIL"), "contactPhone": local("HIFI_REVIEW_PHONE"),
-              "demoAccountRequired": False,
+    detail = {**contact(app), "demoAccountRequired": False,
               "notes": "No account needed. Press the center button on the click wheel to play. "
                        "Synth Sounds stations are original music we made; the Radio stations are the public "
-                       "streams of Radio Paradise, SomaFM and Exclusive Radio. Picture in Picture: start a station, then go home."}
+                       "streams of Radio Paradise, SomaFM and Exclusive Radio. Picture in Picture: start a station, then go home. "
+                       "Spotify is optional: the heart next to a live song and the Playlists menu ask the listener to connect "
+                       "their own Spotify account (Spotify's own sign-in page, PKCE, no password reaches us). Everything else "
+                       "works without it."}
     existing = api("GET", f"/v1/appStoreVersions/{version['id']}/appStoreReviewDetail")
     if existing.get("data"):
         patch("appStoreReviewDetails", existing["data"]["id"], detail)
@@ -151,7 +191,10 @@ def screenshots(localization):
         if not files:
             print("no screenshots in", SHOTS / folder); continue
         if kind in sets:
-            for old in api("GET", f"/v1/appScreenshotSets/{sets[kind]['id']}/appScreenshots")["data"]:
+            current = api("GET", f"/v1/appScreenshotSets/{sets[kind]['id']}/appScreenshots")["data"]
+            if [s["attributes"].get("sourceFileChecksum") for s in current] == [hashlib.md5(f.read_bytes()).hexdigest() for f in files]:
+                print("screenshots unchanged for", kind); continue
+            for old in current:
                 api("DELETE", f"/v1/appScreenshots/{old['id']}")
             set_id = sets[kind]["id"]
         else:
@@ -180,8 +223,10 @@ def submit(app, version):
     api("PATCH", f"/v1/appStoreVersions/{version['id']}", {"data": {"type": "appStoreVersions", "id": version["id"],
         "relationships": {"build": {"data": {"type": "builds", "id": build["id"]}}}}})
     print("build attached:", build["attributes"]["version"])
-    submission = api("POST", "/v1/reviewSubmissions", {"data": {"type": "reviewSubmissions",
-        "attributes": {"platform": "IOS"}, "relationships": {"app": {"data": {"type": "apps", "id": app["id"]}}}}})["data"]
+    # Reuse a submission an earlier, refused run left open.
+    submission = next(iter(api("GET", f"/v1/reviewSubmissions?filter[app]={app['id']}&filter[state]=READY_FOR_REVIEW")["data"]), None) \
+        or api("POST", "/v1/reviewSubmissions", {"data": {"type": "reviewSubmissions",
+            "attributes": {"platform": "IOS"}, "relationships": {"app": {"data": {"type": "apps", "id": app["id"]}}}}})["data"]
     api("POST", "/v1/reviewSubmissionItems", {"data": {"type": "reviewSubmissionItems", "relationships": {
         "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": submission["id"]}},
         "appStoreVersion": {"data": {"type": "appStoreVersions", "id": version["id"]}}}}})

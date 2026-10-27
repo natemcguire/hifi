@@ -1,51 +1,54 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#36394e"><title>HIFI — Nate's Software Radio</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=11">
-<link rel="stylesheet" href="./themes.css">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f2f3f4"><title>HIFI — Nate's Software Radio</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="deck" tabindex="-1" aria-label="HIFI internet radio">
-    <header class="titlebar"><span class="title-lines" aria-hidden="true"></span><h1>HIFI <span>RADIO</span></h1><span class="title-lines" aria-hidden="true"></span><button id="shade" aria-label="Collapse player" aria-expanded="true">−</button></header>
-    <div class="playlist-row"><a id="playlist" class="playlist-button" href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" hidden>♫ Nate's Software playlist on Spotify ↗</a></div>
-    <section class="receiver">
-      <section class="screen" aria-label="Now broadcasting">
-        <div class="screen-top"><span class="air"><i id="lamp"></i><span id="air-label">STANDBY</span></span><span class="song-links"><button id="heart" class="heart" type="button" aria-pressed="false" hidden>♡</button><a id="spotify" class="spotify-link" target="_blank" rel="noopener noreferrer" hidden>♫ Open in Spotify ↗</a></span><span id="mix-mode">CONTINUOUS MIX</span></div>
-        <div class="station-face"><button id="clock" title="Toggle elapsed / remaining" aria-label="Track elapsed time; click for remaining">00:00</button><div class="station-info"><span id="station-name">DIAL-UP</span><span id="format">160 KBPS · 32 KHZ · MONO</span></div></div>
-        <div class="ticker" id="ticker" aria-label="Current track"></div>
-        <div class="track-progress" role="progressbar" aria-label="Current broadcast position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="track-progress"></span></div>
-      </section>
-      <div id="gate" class="gate"><p id="status" role="status">Loading station directory…</p></div>
-      <section class="controls" aria-label="Playback controls"><div class="transport"><button id="previous-station" aria-label="Previous station" title="Previous station" disabled>◀|</button><button id="power" disabled>▶ Play</button><button id="next-station" aria-label="Next station" title="Next station" disabled>|▶</button></div><label for="volume">Volume</label><input id="volume" type="range" min="0" max="1" step="0.01" value="0.65"><output id="volume-value" for="volume">65</output></section>
-    </section>
-    <div class="expanded">
-      <section id="tv-panel" class="tv-panel" aria-label="HIFI TV" hidden>
-        <div class="module-title"><h2>HIFI TV</h2><span id="tv-channel"></span><button id="tv-close" type="button" class="tv-switch" aria-label="Close HIFI TV and show the visualization">Visualizer</button></div>
-        <div class="tv"><canvas id="tv" aria-label="HIFI TV: a music video for the playing station, drawn live from the audio"></canvas></div>
-        <div class="visual-tools"><button id="tv-cut" type="button">Next shot</button><button id="tv-big" type="button" aria-expanded="false">Expand</button></div>
-      </section>
-      <section class="visual-panel" aria-label="Audio visualization">
-        <div class="module-title"><h2>Visualization</h2><button id="tv-open" type="button" class="tv-switch" hidden>▶ HIFI TV</button><select id="visual-mode" aria-label="Visualization preset"><option value="spectrum">Spectrum</option><option value="scope">Oscilloscope</option><option value="orbit">Orbit</option><option value="silk">Silk</option><option value="waterfall">Waterfall</option><option value="off">Off</option></select></div>
-        <div class="visual"><canvas id="scope" aria-label="Live audio spectrum"></canvas><span id="visual-status">Press Play to see the sound</span></div>
-        <div class="visual-tools"><button id="visual-palette" type="button">Color: Station</button><button id="visual-variation" type="button">Style: Classic</button><button id="visual-expand" type="button" aria-expanded="false">Expand</button></div>
-      </section>
-      <section class="playlist" aria-label="Station playlist">
-        <h2 class="visually-hidden">Stations</h2>
-        <div class="tab-strip"><div class="tabs" role="tablist" aria-label="Station bands"><button type="button" role="tab" id="tab-radio" data-band="radio" aria-controls="band-panel" aria-selected="true" tabindex="0">Radio</button><button type="button" role="tab" id="tab-synth" data-band="synth" aria-controls="band-panel" aria-selected="false" tabindex="-1">Synth Sounds</button></div><span id="station-count">4 stations</span></div>
-        <div id="band-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-radio">
-          <p id="band-note" class="band-note">Live, listener-supported internet radio</p>
-          <nav id="stations" aria-label="Radio stations"></nav>
+  <main class="ipod" aria-label="HIFI internet radio">
+    <div class="grip" aria-hidden="true">HIFI</div>
+    <div class="device">
+      <section class="screen" aria-label="Screen">
+        <div class="glass">
+          <header class="bar"><span id="state" class="state" aria-hidden="true"></span><h1 id="title">HIFI</h1><span class="battery" aria-hidden="true"></span></header>
+          <div id="pages" class="pages" aria-live="polite"></div>
+          <div class="dimmer" aria-hidden="true"></div>
         </div>
-        <div class="rotation"><div class="rotation-heading"><span>On this frequency</span><span>Length</span></div><ol id="tracks"></ol></div>
-        <div class="station-note"><span id="tagline">Connected at 56k. Stay a while.</span></div>
-        <div id="provider-links" class="provider-links" hidden><a id="provider" href="https://radioparadise.com" target="_blank" rel="noopener noreferrer" hidden>Radio Paradise · support the station ↗</a><a id="support" target="_blank" rel="noopener noreferrer" hidden></a></div>
       </section>
-      <footer><span>Nate's Software</span><span>Original + AI-generated music</span></footer>
+      <div class="wheel-room"><div id="wheel" class="wheel" role="group" aria-label="Click wheel"></div></div>
     </div>
+    <section id="connect" class="connect" aria-label="Connect Spotify" hidden>
+      <div id="connect-intro" class="connect-body">
+        <div class="beat" aria-hidden="true"><span></span><span></span><svg viewBox="0 0 24 24"><path d="M12 21s-7.6-4.7-9.4-9.4C1.3 8.1 3.6 4.5 7.2 4.5c2.1 0 3.6 1.1 4.8 2.9 1.2-1.8 2.7-2.9 4.8-2.9 3.6 0 5.9 3.6 4.6 7.1C19.6 16.3 12 21 12 21z"/></svg></div>
+        <h2>Keep the songs you love</h2>
+        <p class="lede">Connect Spotify and every <b>♥</b> in HIFI lands in your Liked Songs.</p>
+        <ul class="perks">
+          <li><i>♥</i>Heart a song on the radio, it's saved</li>
+          <li><i>♫</i>Your playlists, right on the click wheel</li>
+          <li><i>✦</i>Nate's Software HIFI playlist up top</li>
+        </ul>
+        <button id="sp-connect" class="pill-button" type="button">Connect Spotify</button>
+        <p class="sp-problem" role="status"></p>
+        <button id="sp-later" class="quiet" type="button">Not now</button>
+        <p class="fine">Free, no ads. HIFI never sees your Spotify password, and you can disconnect any time in Settings.</p>
+        <button id="sp-own" class="green-link" type="button">Use your own Spotify app</button>
+      </div>
+      <div id="connect-setup" class="connect-body setup" hidden>
+        <h2>Use your own Spotify app</h2>
+        <p class="lede">Spotify lets HIFI's app sign in only a few listeners. Make your own free Spotify app and HIFI connects through it instead. It takes two minutes and needs Spotify Premium.</p>
+        <ol class="steps">
+          <li><span>Open Spotify's developer dashboard and press Create app.</span><a class="chip" href="https://developer.spotify.com/dashboard/create" target="_blank" rel="noopener noreferrer">Open dashboard ↗</a></li>
+          <li><span>Name it anything. Under Redirect URIs, add this address:</span><code>https://nates-software.com/hifi/spotify/callback</code><button id="sp-copy" class="chip" type="button">Copy</button></li>
+          <li><span>Tick Web API, agree to the terms and press Save.</span></li>
+          <li><span>Copy the Client ID from your app's page and paste it here. Never the Client Secret.</span><input id="sp-client" type="text" placeholder="Client ID" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Spotify Client ID"></li>
+        </ol>
+        <button id="sp-own-connect" class="pill-button" type="button" disabled>Connect with my app</button>
+        <p class="sp-problem" role="status"></p>
+        <div class="setup-links"><button id="sp-back" class="quiet" type="button">Back</button><button id="sp-shared" class="quiet" type="button" hidden>Use HIFI's app again</button></div>
+      </div>
+    </section>
   </main>
-  <script type="module" src="app.js?v=13"></script>
-<script type="module" src="./themes.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -87,13 +87,18 @@ struct IPodView: View {
         .onAppear {
             focused = true
             #if DEBUG
-            // App Store screenshots: `-screenshot radio|synth|nowPlaying|settings` opens that page.
+            // App Store screenshots: `-screenshot radio|synth|nowPlaying|live|playlists|connect` opens that page.
             switch UserDefaults.standard.string(forKey: "screenshot") {
             case "radio": stack = [.main, .band("radio")]
             case "synth": stack = [.main, .band("synth")]
             case "nowPlaying": radio.start(); stack = [.main, .nowPlaying]
             case "settings": stack = [.main, .settings]
             case "playlists": stack = [.main, .playlists]
+            case "live":  // a live station with its song and the heart
+                if let live = radio.stations.first(where: { $0.id == "indie-pop-rocks" }) { radio.tune(live) }
+                stack = [.main, .nowPlaying]
+            case "connect": spotify.showConnect = true
+            case "setup": spotify.showSetup = true; spotify.showConnect = true
             default: break
             }
             #endif

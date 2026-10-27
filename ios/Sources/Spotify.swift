@@ -22,12 +22,18 @@ final class SpotifyAccount: NSObject, ObservableObject {
     @Published private(set) var liked: [String: Bool] = [:]  // Spotify track id → in Liked Songs
     @Published private(set) var problem: String?
     @Published var showConnect = false
+    // Spotify lets HIFI's shared app sign in only a handful of listeners, so anyone
+    // else can plug in a Spotify app of their own (Client ID only, PKCE, no secret).
+    @Published private(set) var ownClientId = UserDefaults.standard.string(forKey: "spotifyClientId")
+    @Published var showSetup = false
 
-    private static let redirect = "https://nates-software.com/hifi/spotify/callback"
+    static let redirect = "https://nates-software.com/hifi/spotify/callback"
     private static let scopes = "user-library-read user-library-modify playlist-read-private playlist-read-collaborative"
-    private var clientId: String?
+    private var sharedClientId: String?
+    private var clientId: String? { ownClientId ?? sharedClientId }
     private var access: (token: String, expires: Date)?
     private var session: ASWebAuthenticationSession?
+    private var pending: (state: String, verifier: String)?  // the sign-in in progress
     private var trackIds: [String: String] = [:]  // "artist\ntitle" → id found by search
 
     override init() {
@@ -42,7 +48,9 @@ final class SpotifyAccount: NSObject, ObservableObject {
         Task {
             await loadConfig()
             guard let clientId else { return fail("Spotify isn't reachable right now. Try again in a minute.") }
+            showSetup = false
             let verifier = Self.random(48), state = "app." + Self.random(24)
+            pending = (state, verifier)
             var authorize = URLComponents(string: "https://accounts.spotify.com/authorize")!
             authorize.queryItems = [
                 .init(name: "client_id", value: clientId), .init(name: "response_type", value: "code"),
@@ -59,9 +67,21 @@ final class SpotifyAccount: NSObject, ObservableObject {
         }
     }
 
+    // Chrome, as the Mac's sign-in browser, can open nswhifi:// as an ordinary link
+    // instead of handing it to the sign-in session, so the app finishes it here.
+    func handle(_ url: URL) {
+        guard url.scheme == "nswhifi", url.host == "spotify", let pending else { return }
+        session?.cancel()
+        Task { await finish(url, error: nil, state: pending.state, verifier: pending.verifier) }
+    }
+
     private func finish(_ url: URL?, error: Error?, state: String, verifier: String) async {
+        if let error = error as? ASWebAuthenticationSessionError, error.code == .canceledLogin {
+            return
+        }
+        guard pending?.state == state else { return }  // already finished
         session = nil
-        if let error = error as? ASWebAuthenticationSessionError, error.code == .canceledLogin { return }
+        pending = nil
         let items = URLComponents(url: url ?? URL(string: "x:")!, resolvingAgainstBaseURL: false)?.queryItems ?? []
         let value = { (name: String) in items.first { $0.name == name }?.value }
         guard value("state") == state, let code = value("code") else {
@@ -82,6 +102,20 @@ final class SpotifyAccount: NSObject, ObservableObject {
         isConnected = false
         playlists = []
         liked = [:]
+    }
+
+    // A refresh token only works with the app that issued it, so switching apps signs out.
+    func useOwnApp(_ id: String?) {
+        let id = id?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard id != ownClientId else { return }
+        disconnect()
+        ownClientId = id
+        UserDefaults.standard.set(id, forKey: "spotifyClientId")
+    }
+
+    static func isClientId(_ text: String) -> Bool {
+        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.count == 32 && text.allSatisfy(\.isHexDigit)
     }
 
     // MARK: Heart
@@ -151,6 +185,11 @@ final class SpotifyAccount: NSObject, ObservableObject {
         guard let (data, response) = try? await URLSession.shared.data(for: request),
               let status = (response as? HTTPURLResponse)?.statusCode else { return nil }
         if status == 401 { access = nil }
+        // Signed in, but this account isn't on the shared app's Spotify list.
+        if status == 403, ownClientId == nil, String(decoding: data, as: UTF8.self).contains("registered") {
+            showSetup = true
+            showConnect = true
+        }
         return (200..<300).contains(status) ? data : nil
     }
 
@@ -185,11 +224,11 @@ final class SpotifyAccount: NSObject, ObservableObject {
 
     // The client ID and Nate's playlist come from nates-software.com, so neither is baked in.
     private func loadConfig() async {
-        guard clientId == nil || natePlaylist == nil else { return }
+        guard sharedClientId == nil || natePlaylist == nil else { return }
         struct Config: Decodable { let playlist: String?; let clientId: String? }
         guard let (data, _) = try? await URLSession.shared.data(from: URL(string: "https://nates-software.com/api/hifi-spotify")!),
               let config = try? JSONDecoder().decode(Config.self, from: data) else { return }
-        clientId = config.clientId
+        sharedClientId = config.clientId
         if let id = config.playlist?.split(separator: "/").last.map(String.init) {
             natePlaylist = SpotifyPlaylist(id: id, name: "Nate's Software HIFI", detail: "Picked from HIFI")
         }
@@ -261,66 +300,79 @@ struct SpotifyConnectView: View {
     var body: some View {
         ZStack {
             Color.white.ignoresSafeArea()
-            VStack(spacing: 0) {
-                Spacer(minLength: 24)
-                ZStack {
-                    Circle().fill(Color(hex: "#e5484d").opacity(0.10)).frame(width: 172, height: 172)
-                        .scaleEffect(beat ? 1.06 : 0.94)
-                    Circle().fill(Color(hex: "#e5484d").opacity(0.16)).frame(width: 124, height: 124)
-                    Image(systemName: "heart.fill")
-                        .font(.system(size: 62, weight: .bold))
-                        .foregroundStyle(Color(hex: "#e5484d"))
-                        .scaleEffect(beat ? 1.08 : 1)
-                }
-                .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: beat)
-                .onAppear { beat = true }
-                .padding(.bottom, 30)
-                Text("Keep the songs you love")
-                    .font(.system(size: 32, weight: .heavy))
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 12)
-                Text("Connect Spotify and every ♥ in HIFI lands in your Liked Songs.")
-                    .font(.system(size: 17))
-                    .foregroundStyle(Color(hex: "#555"))
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 28)
-                VStack(alignment: .leading, spacing: 14) {
-                    perk("heart.fill", "Heart a song on the radio, it's saved")
-                    perk("music.note.list", "Your playlists, right on the click wheel")
-                    perk("sparkles", "Nate's Software HIFI playlist up top")
-                }
-                .frame(maxWidth: 380, alignment: .leading)
-                Spacer(minLength: 28)
-                Button { spotify.connect() } label: {
-                    Label("Connect Spotify", systemImage: "waveform")
-                        .font(.system(size: 19, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: 380, minHeight: 58)
-                        .background(Capsule().fill(Color(hex: "#1db954")))
-                        .shadow(color: Color(hex: "#1db954").opacity(0.35), radius: 14, y: 6)
-                }
-                .buttonStyle(.plain)
-                .keyboardShortcut(.defaultAction)
-                if let problem = spotify.problem {
-                    Text(problem).font(.system(size: 15)).foregroundStyle(.orange)
-                        .multilineTextAlignment(.center).padding(.top, 12)
-                }
-                Button("Not now") { spotify.showConnect = false }
-                    .buttonStyle(.plain)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(Color(hex: "#555"))
-                    .padding(.top, 18)
-                Text("Free, no ads. HIFI never sees your Spotify password, and you can disconnect any time in Settings.")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(hex: "#999"))
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: 380)
-                    .padding(.top, 18).padding(.bottom, 20)
+            if spotify.showSetup {
+                SpotifyOwnAppView(spotify: spotify)
+            } else {
+                intro
             }
-            .foregroundStyle(Color(hex: "#111"))
-            .padding(.horizontal, 28)
         }
         .preferredColorScheme(.light)
+    }
+
+    private var intro: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 24)
+            ZStack {
+                Circle().fill(Color(hex: "#e5484d").opacity(0.10)).frame(width: 172, height: 172)
+                    .scaleEffect(beat ? 1.06 : 0.94)
+                Circle().fill(Color(hex: "#e5484d").opacity(0.16)).frame(width: 124, height: 124)
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 62, weight: .bold))
+                    .foregroundStyle(Color(hex: "#e5484d"))
+                    .scaleEffect(beat ? 1.08 : 1)
+            }
+            .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: beat)
+            .onAppear { beat = true }
+            .padding(.bottom, 30)
+            Text("Keep the songs you love")
+                .font(.system(size: 32, weight: .heavy))
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 12)
+            (Text("Connect Spotify and every ") + Text("♥").foregroundColor(Color(hex: "#e5484d")) + Text(" in HIFI lands in your Liked Songs."))
+                .font(.system(size: 17))
+                .foregroundStyle(Color(hex: "#555"))
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 28)
+            VStack(alignment: .leading, spacing: 14) {
+                perk("heart.fill", "Heart a song on the radio, it's saved")
+                perk("music.note.list", "Your playlists, right on the click wheel")
+                perk("sparkles", "Nate's Software HIFI playlist up top")
+            }
+            .frame(maxWidth: 380, alignment: .leading)
+            Spacer(minLength: 28)
+            Button { spotify.connect() } label: {
+                Label("Connect Spotify", systemImage: "waveform")
+                    .font(.system(size: 19, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: 380, minHeight: 58)
+                    .background(Capsule().fill(Color(hex: "#1db954")))
+                    .shadow(color: Color(hex: "#1db954").opacity(0.35), radius: 14, y: 6)
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut(.defaultAction)
+            if let problem = spotify.problem {
+                Text(problem).font(.system(size: 15)).foregroundStyle(.orange)
+                    .multilineTextAlignment(.center).padding(.top, 12)
+            }
+            Button("Not now") { spotify.showConnect = false }
+                .buttonStyle(.plain)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Color(hex: "#555"))
+                .padding(.top, 18)
+            Text("Free, no ads. HIFI never sees your Spotify password, and you can disconnect any time in Settings.")
+                .font(.system(size: 13))
+                .foregroundStyle(Color(hex: "#999"))
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 380)
+                .padding(.top, 18)
+            Button(spotify.ownClientId == nil ? "Use your own Spotify app" : "Using your own Spotify app") { spotify.showSetup = true }
+                .buttonStyle(.plain)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color(hex: "#1db954"))
+                .padding(.top, 8).padding(.bottom, 20)
+        }
+        .foregroundStyle(Color(hex: "#111"))
+        .padding(.horizontal, 28)
     }
 
     private func perk(_ icon: String, _ text: String) -> some View {
@@ -332,5 +384,120 @@ struct SpotifyConnectView: View {
                 .background(Circle().fill(Color(hex: "#e5484d").opacity(0.10)))
             Text(text).font(.system(size: 16, weight: .medium)).foregroundStyle(Color(hex: "#333"))
         }
+    }
+}
+
+// Spotify's own steps for making a free app in its developer dashboard, then a
+// field for its Client ID. HIFI signs in through that app from then on.
+struct SpotifyOwnAppView: View {
+    @ObservedObject var spotify: SpotifyAccount
+    @State private var clientId = ""
+    @State private var copied = false
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Use your own Spotify app")
+                    .font(.system(size: 28, weight: .heavy))
+                    .padding(.bottom, 10)
+                Text("Spotify lets HIFI's app sign in only a few listeners. Make your own free Spotify app and HIFI connects through it instead. It takes two minutes and needs Spotify Premium.")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color(hex: "#555"))
+                    .padding(.bottom, 24)
+                step(1, "Open Spotify's developer dashboard and press Create app.") {
+                    pill("Open dashboard", icon: "arrow.up.right") { openURL(URL(string: "https://developer.spotify.com/dashboard/create")!) }
+                }
+                step(2, "Name it anything. Under Redirect URIs, add this address:") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(SpotifyAccount.redirect)
+                            .font(.system(size: 14, design: .monospaced))
+                            .textSelection(.enabled)
+                            .fixedSize(horizontal: false, vertical: true)
+                        pill(copied ? "Copied" : "Copy", icon: copied ? "checkmark" : "doc.on.doc") { copy(SpotifyAccount.redirect) }
+                    }
+                }
+                step(3, "Tick Web API, agree to the terms and press Save.") { EmptyView() }
+                step(4, "Copy the Client ID from your app's page and paste it here. Never the Client Secret.") {
+                    TextField("Client ID", text: $clientId)
+                        .font(.system(size: 15, design: .monospaced))
+                        .textFieldStyle(.plain)
+                        .autocorrectionDisabled()
+                        #if os(iOS)
+                        .textInputAutocapitalization(.never)
+                        #endif
+                        .padding(12)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(hex: "#f2f2f4")))
+                }
+                Button { spotify.useOwnApp(clientId); spotify.connect() } label: {
+                    Label("Connect with my app", systemImage: "waveform")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 54)
+                        .background(Capsule().fill(Color(hex: "#1db954")))
+                }
+                .buttonStyle(.plain)
+                .keyboardShortcut(.defaultAction)
+                .disabled(!SpotifyAccount.isClientId(clientId))
+                .opacity(SpotifyAccount.isClientId(clientId) ? 1 : 0.4)
+                .padding(.top, 8)
+                if let problem = spotify.problem {
+                    Text(problem).font(.system(size: 15)).foregroundStyle(.orange).padding(.top, 12)
+                }
+                HStack {
+                    Button("Back") { spotify.showSetup = false }
+                    Spacer()
+                    if spotify.ownClientId != nil {
+                        Button("Use HIFI's app again") { spotify.useOwnApp(nil); spotify.showSetup = false }
+                    }
+                }
+                .buttonStyle(.plain)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color(hex: "#555"))
+                .padding(.top, 20)
+            }
+            .foregroundStyle(Color(hex: "#111"))
+            .frame(maxWidth: 440)
+            .padding(.horizontal, 28).padding(.vertical, 32)
+            .frame(maxWidth: .infinity)
+        }
+        .onAppear { clientId = spotify.ownClientId ?? "" }
+    }
+
+    private func step<Content: View>(_ number: Int, _ text: String, @ViewBuilder _ content: () -> Content) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Text("\(number)")
+                .font(.system(size: 14, weight: .heavy))
+                .foregroundStyle(.white)
+                .frame(width: 28, height: 28)
+                .background(Circle().fill(Color(hex: "#1db954")))
+            VStack(alignment: .leading, spacing: 10) {
+                Text(text).font(.system(size: 16, weight: .medium)).foregroundStyle(Color(hex: "#333"))
+                    .fixedSize(horizontal: false, vertical: true)
+                content()
+            }
+        }
+        .padding(.bottom, 22)
+    }
+
+    private func pill(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color(hex: "#1db954"))
+                .padding(.horizontal, 14).padding(.vertical, 8)
+                .background(Capsule().fill(Color(hex: "#1db954").opacity(0.12)))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func copy(_ text: String) {
+        #if os(iOS)
+        UIPasteboard.general.string = text
+        #else
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        #endif
+        copied = true
     }
 }
