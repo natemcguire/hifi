@@ -23,3 +23,9 @@ class_name = "Downloads"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Downloads"]
+
+# Nate's Taste Makers: TestFlight signups. ios/scripts/tastemakers.py adds them to the group.
+[[d1_databases]]
+binding = "DB"
+database_name = "nsw-hifi"
+database_id = "62be806d-d671-4808-ad84-263809cca29f"

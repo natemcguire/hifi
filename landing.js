@@ -34,3 +34,23 @@ fetch('/api/downloads').then(response => response.ok ? response.json() : null).t
     reel.style.transform = `translateY(${-36 * Number(digits[index])}px)`;
   })));
 }).catch(() => {});
+
+// Nate's Taste Makers: the email goes on the TestFlight list; Apple sends the invite.
+const join = document.getElementById('tastemakers');
+join.addEventListener('submit', async event => {
+  event.preventDefault();
+  const note = join.querySelector('.tm-note'), button = join.querySelector('button'), email = join.email.value.trim();
+  if (!join.email.checkValidity() || !email) { note.textContent = 'That email doesn’t look right.'; join.email.focus(); return; }
+  button.disabled = true;
+  note.textContent = 'Signing you up…';
+  try {
+    const response = await fetch('/api/tastemakers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, website: join.website.value }) });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Something went wrong. Try again?');
+    join.classList.add('done');
+    note.textContent = 'You’re in. Watch for an email from TestFlight in the next day or so.';
+  } catch (error) {
+    note.textContent = error.message;
+    button.disabled = false;
+  }
+});

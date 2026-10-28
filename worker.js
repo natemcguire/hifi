@@ -163,9 +163,25 @@ export class Downloads {
 }
 const downloads = env => env.DOWNLOADS.get(env.DOWNLOADS.idFromName('mac'));
 
+// Nate's Taste Makers: an email for the TestFlight beta. Kept only to send Apple's invite;
+// ios/scripts/tastemakers.py on the Mac adds new ones to the TestFlight group.
+const EMAIL = /^[^\s@<>()"',;:]{1,64}@[a-z0-9.-]{1,190}\.[a-z]{2,24}$/i;
+async function tastemakers(request, env) {
+  const headers = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
+  if (new URL(request.headers.get('Origin') || 'null').host !== 'hifi.nates-software.com') return new Response('{"error":"Wrong origin"}', { status: 403, headers });
+  let body;
+  try { body = JSON.parse((await request.text()).slice(0, 2048)); } catch { return new Response('{"error":"Bad request"}', { status: 400, headers }); }
+  if (body?.website) return new Response('{"ok":true}', { headers });  // the hidden field only bots fill in
+  const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
+  if (!EMAIL.test(email) || email.length > 254) return new Response('{"error":"That email doesn\u2019t look right."}', { status: 400, headers });
+  await env.DB.prepare('INSERT OR IGNORE INTO tastemakers (email, created_at) VALUES (?, ?)').bind(email, Date.now()).run();
+  return new Response('{"ok":true}', { headers });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname === '/api/tastemakers' && request.method === 'POST') return tastemakers(request, env);
     if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', {status:405,headers:{Allow:'GET, HEAD'}});
     if (url.pathname === '/api/now-playing') return nowPlaying(url, env);
     if (url.pathname === '/api/spotify-config') {
