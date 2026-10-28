@@ -111,3 +111,18 @@ footer .about-open{font-size:13px;color:var(--muted)}
 .odometer .comma{align-self:flex-end;padding:0 1px 4px;font:700 18px/1 "SF Mono",ui-monospace,monospace;color:#8e8e93}
 .counter-label{font-size:14px;font-weight:600;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.odometer .reel{transition:none}}
+
+/* Nate's Taste Makers: the TestFlight signup, a glass card on the dark iPhone section. */
+.tastemakers{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px 32px;max-width:1180px;margin:-12px auto 40px;padding:22px 26px;border-radius:22px;background:linear-gradient(150deg,rgba(255,255,255,.12),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+@media (max-width:1212px){.tastemakers{margin-left:16px;margin-right:16px}}
+.tm-copy{flex:1 1 320px}
+.tm-copy h3{font-size:24px;letter-spacing:-.02em}
+.tm-copy p{margin-top:4px;color:#c7c7cc}
+.tm-row{display:flex;gap:10px;flex:1 1 340px;max-width:460px}
+.tm-row input[type=email]{flex:1;min-width:0;min-height:48px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.25);color:#fff;font:inherit;font-size:16px}
+.tm-row input[type=email]::placeholder{color:#8e8e93}
+.tm-row input[type=email]:focus{outline:none;border-color:#45a2ff;box-shadow:0 0 0 3px rgba(69,162,255,.3)}
+.tm-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.tm-note{flex-basis:100%;margin-top:-6px;font-size:14px;color:#c7c7cc}
+.tm-note:empty{display:none}
+.tastemakers.done .tm-row{display:none}
