@@ -150,8 +150,19 @@ async function nowPlaying(url, env) {
 }
 // Self-contained Windows 95 dialog (inline CSS, no script) shared with Nate's Software error pages.
 const notFoundPage = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Page not found — HIFI</title><style>*{box-sizing:border-box}html{background:#008080}body{margin:0;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:16px;background:#008080;color:#000;font:14px/1.5 "MS Sans Serif","Microsoft Sans Serif",Tahoma,Geneva,Verdana,sans-serif}.window{width:100%;max-width:460px;background:#c0c0c0;border:2px solid;border-color:#dfdfdf #000 #000 #dfdfdf;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080,4px 4px 0 rgba(0,0,0,.35);padding:3px}.titlebar{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;font-size:13px;padding:3px 3px 3px 6px;min-height:22px}.titlebar i{width:16px;height:14px;background:#c0c0c0;border:1px solid;border-color:#fff #000 #000 #fff;color:#000;font:bold 11px/12px Tahoma,sans-serif;font-style:normal;text-align:center}.content{display:flex;gap:14px;padding:18px 16px 14px}.icon{flex:none;width:34px;height:34px;border-radius:50%;background:#000080;color:#fff;font:bold 22px/34px Georgia,serif;text-align:center;box-shadow:1px 1px 0 #808080}h1{margin:0 0 8px;font-size:17px;line-height:1.3}p{margin:0 0 8px}.actions{display:flex;justify-content:flex-end;padding:4px 16px 16px}.button{display:inline-block;min-width:96px;padding:5px 16px;background:#c0c0c0;color:#000;text-align:center;text-decoration:none;font-weight:bold;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset -1px -1px #808080,inset 1px 1px #dfdfdf,0 0 0 1px #000}.button:focus-visible{outline:1px dotted #000;outline-offset:-5px}.status{margin:0 3px;padding:2px 6px;font-size:12px;border:1px solid;border-color:#808080 #fff #fff #808080}@media(max-width:420px){.actions .button{flex:1}}</style></head><body><main class="window" aria-labelledby="heading"><div class="titlebar"><span>HIFI</span><i aria-hidden="true">×</i></div><div class="content"><div class="icon" aria-hidden="true">i</div><div><h1 id="heading">This page isn’t on the air</h1><p>There’s nothing at this address on HIFI. The link may be old or mistyped.</p><p>The radio itself is one click away.</p></div></div><div class="actions"><a class="button" href="/">Open HIFI</a></div><div class="status">HIFI · a little radio from Nate’s Software</div></main></body></html>`;
+// Mac downloads, counted as one anonymous number: nothing about who downloaded is kept.
+export class Downloads {
+  constructor(state) { this.state = state; }
+  async fetch(request) {
+    let count = (await this.state.storage.get('count')) || 0;
+    if (request.method === 'POST') await this.state.storage.put('count', ++count);
+    return Response.json({ count });
+  }
+}
+const downloads = env => env.DOWNLOADS.get(env.DOWNLOADS.idFromName('mac'));
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', {status:405,headers:{Allow:'GET, HEAD'}});
     if (url.pathname === '/api/now-playing') return nowPlaying(url, env);
@@ -159,12 +170,17 @@ export default {
       const { playlist, clientId } = await spotifyConfig();
       return new Response(JSON.stringify({ playlist, clientId }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60', 'X-Content-Type-Options': 'nosniff' } });
     }
+    if (url.pathname === '/api/downloads') {
+      const { count } = await (await downloads(env).fetch('https://downloads/')).json();
+      return new Response(JSON.stringify({ count }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=30', 'X-Content-Type-Options': 'nosniff' } });
+    }
     if (url.pathname.startsWith('/api/track/')) return track(env, url.pathname.slice('/api/track/'.length));
     if (url.pathname === '/player/') return Response.redirect(url.origin + '/player' + url.search, 308);
     if (url.pathname === '/') url.pathname = '/landing.html';
     else if (url.pathname === '/player') url.pathname = '/index.html';
     else if (url.pathname === '/privacy') url.pathname = '/privacy.html';
     else if (url.pathname === '/spotify') url.pathname = '/spotify.html';
+    else if (url.pathname === '/video') url.pathname = '/video.html';
     else if (url.pathname === '/download') url.pathname = '/download/HIFI.dmg';
     let response = await env.ASSETS.fetch(new Request(url, request));
     // Browsers asking for a missing page get a readable Win95 dialog, not an empty 404.
@@ -179,7 +195,12 @@ export default {
     else if (response.ok && url.searchParams.has('v') && /\.(js|css)$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=31536000, immutable');
     else if (response.ok && /^\/(shots|tracks|tv|playlists)\/|\.svg$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=86400, stale-while-revalidate=604800');
     else if (response.ok && url.pathname === '/stations.json') headers.set('Cache-Control','public, max-age=300, stale-while-revalidate=86400');
-    if (url.pathname.endsWith('.dmg') && response.ok) headers.set('Content-Disposition', 'attachment; filename="HIFI.dmg"');
+    if (url.pathname.endsWith('.dmg') && response.ok) {
+      headers.set('Content-Disposition', 'attachment; filename="HIFI.dmg"');
+      // One download per fetch from the start of the file (resumed ranges aren't new downloads).
+      const range = request.headers.get('Range');
+      if (request.method === 'GET' && (!range || /^bytes=0-/.test(range))) ctx.waitUntil(downloads(env).fetch('https://downloads/', { method: 'POST' }).catch(() => {}));
+    }
     // Safari and iMessage only play video and audio that answer byte ranges, and
     // static assets ignore Range, so slice those here.
     if (response.status === 200 && /^(video|audio)\//.test(headers.get('Content-Type') || '')) {

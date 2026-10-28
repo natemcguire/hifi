@@ -5,6 +5,11 @@ import SwiftUI
 struct Catalog: Decodable {
     let epoch: Double  // ms since 1970; synth rotations are measured from here
     let stations: [Station]
+    // Stations that play official videos (101X Chillville). Older builds don't read
+    // this list, so they never see a station they can't play.
+    let videoStations: [Station]?
+
+    var all: [Station] { stations + (videoStations ?? []) }
 
     static let base = URL(string: "https://hifi.nates-software.com/")!
 
@@ -38,8 +43,14 @@ struct Station: Decodable, Identifiable, Equatable {
     let providerLabel: String?
     let support: String?
     let tracks: [Track]?
+    let tv: [String]?      // HIFI TV clips for Now Playing
+    let video: String?     // "youtube" for a video station
+    let label: String?     // a name with its own capitals, like "101X Chillville"
 
     var isLive: Bool { stream != nil }
+    var isVideo: Bool { video != nil }
+    var displayName: String { label ?? name.capitalized }
+    var clips: [URL] { (tv ?? []).map { Catalog.base.appending(path: $0) } }
     var tint: Color { Color(hex: color) }
     var streamURL: URL? { stream.flatMap(URL.init(string:)) }
 }

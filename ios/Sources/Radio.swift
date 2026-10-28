@@ -1,6 +1,11 @@
 import AVFoundation
 import MediaPlayer
 
+struct VideoSong: Equatable {
+    let title: String
+    let artist: String
+}
+
 struct LiveSong: Decodable, Equatable {
     let artist: String?
     let title: String?
@@ -20,6 +25,7 @@ final class Radio: ObservableObject {
     @Published private(set) var track: Track?
     @Published private(set) var liveSong: LiveSong?
     @Published private(set) var problem: String?
+    @Published private(set) var videoSong: VideoSong?
     @Published var volume: Float = UserDefaults.standard.object(forKey: "volume") as? Float ?? 1 {
         didSet { player.volume = volume; UserDefaults.standard.set(volume, forKey: "volume") }
     }
@@ -41,7 +47,7 @@ final class Radio: ObservableObject {
     init() {
         let catalog = Catalog.bundled
         let saved = UserDefaults.standard.string(forKey: "station")
-        station = catalog.stations.first { $0.id == saved } ?? catalog.stations[0]
+        station = catalog.all.first { $0.id == saved } ?? catalog.stations[0]
         player.automaticallyWaitsToMinimizeStalling = true
         player.volume = volume
         observePlayer()
@@ -50,12 +56,12 @@ final class Radio: ObservableObject {
         Task { await refreshCatalog() }
     }
 
-    var stations: [Station] { catalog.stations }
+    var stations: [Station] { catalog.all }
 
     func refreshCatalog() async {
         guard let live = await Catalog.fetchLive() else { return }
         catalog = live
-        if let fresh = live.stations.first(where: { $0.id == station.id }) { station = fresh }
+        if let fresh = live.all.first(where: { $0.id == station.id }) { station = fresh }
     }
 
     // MARK: Controls
@@ -78,6 +84,24 @@ final class Radio: ObservableObject {
 
     // Radio semantics: play always rejoins the broadcast now; there is no pause point.
     func start() {
+        // A video station plays on the screen (VideoStation); the radio just keeps its state.
+        if station.isVideo {
+            retryTask?.cancel()
+            pollTask?.cancel()
+            player.pause()
+            player.removeAllItems()
+            queued.removeAll()
+            track = nil
+            videoSong = nil
+            problem = nil
+            #if os(iOS)
+            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)  // WebKit plays it
+            #endif
+            isPlaying = true
+            isBuffering = true
+            updateNowPlaying()
+            return
+        }
         if !station.isLive, let tracks = station.tracks, !tracks.isEmpty {
             let now = rotationAt(tracks, epoch: catalog.epoch)
             play(from: now.index, offset: now.offset)
@@ -108,6 +132,17 @@ final class Radio: ObservableObject {
         isPlaying = true
         isBuffering = true
         updateNowPlaying()
+    }
+
+    // What the video station's page says it's playing.
+    func videoSaid(_ message: [String: Any]) {
+        guard station.isVideo, isPlaying else { return }
+        if let title = message["title"] as? String {
+            videoSong = VideoSong(title: title, artist: message["artist"] as? String ?? "")
+            updateNowPlaying()
+        }
+        if message["playing"] as? Bool == true { isBuffering = false }
+        if let text = message["problem"] as? String { problem = text }
     }
 
     func stop() {
@@ -212,6 +247,8 @@ final class Radio: ObservableObject {
             let options = AVAudioSession.InterruptionOptions(rawValue: note.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0)
             Task { @MainActor in
                 guard let self else { return }
+                // A video station's sound is the web view's; its starting isn't an interruption.
+                if type == .began, self.station.isVideo { return }
                 if type == .began { self.wasInterrupted = self.isPlaying; self.stop() }
                 else if type == .ended, self.wasInterrupted, options.contains(.shouldResume) { self.start() }
             }
@@ -227,7 +264,7 @@ final class Radio: ObservableObject {
         keyValueObservers.append(player.observe(\.timeControlStatus, options: [.new]) { [weak self] player, _ in
             let status = player.timeControlStatus
             Task { @MainActor in
-                guard let self else { return }
+                guard let self, !self.station.isVideo else { return }
                 self.isBuffering = self.isPlaying && status != .playing
                 if status == .playing { self.problem = nil; self.updateNowPlaying() }
             }
@@ -264,6 +301,7 @@ final class Radio: ObservableObject {
     }
 
     var displayTitle: String {
+        if station.isVideo { return videoSong?.title ?? station.displayName }
         if station.isLive { return liveSong?.title ?? station.name }
         return track?.title ?? station.name
     }
@@ -274,6 +312,7 @@ final class Radio: ObservableObject {
     var spotifyTrackId: String? { station.isLive ? liveSong?.trackId : nil }
 
     var displayArtist: String {
+        if station.isVideo { return videoSong?.artist ?? station.genre }
         if station.isLive { return liveSong?.artist ?? station.genre }
         return track?.artist ?? station.genre
     }

@@ -21,7 +21,7 @@ svg{display:block}
 /* A faint diagonal glare across the glass. */
 .glass::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom right,rgba(255,255,255,.22),rgba(255,255,255,0) 45%)}
 .dimmer{position:absolute;inset:0;pointer-events:none;background:#000;opacity:0;transition:opacity .2s ease-out;z-index:3}
-.dimmed .dimmer{opacity:.32;transition-duration:.8s}
+.dimmed .dimmer{opacity:.22;transition-duration:.8s}
 
 .bar{position:relative;flex:none;height:calc(var(--row)*.92);display:flex;align-items:center;justify-content:space-between;padding:0 8px;background:linear-gradient(#fdfdfd,#c5cbd1);border-bottom:1px solid #8d959c}
 .bar h1{position:absolute;inset:0 44px;margin:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--row)*.46);font-weight:700;white-space:nowrap;overflow:hidden}
@@ -61,6 +61,15 @@ svg{display:block}
 @keyframes wave{0%,100%{opacity:1}50%{opacity:.2}}
 .cover-pane{flex:none;width:calc((var(--sw) - 12px)*.46);display:flex;align-items:center;justify-content:center;overflow:hidden;background:#1b2024}
 .cover-pane .cover{width:100%;height:100%}
+.cover-pane{position:relative}
+.cover-pane video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;opacity:0;transition:opacity .45s ease-in-out}
+.cover-pane video.on{opacity:1}
+.cover-pane:has(video)::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(transparent 55%,rgba(0,0,0,.55))}
+.cover-pane:has(video)::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle,transparent 42%,rgba(0,0,0,.28) 80%) 0 0/3px 3px}
+.cover-pane .tv-bug{top:6px;right:8px}
+.pane-text{position:absolute;z-index:2;left:6px;right:6px;bottom:10%;display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.75)}
+.pane-text b{font-size:calc(var(--row)*.46);font-weight:900;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pane-text span{font-size:calc(var(--row)*.26);font-weight:700;color:rgba(255,255,255,.8);white-space:nowrap}
 @container (max-width:380px){.cover-pane{display:none}}
 .cover text{font-family:ui-rounded,"SF Pro Rounded",-apple-system,"Helvetica Neue",Arial,sans-serif}
 
@@ -70,12 +79,31 @@ svg{display:block}
 .np-main{flex:1;min-height:0;display:flex;align-items:center;gap:12px;padding:0 10px}
 .art{flex:none;width:min(42cqw,62cqh);aspect-ratio:1;border-radius:3px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.25);transform:perspective(500px) rotateY(0);transition:transform .4s cubic-bezier(.3,1.4,.5,1)}
 .art .cover{width:100%;height:100%}
-/* HIFI TV: the clip under a fine dot screen, the name over a soft shade, like an old set. */
-.tv{position:relative;width:100%;height:100%;background:#111}
-.tv video{display:block;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
-.tv::before{content:"";position:absolute;inset:58% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.65))}
-.tv-text{position:absolute;inset:0;width:100%;height:100%}
-.tv::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 42%,rgba(0,0,0,.3) 80%) 0 0/3px 3px}
+/* HIFI TV: the clip fills Now Playing under a fine dot screen; the words sit on liquid glass. */
+.np-bg{position:absolute;inset:0;display:none;background:#111}
+.tv-on .np-bg{display:block}
+.np-bg video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;opacity:0;transition:opacity .45s ease-in-out}
+.np-bg video.on{opacity:1}
+.np-bg::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(0,0,0,.28),transparent 28%,transparent 62%,rgba(0,0,0,.4))}
+.np-bg::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle,transparent 42%,rgba(0,0,0,.28) 80%) 0 0/3px 3px}
+.tv-bug{position:absolute;z-index:2;top:7px;right:10px;font-size:calc(var(--row)*.36);font-weight:900;font-style:italic;letter-spacing:.02em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.tv-on{color:#fff}
+.tv-on>:not(.np-bg){position:relative;z-index:1}
+.tv-on .art{display:none}
+.tv-on .pos{display:none}
+/* One dark glass card at the bottom, like a TV lower third: the song, the station, the bar. */
+.tv-on .details,.tv-on .np-bottom{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,0) 50%),rgba(10,10,14,.1);-webkit-backdrop-filter:blur(3px) saturate(140%);backdrop-filter:blur(3px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
+.tv-on .np-main{align-items:flex-end;padding:calc(var(--row)*.7) 10px 0}
+.tv-on .details{flex:1;padding:9px 12px 4px;border:1px solid rgba(255,255,255,.16);border-bottom:0;border-radius:14px 14px 0 0}
+.tv-on .np-title{font-size:calc(var(--row)*.54)}
+.tv-on .np-artist{color:rgba(255,255,255,.86)}
+.tv-on .np-station{margin-top:1px;color:var(--tint,#fff);font-size:calc(var(--row)*.3);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tv-on .np-title,.tv-on .np-artist,.tv-on .np-station{text-shadow:0 1px 3px rgba(0,0,0,.75),0 0 12px rgba(0,0,0,.35)}
+.tv-on .details>*{transition:opacity .28s ease}
+.tv-on .details.swap>*{opacity:0}
+.tv-on .heart{color:#fff}
+.tv-on .np-bottom{margin:0 10px calc(var(--row)*.3);padding:4px 12px 2px;border:1px solid rgba(255,255,255,.16);border-top:0;border-radius:0 0 14px 14px}
+.tv-on .labels{color:#fff}
 .stopped .art{transform:perspective(500px) rotateY(8deg)}
 .details{flex:1;min-width:0;display:flex;flex-direction:column;gap:calc(var(--row)*.12)}
 .title-line{display:flex;align-items:flex-start;gap:4px}

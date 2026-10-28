@@ -29,6 +29,7 @@ struct IPodView: View {
     @EnvironmentObject private var radio: Radio
     @ObservedObject private var spotify = SpotifyAccount.shared
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
     @AppStorage("clicker") private var clicker = true
     @AppStorage("backlight") private var backlight = 30  // seconds; 0 = always on
     @State private var stack: [Page] = [.main]
@@ -103,6 +104,16 @@ struct IPodView: View {
             }
             #endif
         }
+        // A video station needs the screen: playing one jumps to Now Playing.
+        .onChange(of: "\(radio.station.id) \(radio.isPlaying)") {
+            if radio.station.isVideo, radio.isPlaying, page != .nowPlaying {
+                forward = true
+                withAnimation(.easeInOut(duration: 0.25)) { stack.append(.nowPlaying) }
+            }
+        }
+        #if os(iOS)
+        .onChange(of: scenePhase) { if scenePhase == .background, radio.station.isVideo { radio.stop() } }
+        #endif
         .onKeyPress(.upArrow) { key(nil) { rotate(-1) } }
         .onKeyPress(.downArrow) { key(nil) { rotate(1) } }
         .onKeyPress(.leftArrow) { key(.previous) { radio.skip(-1) } }
@@ -191,7 +202,7 @@ struct IPodView: View {
             .clipped()
         }
         .background(LinearGradient(colors: [.white, Color(hex: "#eef2f5")], startPoint: .top, endPoint: .bottom))
-        .overlay { Color.black.opacity(dimmed ? 0.32 : 0).allowsHitTesting(false) }
+        .overlay { Color.black.opacity(dimmed ? 0.22 : 0).allowsHitTesting(false) }
         .overlay {
             // A faint diagonal glare across the glass.
             LinearGradient(stops: [.init(color: .white.opacity(0.22), location: 0), .init(color: .white.opacity(0), location: 0.45)],
@@ -215,7 +226,7 @@ struct IPodView: View {
             HStack(spacing: 0) {
                 list(rowHeight: rowHeight)
                 if page == .main && width > 380 {
-                    Cover(station: radio.station)
+                    SidePanel(station: radio.station)
                         .frame(width: (width - 12) * 0.46)
                         .frame(maxHeight: .infinity)
                         .background(Color(hex: "#1b2024"))
@@ -349,7 +360,7 @@ struct IPodView: View {
             return [Row(title: "Now Playing", playing: radio.isPlaying), Row(title: "Radio"),
                     Row(title: "Synth Sounds"), Row(title: "Playlists"), Row(title: "Settings"), Row(title: "About")]
         case .band(let band):
-            return stations(band).map { Row(title: $0.name.capitalized, chevron: false,
+            return stations(band).map { Row(title: $0.displayName, chevron: false,
                                             playing: radio.isPlaying && $0.id == radio.station.id,
                                             subtitle: songLine($0)) }
         case .playlists:
@@ -443,7 +454,7 @@ struct IPodView: View {
             let list = stations(band)
             guard list.indices.contains(index) else { return }
             radio.tune(list[index])
-            push(.nowPlaying)
+            if page != .nowPlaying { push(.nowPlaying) }
         case .playlists:
             // Spotify plays its own music: a playlist opens in the Spotify app.
             if let playlist = playlistRows[safe: index] { openURL(playlist.url) } else { spotify.showConnect = true }
@@ -471,6 +482,8 @@ struct IPodView: View {
     private func menu() {
         touched()
         guard stack.count > 1 else { return }
+        // Leaving a video stops it, the way MENU stops a movie on an iPod.
+        if page == .nowPlaying, radio.station.isVideo, radio.isPlaying { radio.stop() }
         forward = false
         withAnimation(.easeInOut(duration: 0.25)) { _ = stack.removeLast() }
     }
@@ -482,13 +495,106 @@ private extension Array {
 
 // MARK: Now Playing
 
+private struct Words: Equatable {
+    var title = "", artist = "", station = "", tint = Color.white
+    init() {}
+    @MainActor init(_ radio: Radio) {
+        title = radio.displayTitle
+        artist = radio.displayArtist
+        station = radio.station.displayName.uppercased() + "  ·  " + radio.station.genre
+        tint = radio.station.tint
+    }
+}
+
 private struct NowPlaying: View {
     @EnvironmentObject private var radio: Radio
+    @State private var shown = Words()
+    @State private var wordsOpacity = 1.0
     @ObservedObject private var spotify = SpotifyAccount.shared
     let rowHeight: CGFloat
     let showVolume: Bool
 
     var body: some View {
+        if radio.station.isVideo, radio.isPlaying {
+            VideoStation(station: radio.station).id(radio.station.id)
+        } else if !radio.station.clips.isEmpty {
+            tv
+        } else {
+            classic
+        }
+    }
+
+    // HIFI TV: the station's clip fills the screen; the words sit on liquid glass.
+    private var tv: some View {
+        // The clip goes with the station and a 30-second slot (same as the web), so
+        // tuning changes it once and it moves on calmly, never with every song title.
+        return ZStack {
+            Color.black
+            TimelineView(.periodic(from: .now, by: 5)) { context in
+                if let clip = tvClip(radio.station, at: context.date) { LoopingVideo(url: clip) }
+            }
+            DotScreen()
+            LinearGradient(stops: [.init(color: .black.opacity(0.28), location: 0), .init(color: .clear, location: 0.28),
+                                   .init(color: .clear, location: 0.62), .init(color: .black.opacity(0.4), location: 1)],
+                           startPoint: .top, endPoint: .bottom)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Spacer()
+                    Text("HIFI TV")
+                        .font(.system(size: rowHeight * 0.36, weight: .black).italic())
+                        .shadow(color: .black.opacity(0.6), radius: 2, y: 1)
+                }
+                Spacer(minLength: 0)
+                // One glass card, like a TV lower third: the song, the station, the bar.
+                VStack(alignment: .leading, spacing: rowHeight * 0.08) {
+                    VStack(alignment: .leading, spacing: rowHeight * 0.08) {
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text(shown.title)
+                                .font(.system(size: rowHeight * 0.54, weight: .bold))
+                                .lineLimit(2)
+                            if radio.heartable { heart }
+                        }
+                        Text(shown.artist)
+                            .font(.system(size: rowHeight * 0.42, weight: .semibold))
+                            .lineLimit(1)
+                            .opacity(0.9)
+                        Text(shown.station)
+                            .font(.system(size: rowHeight * 0.3, weight: .bold))
+                            .tracking(0.6)
+                            .foregroundStyle(shown.tint)
+                            .lineLimit(1)
+                    }
+                    .opacity(wordsOpacity)
+                    if let problem = radio.problem ?? spotify.problem {
+                        Text(problem).font(.system(size: rowHeight * 0.32)).foregroundStyle(.orange)
+                    }
+                    ZStack {
+                        if showVolume { volume.transition(.opacity) } else { progress.transition(.opacity) }
+                    }
+                    .padding(.top, rowHeight * 0.12)
+                }
+                .minimumScaleFactor(0.6)
+                .shadow(color: .black.opacity(0.7), radius: 2.5, y: 1)
+                .padding(.horizontal, 12).padding(.top, 9).padding(.bottom, 2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .hifiGlass(radius: 14)
+            }
+            .foregroundStyle(.white)
+            .padding(10)
+        }
+        .environment(\.colorScheme, .dark)
+        .clipped()
+        // The words fade out and back in when the song or station changes, rather than jump.
+        .onAppear { shown = Words(radio) }
+        .onChange(of: Words(radio)) { _, next in
+            withAnimation(.easeIn(duration: 0.25)) { wordsOpacity = 0 } completion: {
+                shown = next
+                withAnimation(.easeOut(duration: 0.35)) { wordsOpacity = 1 }
+            }
+        }
+    }
+
+    private var classic: some View {
         GeometryReader { geo in
             let art = min(geo.size.width * 0.42, geo.size.height * 0.62)
             VStack(spacing: 0) {
@@ -519,7 +625,7 @@ private struct NowPlaying: View {
                             .foregroundStyle(Color(hex: "#333"))
                             .lineLimit(2)
                             .contentTransition(.opacity)
-                        Text(radio.station.name.capitalized)
+                        Text(radio.station.displayName)
                             .font(.system(size: rowHeight * 0.38))
                             .foregroundStyle(Color(hex: "#555"))
                             .lineLimit(1)

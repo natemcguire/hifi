@@ -183,7 +183,7 @@ function stop() {
 
 // MARK: Video stations (YouTube's privacy-enhanced player)
 
-const video = { player: null, api: null, host: null, token: 0 };
+const video = { player: null, api: null, host: null, token: 0, started: false };
 function loadYouTube() {
   return video.api ??= new Promise((resolve, reject) => {
     window.onYouTubeIframeAPIReady = resolve;
@@ -220,10 +220,12 @@ async function playVideo(track, offset) {
 function videoState(event) {
   if (!isVideo(radio.station) || !radio.playing) return;
   const state = event.data;
-  if (state === YT.PlayerState.PLAYING) { radio.buffering = false; radio.problem = null; }
+  if (state === YT.PlayerState.PLAYING) { video.started = true; radio.buffering = false; radio.problem = null; }
   else if (state === YT.PlayerState.BUFFERING) radio.buffering = true;
   else if (state === YT.PlayerState.ENDED) return nextVideo();
-  // Paused on the video itself: the radio stops, as with the ▶︎❚❚ button.
+  // Paused before it ever played: the browser held back autoplay. Leave the video up to tap.
+  else if ((state === YT.PlayerState.PAUSED || state === YT.PlayerState.CUED) && !video.started) { radio.buffering = false; radio.problem = 'Tap the video to start it.'; }
+  // Paused on the video itself after playing: the radio stops, as with the ▶︎❚❚ button.
   else if (state === YT.PlayerState.PAUSED && Date.now() - startedAt > 1500) return stop();
   changed();
 }
@@ -363,18 +365,30 @@ function coverSVG(station) {
 }
 // HIFI TV: a station with its own clips plays one, muted, where the cover would be,
 // under the same name and genre. The clip changes with the song.
+// The clip goes with the station and a 30-second slot, so tuning changes it once
+// and it moves on calmly after that, never with every song title.
 function tvClip(station) {
-  const key = isLive(station) ? radio.liveSong?.title || '' : radio.track?.title || '';
   let hash = 0;
-  for (const char of key) hash = (hash * 31 + char.codePointAt(0)) >>> 0;
-  return station.tv[hash % station.tv.length];
+  for (const char of station.id) hash = (hash * 31 + char.codePointAt(0)) >>> 0;
+  return station.tv[(Math.floor(Date.now() / 30000) + hash) % station.tv.length];
 }
-function tvHTML(station, clip) {
-  const fit = (text, size, ratio) => text.length * size * ratio > 28 ? ' textLength="28" lengthAdjust="spacingAndGlyphs"' : '';
-  return `<div class="tv"><video src="${escape(clip)}" muted loop playsinline preload="auto" aria-hidden="true"></video>`
-    + `<svg class="tv-text" viewBox="0 0 32 32" aria-hidden="true"><text x="2.4" y="4.4" font-size="2.3" font-weight="900" font-style="italic" fill="#fff" stroke="rgba(0,0,0,.55)" stroke-width=".35" paint-order="stroke">HIFI TV</text>`
-    + `<text x="16" y="27" text-anchor="middle" font-size="2.8" font-weight="900" fill="${escape(station.color)}"${fit(station.name, 2.8, 0.66)}>${escape(station.name)}</text>`
-    + `<text x="16" y="29.6" text-anchor="middle" font-size="1.5" font-weight="600" fill="rgba(255,255,255,.8)"${fit(station.genre, 1.5, 0.62)}>${escape(station.genre)}</text></svg></div>`;
+// A new clip loads under the old one and fades in once it plays: no black frame.
+function swapClip(bg, clip) {
+  const old = [...bg.querySelectorAll('video')];
+  if (!clip) { bg.innerHTML = ''; return; }
+  if (!bg.querySelector('.tv-bug')) bg.insertAdjacentHTML('beforeend', '<span class="tv-bug">HIFI TV</span>');
+  const next = document.createElement('video');
+  next.muted = true; next.loop = true; next.playsInline = true; next.autoplay = true; next.preload = 'auto';
+  next.setAttribute('muted', ''); next.setAttribute('playsinline', '');
+  next.src = clip;
+  // Out, then in: the old clip fades to black before the new one fades up, like changing channel.
+  next.addEventListener('playing', () => {
+    old.forEach(video => video.classList.remove('on'));
+    setTimeout(() => next.classList.add('on'), old.length ? 450 : 0);
+    setTimeout(() => old.forEach(video => video.remove()), 1000);
+  }, { once: true });
+  if (old.length) old.at(-1).after(next); else bg.prepend(next);
+  next.play().catch(() => {});
 }
 const coverPNGs = new Map();
 function coverPNG(station) {
@@ -762,11 +776,23 @@ function listView(p) {
       if (top < list.scrollTop) list.scrollTo({ top, behavior });
       else if (bottom > list.scrollTop + list.clientHeight) list.scrollTo({ top: bottom - list.clientHeight, behavior });
     }
-    if (pane && coverFor !== radio.station.id) {
-      coverFor = radio.station.id;
-      pane.innerHTML = coverSVG(radio.station);
-      if (!first) pane.firstChild.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-in-out' });
+    // The main menu's side panel: the station's HIFI TV clip under its name, or its cover.
+    const clip = pane && radio.station.tv?.length ? tvClip(radio.station) : '';
+    if (pane && coverFor !== radio.station.id + clip) {
+      const station = radio.station;
+      coverFor = station.id + clip;
+      if (clip) {
+        pane.querySelector('svg')?.remove();
+        swapClip(pane, clip);
+        let label = pane.querySelector('.pane-text');
+        if (!label) { label = document.createElement('div'); label.className = 'pane-text'; pane.append(label); }
+        label.innerHTML = `<b style="color:${escape(station.color)}">${escape(station.name)}</b><span>${escape(station.genre)}</span>`;
+      } else {
+        pane.innerHTML = coverSVG(station);
+        if (!first) pane.firstChild.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-in-out' });
+      }
     }
+    if (pane) for (const tv of pane.querySelectorAll('video')) if (tv.paused) tv.play().catch(() => {});
     first = false;
   } };
 }
@@ -774,35 +800,46 @@ function listView(p) {
 function nowPlayingView() {
   const el = document.createElement('div');
   el.className = 'page now';
-  el.innerHTML = `<div class="pos"></div><div class="np-main"><div class="art"></div><div class="details"><div class="title-line"><span class="np-title"></span>`
+  el.innerHTML = `<div class="np-bg" aria-hidden="true"></div><div class="pos"></div><div class="np-main"><div class="art"></div><div class="details"><div class="title-line"><span class="np-title"></span>`
     + `<button class="heart" type="button" hidden></button><button class="curate" type="button" hidden></button></div>`
     + `<div class="np-artist"></div><div class="np-station"></div><div class="np-problem" role="status"></div></div></div>`
     + `<div class="np-bottom"><div class="progress"><div class="track"><div class="fill"></div></div><div class="labels"><span class="l"></span><span class="m"></span><span class="r"></span></div></div>`
     + `<div class="volume" aria-hidden="true">${ICON.speakerLow}<div class="track"><div class="fill"></div></div>${ICON.speakerHigh}</div></div>`;
   const q = selector => el.querySelector(selector);
-  const art = q('.art'), heart = q('.heart'), curateButton = q('.curate');
+  const art = q('.art'), bg = q('.np-bg'), heart = q('.heart'), curateButton = q('.curate');
   heart.addEventListener('click', event => { event.stopPropagation(); touched(); feedback.click(); void toggleHeart(); });
   curateButton.addEventListener('click', event => { event.stopPropagation(); touched(); feedback.click(); curate(); });
-  let coverFor = null, first = true;
+  let coverFor = null, bgFor = null, wordsFor = null, swapTimer = 0, first = true;
   const text = (selector, value) => { const node = q(selector); if (node.textContent !== value) node.textContent = value; };
   const view = { el, update() {
     const station = radio.station;
     text('.pos', position());
+    // HIFI TV: a station with clips fills the screen with one, under glass.
     const clip = station.tv?.length ? tvClip(station) : '';
-    if (coverFor !== station.id + clip) {
-      const sameStation = coverFor?.startsWith(station.id);
-      coverFor = station.id + clip;
-      art.innerHTML = clip ? tvHTML(station, clip) : coverSVG(station);
-      if (!first && !sameStation && !reducedMotion.matches) art.firstChild.animate?.([{ transform: 'scale(.85)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    el.classList.toggle('tv-on', Boolean(clip));
+    el.style.setProperty('--tint', station.color);
+    if (bgFor !== clip) { bgFor = clip; swapClip(bg, clip); }
+    // It comes on with the screen, like a TV, whether or not the radio is playing.
+    for (const tv of bg.querySelectorAll('video')) if (tv.paused) tv.play().catch(() => {});
+    if (!clip && coverFor !== station.id) {
+      coverFor = station.id;
+      art.innerHTML = coverSVG(station);
+      if (!first && !reducedMotion.matches) art.firstChild.animate?.([{ transform: 'scale(.85)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'ease-out' });
     }
-    // The TV plays while the radio does.
-    const tv = art.querySelector('video');
-    if (tv && radio.playing && tv.paused) tv.play().catch(() => {});
-    else if (tv && !radio.playing && !tv.paused) tv.pause();
+    if (clip) coverFor = null;
     el.classList.toggle('stopped', !radio.playing);
-    text('.np-title', displayTitle());
-    text('.np-artist', displayArtist());
-    text('.np-station', stationName(station));
+    const words = [displayTitle(), displayArtist(), clip ? `${stationName(station)} · ${capitalized(station.genre)}` : stationName(station)];
+    if (words.join('\n') !== wordsFor) {
+      const apply = () => { text('.np-title', words[0]); text('.np-artist', words[1]); text('.np-station', words[2]); };
+      const details = q('.details');
+      // Under HIFI TV the words fade out and back in rather than jump.
+      if (clip && wordsFor !== null && !reducedMotion.matches) {
+        details.classList.add('swap');
+        clearTimeout(swapTimer);
+        swapTimer = setTimeout(() => { apply(); details.classList.remove('swap'); }, 280);
+      } else apply();
+      wordsFor = words.join('\n');
+    }
     text('.np-problem', radio.problem || spotify.problem || '');
     heart.hidden = !heartable();
     const liked = likedNow();
@@ -822,6 +859,7 @@ function nowPlayingView() {
     view.tick();
     first = false;
   }, tick() {
+    if (radio.station.tv?.length && bgFor !== tvClip(radio.station)) return view.update();
     const live = isLive(radio.station);
     const duration = live ? 0 : radio.track?.duration || 0;
     const done = Math.min(elapsed(), duration);
@@ -1130,7 +1168,7 @@ function changed() {
 }
 setInterval(() => { if (page() === 'nowPlaying' && radio.playing) ui.view?.tick(); }, 500);
 // The synth rotations move on by themselves; keep the open list's song lines honest.
-setInterval(() => { if (page().startsWith('band:')) changed(); }, 5000);
+setInterval(() => { if (page().startsWith('band:') || page() === 'main') changed(); }, 5000);
 
 // `?page=radio|synth|nowPlaying|playlists|settings|about` opens on that screen.
 const opening = { radio: 'band:radio', synth: 'band:synth', nowPlaying: 'nowPlaying', playlists: 'playlists', settings: 'settings', about: 'about' }[params.get('page')];
