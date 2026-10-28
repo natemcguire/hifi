@@ -102,7 +102,12 @@ function tune(next) {
   savePrefs();
   start();
 }
-const toggle = () => radio.playing ? stop() : start();
+// Play brings up Now Playing, so the station's TV comes on with the music.
+function toggle() {
+  if (radio.playing) return stop();
+  start();
+  if (page() !== 'nowPlaying') push('nowPlaying');
+}
 
 function notice(text) {
   radio.problem = text;
