@@ -8,10 +8,8 @@ window.addEventListener('message',event=>{
   const data=event.data;
   if(data?.type==='hifi:height' && Number.isFinite(data.height) && data.height>0) frame.style.height=Math.max(400,Math.min(760,data.height))+'px';
 });
-// The live player comes in after the page has loaded; until then the hero shows a still of it.
-const start = () => { player.src = player.dataset.src; };
-const idle = () => (window.requestIdleCallback || setTimeout)(start, {timeout: 1500});
-if (document.readyState === 'complete') idle(); else addEventListener('load', idle, {once: true});
+// The live player starts loading straight away; until it's ready the hero shows a still of it.
+player.src = player.dataset.src;
 
 // About Nate's Software; #about opens it directly.
 const about = document.getElementById('about');

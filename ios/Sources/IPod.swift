@@ -121,7 +121,7 @@ struct IPodView: View {
         .onKeyPress(.return) { key(.center) { select() } }
         .onKeyPress(.escape) { key(.menu) { menu() } }
         .onKeyPress(.delete) { key(.menu) { menu() } }
-        .onKeyPress(.space) { key(.play) { radio.toggle() } }
+        .onKeyPress(.space) { key(.play) { playPause() } }
         .task(id: page) {
             if page == .playlists { await spotify.refreshPlaylists() }
         }
@@ -404,7 +404,7 @@ struct IPodView: View {
 
     private var wheelHandler: ClickWheel.Handler {
         .init(touch: touched, rotate: rotate, menu: menu, previous: { radio.skip(-1) }, next: { radio.skip(1) },
-              play: { radio.toggle() }, select: select)
+              play: { playPause() }, select: select)
     }
 
     private func rotate(_ steps: Int) {
@@ -477,6 +477,13 @@ struct IPodView: View {
         case .about:
             menu()
         }
+    }
+
+    // Play brings up Now Playing, so the station's TV comes on with the music.
+    private func playPause() {
+        let starting = !radio.isPlaying
+        radio.toggle()
+        if starting, page != .nowPlaying { push(.nowPlaying) }
     }
 
     private func menu() {
