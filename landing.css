@@ -67,6 +67,7 @@ details p{margin-top:10px;color:var(--muted)}
 
 .signoff{padding:clamp(80px,10vw,140px) 16px;text-align:center}
 .signoff p{margin:14px 0 30px;font-size:21px;color:var(--muted)}
+.actions.center{justify-content:center;margin-top:0}
 footer{display:flex;flex-wrap:wrap;align-items:center;gap:20px;max-width:1180px;margin:auto;padding:26px 16px 40px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 footer p{margin-right:auto}
 

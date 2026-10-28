@@ -8,5 +8,3 @@ window.addEventListener('message',event=>{
   if(data?.type==='hifi:height' && Number.isFinite(data.height) && data.height>0) player.style.height=Math.max(400,Math.min(760,data.height))+'px';
 });
 connect();
-// The Mac button appears once a notarized DMG is published (ios/scripts/build-dmg.sh).
-fetch('/download/HIFI.dmg',{method:'HEAD',cache:'no-store'}).then(response=>{if(response.ok)document.getElementById('mac').hidden=false;}).catch(()=>{});
