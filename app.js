@@ -33,6 +33,8 @@ const ICON = {
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 // "INDIE POP ROCKS!" → "Indie Pop Rocks!", like Swift's .capitalized.
 const capitalized = text => text.toLowerCase().replace(/(^|[^\p{L}\p{N}'’])(\p{L})/gu, (_, gap, letter) => gap + letter.toUpperCase());
+// A station can spell its own name ("101X Chillville"); the rest are title-cased.
+const stationName = station => station.label || capitalized(station.name);
 const clock = seconds => { const s = Math.max(0, Math.round(seconds)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
 const prefs = createStorage('hifi.ipod', {
@@ -58,6 +60,22 @@ async function loadCatalog() {
 }
 const catalog = await loadCatalog();
 const isLive = station => Boolean(station.stream);
+// Video stations play official YouTube uploads on the screen. They live in
+// catalog.videoStations, which the native apps don't read, and load their
+// song list after the player is up.
+const isVideo = station => station.video === 'youtube';
+async function loadVideoStations() {
+  for (const station of catalog.videoStations || []) {
+    try {
+      const response = await fetch(station.playlist, { signal: AbortSignal.timeout(15000) });
+      const tracks = (await response.json()).filter(track => track.youtube && track.duration > 0);
+      if (!tracks.length || catalog.stations.some(s => s.id === station.id)) continue;
+      catalog.stations.push({ ...station, tracks });
+      if (wanted === station.id && !radio.playing) radio.station = catalog.stations.at(-1);
+      changed();
+    } catch { /* the station just stays off the list */ }
+  }
+}
 const stationsIn = band => catalog.stations.filter(s => s.band === band);
 
 // MARK: Radio (ios/Sources/Radio.swift)
@@ -114,6 +132,18 @@ function play(index, offset) {
   radio.problem = null;
   const station = radio.station;
   startedAt = Date.now();
+  if (isVideo(station)) {
+    stopPolling();
+    silence();
+    radio.track = station.tracks[index];
+    radio.playing = true;
+    radio.buffering = true;
+    // The video needs the screen, like an iPod playing a movie.
+    if (page() !== 'nowPlaying') push('nowPlaying');
+    void playVideo(radio.track, offset);
+    return changed();
+  }
+  stopVideo();
   if (isLive(station)) {
     radio.track = null; pendingSeek = 0;
     audio.src = station.stream;
@@ -135,15 +165,89 @@ function play(index, offset) {
   changed();
 }
 
+function silence() {
+  audio.pause();
+  audio.removeAttribute('src');
+  audio.load();
+}
+
 function stop() {
   clearTimeout(retryTimer); clearTimeout(stallTimer);
   stopPolling();
   radio.playing = false;
   radio.buffering = false;
-  audio.pause();
-  audio.removeAttribute('src');
-  audio.load();
+  silence();
+  stopVideo();
   changed();
+}
+
+// MARK: Video stations (YouTube's privacy-enhanced player)
+
+const video = { player: null, api: null, host: null, token: 0 };
+function loadYouTube() {
+  return video.api ??= new Promise((resolve, reject) => {
+    window.onYouTubeIframeAPIReady = resolve;
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    script.onerror = () => { video.api = null; reject(new Error('YouTube did not load')); };
+    document.head.append(script);
+  });
+}
+async function playVideo(track, offset) {
+  const token = ++video.token;
+  try { await loadYouTube(); } catch { return failed(); }
+  if (token !== video.token || !radio.playing) return;
+  if (!video.player) {
+    video.host = document.createElement('div');
+    video.host.className = 'video';
+    const target = document.createElement('div');
+    video.host.append(target);
+    $('pages').append(video.host);
+    video.player = new YT.Player(target, {
+      host: 'https://www.youtube-nocookie.com', width: '100%', height: '100%', videoId: track.youtube,
+      playerVars: { autoplay: 1, start: Math.floor(offset), playsinline: 1, rel: 0, iv_load_policy: 3 },
+      events: {
+        onReady: event => { event.target.setVolume(Math.round(radio.volume * 100)); if (token === video.token && radio.playing) event.target.playVideo(); },
+        onStateChange: videoState, onError: videoError,
+      },
+    });
+  } else {
+    video.player.loadVideoById?.({ videoId: track.youtube, startSeconds: Math.floor(offset) });
+    video.player.setVolume?.(Math.round(radio.volume * 100));
+  }
+  syncVideo();
+}
+function videoState(event) {
+  if (!isVideo(radio.station) || !radio.playing) return;
+  const state = event.data;
+  if (state === YT.PlayerState.PLAYING) { radio.buffering = false; radio.problem = null; }
+  else if (state === YT.PlayerState.BUFFERING) radio.buffering = true;
+  else if (state === YT.PlayerState.ENDED) return nextVideo();
+  // Paused on the video itself: the radio stops, as with the ▶︎❚❚ button.
+  else if (state === YT.PlayerState.PAUSED && Date.now() - startedAt > 1500) return stop();
+  changed();
+}
+// A video that won't play here (removed, blocked in this country) is skipped.
+function videoError() {
+  if (!isVideo(radio.station) || !radio.playing) return;
+  radio.problem = "That one won't play here. Next…";
+  changed();
+  clearTimeout(retryTimer);
+  retryTimer = setTimeout(nextVideo, 1200);
+}
+function nextVideo() {
+  if (!isVideo(radio.station) || !radio.playing) return;
+  const tracks = radio.station.tracks;
+  play((tracks.indexOf(radio.track) + 1) % tracks.length, 0);
+}
+function stopVideo() {
+  video.token++;
+  video.player?.stopVideo?.();
+  syncVideo();
+}
+// The player shows only on Now Playing while a video station plays.
+function syncVideo() {
+  if (video.host) video.host.hidden = !(isVideo(radio.station) && radio.playing && page() === 'nowPlaying');
 }
 
 function failed() {
@@ -233,7 +337,7 @@ async function refreshSongs() {
   changed();
 }
 
-const displayTitle = () => isLive(radio.station) ? radio.liveSong?.title || capitalized(radio.station.name) : radio.track?.title || capitalized(radio.station.name);
+const displayTitle = () => isLive(radio.station) ? radio.liveSong?.title || stationName(radio.station) : radio.track?.title || stationName(radio.station);
 const displayArtist = () => isLive(radio.station) ? radio.liveSong?.artist || radio.station.genre : radio.track?.artist || radio.station.genre;
 // Synth stations play our own music, which isn't on Spotify.
 const heartable = () => isLive(radio.station) && Boolean(radio.liveSong?.title);
@@ -243,6 +347,7 @@ const position = () => { const list = stationsIn(radio.station.band); return `${
 function setVolume(value) {
   radio.volume = Math.round(Math.min(1, Math.max(0, value)) * 100) / 100;
   audio.volume = radio.volume;
+  video.player?.setVolume?.(Math.round(radio.volume * 100));
   savePrefs();
 }
 
@@ -255,6 +360,21 @@ function coverSVG(station) {
     + `<rect width="32" height="32" fill="url(#cg-${station.id})"/><g fill="${escape(station.color)}"><rect x="6" y="9" width="4" height="8"/><rect x="14" y="4" width="4" height="13"/><rect x="22" y="7" width="4" height="10"/></g>`
     + `<text x="16" y="23.1" text-anchor="middle" font-size="2.8" font-weight="900" fill="${escape(station.color)}"${fit(station.name, 2.8, 0.66)}>${escape(station.name)}</text>`
     + `<text x="16" y="25.6" text-anchor="middle" font-size="1.5" font-weight="600" fill="rgba(255,255,255,.65)"${fit(station.genre, 1.5, 0.62)}>${escape(station.genre)}</text></svg>`;
+}
+// HIFI TV: a station with its own clips plays one, muted, where the cover would be,
+// under the same name and genre. The clip changes with the song.
+function tvClip(station) {
+  const key = isLive(station) ? radio.liveSong?.title || '' : radio.track?.title || '';
+  let hash = 0;
+  for (const char of key) hash = (hash * 31 + char.codePointAt(0)) >>> 0;
+  return station.tv[hash % station.tv.length];
+}
+function tvHTML(station, clip) {
+  const fit = (text, size, ratio) => text.length * size * ratio > 28 ? ' textLength="28" lengthAdjust="spacingAndGlyphs"' : '';
+  return `<div class="tv"><video src="${escape(clip)}" muted loop playsinline preload="auto" aria-hidden="true"></video>`
+    + `<svg class="tv-text" viewBox="0 0 32 32" aria-hidden="true"><text x="2.4" y="4.4" font-size="2.3" font-weight="900" font-style="italic" fill="#fff" stroke="rgba(0,0,0,.55)" stroke-width=".35" paint-order="stroke">HIFI TV</text>`
+    + `<text x="16" y="27" text-anchor="middle" font-size="2.8" font-weight="900" fill="${escape(station.color)}"${fit(station.name, 2.8, 0.66)}>${escape(station.name)}</text>`
+    + `<text x="16" y="29.6" text-anchor="middle" font-size="1.5" font-weight="600" fill="rgba(255,255,255,.8)"${fit(station.genre, 1.5, 0.62)}>${escape(station.genre)}</text></svg></div>`;
 }
 const coverPNGs = new Map();
 function coverPNG(station) {
@@ -600,7 +720,7 @@ function songLine(station) {
 function rows(p) {
   if (p === 'main') return [{ title: 'Now Playing', playing: radio.playing }, { title: 'Radio' }, { title: 'Synth Sounds' }, { title: 'Playlists' }, { title: 'Settings' }, { title: 'About' }]
     .map(row => ({ chevron: true, ...row }));
-  if (p.startsWith('band:')) return stationsIn(p.slice(5)).map(station => ({ title: capitalized(station.name), playing: radio.playing && station.id === radio.station.id, subtitle: songLine(station) }));
+  if (p.startsWith('band:')) return stationsIn(p.slice(5)).map(station => ({ title: stationName(station), playing: radio.playing && station.id === radio.station.id, subtitle: songLine(station) }));
   if (p === 'playlists') {
     // Nate's Software's playlist first, then the listener's own.
     const list = playlistRows().map(playlist => ({ title: playlist.name, subtitle: playlist.detail }));
@@ -668,15 +788,21 @@ function nowPlayingView() {
   const view = { el, update() {
     const station = radio.station;
     text('.pos', position());
-    if (coverFor !== station.id) {
-      coverFor = station.id;
-      art.innerHTML = coverSVG(station);
-      if (!first && !reducedMotion.matches) art.firstChild.animate?.([{ transform: 'scale(.85)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    const clip = station.tv?.length ? tvClip(station) : '';
+    if (coverFor !== station.id + clip) {
+      const sameStation = coverFor?.startsWith(station.id);
+      coverFor = station.id + clip;
+      art.innerHTML = clip ? tvHTML(station, clip) : coverSVG(station);
+      if (!first && !sameStation && !reducedMotion.matches) art.firstChild.animate?.([{ transform: 'scale(.85)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'ease-out' });
     }
+    // The TV plays while the radio does.
+    const tv = art.querySelector('video');
+    if (tv && radio.playing && tv.paused) tv.play().catch(() => {});
+    else if (tv && !radio.playing && !tv.paused) tv.pause();
     el.classList.toggle('stopped', !radio.playing);
     text('.np-title', displayTitle());
     text('.np-artist', displayArtist());
-    text('.np-station', capitalized(station.name));
+    text('.np-station', stationName(station));
     text('.np-problem', radio.problem || spotify.problem || '');
     heart.hidden = !heartable();
     const liked = likedNow();
@@ -722,6 +848,7 @@ const makeView = p => p === 'nowPlaying' ? nowPlayingView() : p === 'about' ? ab
 
 function show(forward) {
   const old = ui.view, p = page();
+  if (p !== 'nowPlaying' && isVideo(radio.station) && radio.playing) stop();
   const view = makeView(p);
   ui.view = view;
   $('pages').append(view.el);
@@ -804,7 +931,7 @@ function select() {
     const station = stationsIn(p.slice(5))[index];
     if (!station) return;
     tune(station);
-    push('nowPlaying');
+    if (page() !== 'nowPlaying') push('nowPlaying');  // a video station already went there
   } else if (p === 'playlists') {
     // Spotify plays its own music: a playlist opens in Spotify.
     const playlist = playlistRows()[index];
@@ -995,6 +1122,7 @@ function changed() {
     if (state.dataset.icon !== icon) { state.dataset.icon = icon; state.innerHTML = ICON[icon]; }
     state.classList.toggle('buffering', radio.buffering);
     ui.view?.update();
+    syncVideo();
     renderConnect();
     updateMediaSession();
     sendStatus();
@@ -1016,3 +1144,4 @@ changed();
 void loadConfig();
 if (spotify.connected) void refreshPlaylists();
 if (params.get('autoplay') === '1') start();
+void loadVideoStations();

@@ -15,7 +15,11 @@
       "nowPlaying": "/api/now-playing?station=radio-paradise",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/radio-paradise-1.mp4",
+        "tv/radio-paradise-2.mp4"
+      ]
     },
     {
       "id": "boot-liquor",
@@ -33,7 +37,11 @@
       "nowPlaying": "/api/now-playing?station=boot-liquor",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/boot-liquor-1.mp4",
+        "tv/boot-liquor-2.mp4"
+      ]
     },
     {
       "id": "sonic-universe",
@@ -51,7 +59,11 @@
       "nowPlaying": "/api/now-playing?station=sonic-universe",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/sonic-universe-1.mp4",
+        "tv/sonic-universe-2.mp4"
+      ]
     },
     {
       "id": "indie-pop-rocks",
@@ -69,7 +81,11 @@
       "nowPlaying": "/api/now-playing?station=indie-pop-rocks",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/indie-pop-rocks-1.mp4",
+        "tv/indie-pop-rocks-2.mp4"
+      ]
     },
     {
       "id": "pop-girl",
@@ -85,7 +101,11 @@
       "providerLabel": "Live on Exclusive.Radio ↗",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/pop-girl-1.mp4",
+        "tv/pop-girl-2.mp4"
+      ]
     },
     {
       "id": "dial-up",
@@ -184,6 +204,10 @@
           "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
           "license": "Original project audio; no third-party samples"
         }
+      ],
+      "tv": [
+        "tv/dial-up-1.mp4",
+        "tv/dial-up-2.mp4"
       ]
     },
     {
@@ -272,6 +296,10 @@
           "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
           "license": "Original project audio; no third-party samples"
         }
+      ],
+      "tv": [
+        "tv/shareware-summer-1.mp4",
+        "tv/shareware-summer-2.mp4"
       ]
     },
     {
@@ -360,6 +388,10 @@
           "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
           "license": "Original project audio; no third-party samples"
         }
+      ],
+      "tv": [
+        "tv/night-build-1.mp4",
+        "tv/night-build-2.mp4"
       ]
     },
     {
@@ -437,7 +469,28 @@
           "provenance": "Original procedural instrumental composition; see scripts/compose-instrumentals.py (SCORES)",
           "license": "Original project audio; no third-party samples"
         }
+      ],
+      "tv": [
+        "tv/pixel-drift-1.mp4",
+        "tv/pixel-drift-2.mp4"
       ]
+    }
+  ],
+  "videoStations": [
+    {
+      "id": "101x-chillville",
+      "name": "101X CHILLVILLE",
+      "band": "radio",
+      "frequency": "06",
+      "tagline": "101X Austin's Chillville playlist, played from each song's official video.",
+      "genre": "CHILL / 101X AUSTIN",
+      "color": "#9fd8ff",
+      "video": "youtube",
+      "playlist": "playlists/101x-chillville.json",
+      "website": "https://open.spotify.com/playlist/61U0gXCJiZZf1LcdfUZcbJ",
+      "provider": "101X",
+      "providerLabel": "Chillville on Spotify ↗",
+      "label": "101X Chillville"
     }
   ]
 }
