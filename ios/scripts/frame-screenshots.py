@@ -12,12 +12,12 @@ FONT = "/System/Library/Fonts/SFNS.ttf"
 
 # name: (headline, subline, top color, bottom color)
 SLIDES = {
-    "1-main": ("Little radio.\nVery big mood.", "Spin the wheel, press play, it's already on.", "#2b2d42", "#11121c"),
-    "2-live": ("Heart it.\nKeep it.", "Tap the heart and the song lands in your Spotify Liked Songs.", "#e5484d", "#9b1c2a"),
-    "3-radio": ("Real radio,\nlive right now.", "Radio Paradise, SomaFM, Exclusive Radio and POP GIRL RADIO.", "#3a5bd9", "#1d2a73"),
-    "4-playlists": ("Your playlists,\non the wheel.", "With the Nate's Software HIFI playlist up top.", "#1db954", "#0d6b30"),
-    "5-connect": ("Free. No ads.\nNo tracking.", "Spotify is optional. The radio just plays.", "#f2a33a", "#b5601a"),
-    "6-synth": ("Original synth\nstations.", "Made by us, for working, coding and drifting off.", "#7b4fd6", "#3b1f7a"),
+    "1-main": ("Little radio.\nVery big mood.", "Free, listener-supported radio on a click wheel.", "#2b2d42", "#11121c"),
+    "2-tv": ("Radio with\nthe TV on.", "Every station plays its own old-TV clips, under clear glass.", "#3a5bd9", "#1d2a73"),
+    "3-radio": ("Free radio,\nlistener supported.", "Live from Radio Paradise and SomaFM, straight from the stations.", "#e5484d", "#9b1c2a"),
+    "4-live": ("Heart it.\nKeep it.", "Tap the heart and the song lands in your Spotify Liked Songs.", "#1db954", "#0d6b30"),
+    "5-synth": ("Original synth\nstations.", "Made by us, for working, coding and drifting off.", "#7b4fd6", "#3b1f7a"),
+    "6-connect": ("Free. No ads.\nNo account.", "Spotify is optional. The radio just plays.", "#f2a33a", "#b5601a"),
 }
 
 
