@@ -61,7 +61,7 @@ def setup():
         print("group created")
     # What testers read in TestFlight.
     locs = api("GET", f"/v1/apps/{APP}/betaAppLocalizations")["data"]
-    attrs = {"description": "HIFI is internet radio on a white click-wheel iPod: live stations, original synth music, "
+    attrs = {"description": "HIFI is free, listener-supported internet radio on a classic white click wheel: live stations, original synth music, "
                             "101X Chillville and HIFI TV. Taste Makers get every new build first.",
              "feedbackEmail": "nate.mcguire@gmail.com", "marketingUrl": "https://hifi.nates-software.com",
              "privacyPolicyUrl": "https://hifi.nates-software.com/privacy"}

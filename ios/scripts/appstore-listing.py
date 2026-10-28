@@ -25,10 +25,12 @@ api = ns["api"]
 BUNDLE_ID = "com.natesoftware.hifi"
 SHOTS = HERE.parent / "Screenshots"
 LISTING = {
-    "subtitle": "Little radio, very big mood",
-    "promotionalText": "Heart a song on the radio and it lands in your Spotify Liked Songs. Free, no ads.",
-    "keywords": "internet radio,lofi,synth,chiptune,ambient,focus,jazz,indie,pop,spotify,somafm,retro,click wheel",
-    "description": """HIFI is a little internet radio with a click wheel.
+    "subtitle": "Free listener-supported radio",
+    "promotionalText": "Free, listener-supported radio on a click wheel, now with HIFI TV: every station plays its own old-TV clips. No ads, no account.",
+    "keywords": "free radio,internet radio,listener supported,somafm,lofi,synth,chill,jazz,indie,retro,click wheel",
+    "description": """HIFI is free, listener-supported internet radio on a click wheel.
+
+No subscription, no ads, no account. The live stations are independent, listener-supported radio from Radio Paradise and SomaFM, streamed straight from the stations, and HIFI is free.
 
 Spin the wheel to pick a station, press the center to tune in, and the music is already playing. Our original stations run on a shared clock, so tuning in drops you into the rotation wherever it is right now, like real radio.
 
@@ -38,19 +40,23 @@ SYNTH SOUNDS: four stations of original instrumental music for working, coding a
 • Night Build: dark ambient for after hours
 • Pixel Drift: bright chiptune
 
-RADIO: live internet radio from Radio Paradise, SomaFM and Exclusive Radio, with the song that's playing right now. Including POP GIRL RADIO: big choruses, every era, all day.
+RADIO: live, listener-supported internet radio from Radio Paradise and SomaFM, plus Exclusive Radio, with the song that's playing right now. Including POP GIRL RADIO: big choruses, every era, all day. If you love a station, support it at radioparadise.com or somafm.com/support.
+
+HIFI TV: every station has its own old-TV clips playing behind Now Playing, under the song and station on a sheet of clear glass.
+
+101X CHILLVILLE: Austin's 101X Chillville playlist, 670 chill songs, each played from its official video.
 
 HEART IT: tap the heart next to a song on the radio and it's saved to your Spotify Liked Songs.
 
 PLAYLISTS: connect Spotify and your playlists show up right on the click wheel, with the Nate's Software HIFI playlist up top.
 
-• Skip between songs with the wheel, the lock screen or your headphones
+• Change stations with the wheel, the lock screen or your headphones
 • Song, artist and station on the lock screen, drawn like a classic Now Playing screen
 • Picture in Picture: go home and HIFI shrinks into a tiny clip-on player you can park in a corner
 • Plays in the background
 • No ads, no tracking. Spotify is optional; the radio needs no account
 
-Free, made for fun by Nate's Software. Bring your own headphones.""",
+Free forever, made for fun by Nate's Software. Bring your own headphones.""",
     "supportUrl": "https://github.com/natemcguire/hifi/issues",
     "marketingUrl": "https://hifi.nates-software.com/",
 }
@@ -116,6 +122,7 @@ def main():
     rating = api("GET", f"/v1/appInfos/{info['id']}/ageRatingDeclaration")["data"]
     none = "NONE"
     patch("ageRatingDeclarations", rating["id"], {
+        "socialMedia": False,  # Apple's newer question: HIFI has no social features
         "alcoholTobaccoOrDrugUseOrReferences": none, "contests": none, "gamblingSimulated": none,
         "horrorOrFearThemes": none, "matureOrSuggestiveThemes": none, "medicalOrTreatmentInformation": none,
         "profanityOrCrudeHumor": "INFREQUENT_OR_MILD", "sexualContentGraphicAndNudity": none,
@@ -168,6 +175,9 @@ def main():
               "notes": "No account needed. Press the center button on the click wheel to play. "
                        "Synth Sounds stations are original music we made; the Radio stations are the public "
                        "streams of Radio Paradise, SomaFM and Exclusive Radio. Picture in Picture: start a station, then go home. "
+                       "HIFI TV clips are original AI-generated video made for HIFI. 101X Chillville plays each song's official "
+                       "YouTube upload in YouTube's own embedded player (youtube-nocookie.com), shown on screen and only while "
+                       "the app is open; leaving Now Playing stops it. "
                        "Spotify is optional: the heart next to a live song and the Playlists menu ask the listener to connect "
                        "their own Spotify account (Spotify's own sign-in page, PKCE, no password reaches us). Everything else "
                        "works without it."}
