@@ -175,6 +175,21 @@ export default {
     headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' https://*.radioparadise.com https://*.somafm.com https://streaming.exclusive.radio; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self'; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'");
     if (headers.get('Content-Type')?.includes('text/html')) headers.set('Cache-Control','no-cache');
     if (url.pathname.endsWith('.dmg') && response.ok) headers.set('Content-Disposition', 'attachment; filename="HIFI.dmg"');
+    // Safari and iMessage only play video and audio that answer byte ranges, and
+    // static assets ignore Range, so slice those here.
+    if (response.status === 200 && /^(video|audio)\//.test(headers.get('Content-Type') || '')) {
+      headers.set('Accept-Ranges', 'bytes');
+      const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get('Range') || '');
+      if (range && request.method === 'GET') {
+        const body = await response.arrayBuffer(), size = body.byteLength;
+        const start = range[1] === '' ? Math.max(0, size - Number(range[2] || size + 1)) : Number(range[1]);
+        const end = range[1] === '' || range[2] === '' ? size - 1 : Math.min(Number(range[2]), size - 1);
+        if (!(start <= end && start < size)) { headers.set('Content-Range', `bytes */${size}`); headers.delete('Content-Length'); return new Response(null, { status: 416, headers }); }
+        headers.set('Content-Range', `bytes ${start}-${end}/${size}`);
+        headers.set('Content-Length', String(end - start + 1));
+        return new Response(body.slice(start, end + 1), { status: 206, headers });
+      }
+    }
     return new Response(response.body,{status:response.status,headers});
   }
 };
