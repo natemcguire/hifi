@@ -173,7 +173,12 @@ export default {
     headers.set('X-Content-Type-Options','nosniff');
     headers.set('Referrer-Policy','strict-origin-when-cross-origin');
     headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' https://*.radioparadise.com https://*.somafm.com https://streaming.exclusive.radio; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self'; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'");
+    // HTML is checked every visit; scripts and styles are linked by content hash
+    // (scripts/build-site.mjs) so they keep for a year; media and the catalog keep a while.
     if (headers.get('Content-Type')?.includes('text/html')) headers.set('Cache-Control','no-cache');
+    else if (response.ok && url.searchParams.has('v') && /\.(js|css)$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=31536000, immutable');
+    else if (response.ok && /^\/(shots|tracks)\/|\.svg$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=86400, stale-while-revalidate=604800');
+    else if (response.ok && url.pathname === '/stations.json') headers.set('Cache-Control','public, max-age=300, stale-while-revalidate=86400');
     if (url.pathname.endsWith('.dmg') && response.ok) headers.set('Content-Disposition', 'attachment; filename="HIFI.dmg"');
     // Safari and iMessage only play video and audio that answer byte ranges, and
     // static assets ignore Range, so slice those here.

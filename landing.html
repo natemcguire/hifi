@@ -14,23 +14,23 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="nav"><a class="brand" href="/" aria-label="HIFI home"><i aria-hidden="true"></i>HIFI</a>
-<nav aria-label="Main navigation"><a href="#iphone">iPhone</a><a href="#stations">Stations</a><a href="#how">How it works</a><a href="https://nates-software.com/hifi">Nate’s desktop</a><a href="/download" download>Mac app</a></nav>
+<nav aria-label="Main navigation"><a href="#iphone">iPhone</a><a href="#stations">Stations</a><a href="#how">How it works</a><button type="button" class="about-open">About Nate’s Software</button><a href="/download" download>Mac app</a></nav>
 <a class="pill small" href="/player">Open player</a></header>
 <main id="main">
 <section class="hero">
 <div class="hero-copy"><p class="eyebrow">Internet radio from Nate’s Software</p><h1>Little radio.<br>Very big mood.</h1><p class="lead">Spin the wheel, press play. It’s already on.</p><p class="sub">Live stations from Radio Paradise and SomaFM, synth stations made here, all on a white click wheel that fits in your browser.</p>
 <div class="actions"><a class="pill" href="/player">▶ Open the player</a><a class="pill ghost" href="/download" download>Download for Mac</a></div><p class="fine">Free to listen. No account. The Mac app runs on macOS 15 or later, Apple silicon and Intel.</p></div>
-<div class="hero-device"><iframe src="/player?compact=1" title="Try HIFI radio" allow="autoplay" loading="eager"></iframe><p class="try"><span class="dot" aria-hidden="true"></span>The real player. Go ahead, spin it.</p></div>
+<div class="hero-device"><div class="device-frame"><img src="/shots/player.webp" width="340" height="544" alt="" fetchpriority="high"><iframe data-src="/player?compact=1" title="Try HIFI radio" allow="autoplay"></iframe></div><p class="try"><span class="dot" aria-hidden="true"></span>The real player. Go ahead, spin it.</p></div>
 </section>
 
 <section class="phones" id="iphone"><div class="section-head"><h2>The same iPod,<br>in your pocket.</h2><p>HIFI on iPhone plays in the background, shows up on the lock screen, and hearts songs straight into your Spotify. It’s on its way to the App Store.</p></div>
 <div class="shots" tabindex="0" aria-label="iPhone screenshots">
-<figure><img src="/shots/1-main.webp" width="560" height="1217" alt="HIFI main menu on iPhone: Now Playing, Radio, Synth Sounds, Playlists, Settings and About, with the click wheel below"></figure>
-<figure><img src="/shots/2-live.webp" width="560" height="1217" alt="Now Playing a live song on Indie Pop Rocks! with a heart to save it" loading="lazy"></figure>
-<figure><img src="/shots/3-radio.webp" width="560" height="1217" alt="The Radio menu listing live stations and the song each one is playing" loading="lazy"></figure>
-<figure><img src="/shots/4-playlists.webp" width="560" height="1217" alt="Spotify playlists on the click wheel, with Nate’s Software HIFI at the top" loading="lazy"></figure>
-<figure><img src="/shots/5-connect.webp" width="560" height="1217" alt="Connect Spotify: keep the songs you love" loading="lazy"></figure>
-<figure><img src="/shots/6-synth.webp" width="560" height="1217" alt="The Synth Sounds menu with HIFI’s own stations" loading="lazy"></figure>
+<figure><img src="/shots/1-main.webp" width="560" height="1217" loading="lazy" decoding="async" alt="HIFI main menu on iPhone: Now Playing, Radio, Synth Sounds, Playlists, Settings and About, with the click wheel below"></figure>
+<figure><img src="/shots/2-live.webp" width="560" height="1217" alt="Now Playing a live song on Indie Pop Rocks! with a heart to save it" loading="lazy" decoding="async"></figure>
+<figure><img src="/shots/3-radio.webp" width="560" height="1217" alt="The Radio menu listing live stations and the song each one is playing" loading="lazy" decoding="async"></figure>
+<figure><img src="/shots/4-playlists.webp" width="560" height="1217" alt="Spotify playlists on the click wheel, with Nate’s Software HIFI at the top" loading="lazy" decoding="async"></figure>
+<figure><img src="/shots/5-connect.webp" width="560" height="1217" alt="Connect Spotify: keep the songs you love" loading="lazy" decoding="async"></figure>
+<figure><img src="/shots/6-synth.webp" width="560" height="1217" alt="The Synth Sounds menu with HIFI’s own stations" loading="lazy" decoding="async"></figure>
 </div></section>
 
 <section class="stations" id="stations"><div class="section-head"><h2>Nine stations.<br>One wheel.</h2><p>Five live stations for company, four rotations of synth music for heads-down work.</p></div>
@@ -53,7 +53,7 @@
 
 <section class="how" id="how"><div class="section-head"><h2>You tune in.<br>The music is already there.</h2><p>The synth stations run on a shared clock. Press play and you join the rotation wherever it is. Leave, come back, and it carried on without you.</p></div>
 <div class="questions">
-<details><summary>How do I use the wheel?</summary><p>Drag around the ring to scroll, press the center to choose. MENU goes back, ▶︎❚❚ plays and stops, and the side buttons skip songs. On Now Playing the wheel is the volume. Arrow keys, Return, Escape and Space work too.</p></details>
+<details><summary>How do I use the wheel?</summary><p>Drag around the ring to scroll, press the center to choose. MENU goes back, ▶︎❚❚ plays and stops, and ⏮ ⏭ change station. On Now Playing the wheel is the volume. Arrow keys, Return, Escape and Space work too.</p></details>
 <details><summary>Is there a Mac app?</summary><p>Yes. <a href="/download" download>Download HIFI for Mac</a>, open the file and drag HIFI to Applications. It’s signed and checked by Apple, so it opens like any other app.</p></details>
 <details><summary>Is it free?</summary><p>Yes. There’s no HIFI account or subscription.</p></details>
 <details><summary>What does the heart do?</summary><p>Connect Spotify (in Settings or Playlists) and the ♥ next to a live song saves it to your Liked Songs. Your playlists show up on the wheel, with Nate’s Software HIFI at the top.</p></details>
@@ -63,6 +63,15 @@
 
 <section class="signoff"><h2>The internet used to have little places like this.</h2><p>It still can.</p><div class="actions center"><a class="pill" href="/player">▶ Find your frequency</a><a class="pill ghost" href="/download" download>Download for Mac</a></div></section>
 </main>
-<footer><a class="brand" href="/"><i aria-hidden="true"></i>HIFI</a><p>A small pleasure from <a href="https://nates-software.com">Nate’s Software</a>.</p><a href="/privacy">Privacy</a></footer>
+<footer><a class="brand" href="/"><i aria-hidden="true"></i>HIFI</a><p>HIFI, by <a href="https://x.com/natemcguire" target="_blank" rel="noopener">@natemcguire</a> · <a href="https://nates-software.com" target="_blank" rel="noopener">Nate’s Software</a></p><button type="button" class="about-open">About Nate’s Software</button><a href="/privacy">Privacy</a></footer>
+<dialog id="about" class="about-dialog" aria-labelledby="about-title">
+<form method="dialog" class="about-close-row"><button class="about-close" aria-label="Close">×</button></form>
+<p class="eyebrow">About Nate’s Software</p>
+<h2 id="about-title">Small, sharp software, built by hand.</h2>
+<p>HIFI is a part of <a href="https://nates-software.com" target="_blank" rel="noopener">Nate’s Software</a>, the home for software enthusiasts who are tired of the same old SaaS. No seat licenses, no onboarding webinars, no dashboard you’ll never open. Just small, sharp tools that do one thing and feel good doing it.</p>
+<p>HIFI is a roll-your-own radio player hitting that nostalgia vibe. It’s free and <a href="https://github.com/natemcguire/hifi" target="_blank" rel="noopener">open source</a> (MIT), and it plays on <a href="https://nates-software.com/hifi" target="_blank" rel="noopener">Nate’s desktop</a> too. Go down the rabbit hole and visit <a href="https://nates-software.com" target="_blank" rel="noopener">Nate’s Software</a> to learn more.</p>
+<p>HIFI is built by hand, with the help of AI, by <a href="https://x.com/natemcguire" target="_blank" rel="noopener">@natemcguire</a>.</p>
+<div class="about-actions"><a class="pill" href="https://nates-software.com" target="_blank" rel="noopener">Visit Nate’s Software</a><a href="https://github.com/natemcguire/hifi" target="_blank" rel="noopener">HIFI on GitHub</a></div>
+</dialog>
 <script type="module" src="/landing.js"></script>
 </body></html>

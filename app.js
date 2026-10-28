@@ -93,15 +93,11 @@ function notice(text) {
   changed();
 }
 
-// Next/previous move between songs, iPod style: previous restarts the song after
-// its first few seconds. Live streams can't skip, so they say so.
+// Next/previous change station, through every station in catalog order and
+// round again, like the dial on a radio.
 function skip(delta) {
-  if (isLive(radio.station)) return notice("Live radio · can't skip songs");
-  const tracks = radio.station.tracks;
-  if (!tracks?.length) return;
-  if (delta < 0 && radio.playing && elapsed() > 3) { audio.currentTime = 0; changed(); return; }
-  const index = Math.max(0, tracks.indexOf(radio.track));
-  play((index + delta + tracks.length) % tracks.length, 0);
+  const stations = catalog.stations, index = Math.max(0, stations.indexOf(radio.station));
+  tune(stations[(index + delta + stations.length) % stations.length]);
 }
 
 // Radio semantics: play always rejoins the broadcast now; there is no pause point.
