@@ -69,26 +69,11 @@ final class Radio: ObservableObject {
 
     func toggle() { isPlaying ? stop() : start() }
 
-    // Next/previous move between songs, iPod style: previous restarts the song
-    // after its first few seconds. Live streams can't skip, so they say so.
+    // Next/previous change station, through every station in catalog order and
+    // round again, like the dial on a radio.
     func skip(_ delta: Int) {
-        guard !station.isLive else {
-            let notice = "Live radio · can't skip songs"
-            problem = notice
-            Task { [weak self] in
-                try? await Task.sleep(for: .seconds(2.5))
-                if self?.problem == notice { self?.problem = nil }
-            }
-            return
-        }
-        guard let tracks = station.tracks, !tracks.isEmpty else { return }
-        if delta < 0, isPlaying, elapsed > 3 {
-            player.seek(to: .zero)
-            updateNowPlaying()
-            return
-        }
-        let index = track.flatMap { tracks.firstIndex(of: $0) } ?? 0
-        play(from: (index + delta + tracks.count) % tracks.count, offset: 0)
+        let index = stations.firstIndex { $0.id == station.id } ?? 0
+        tune(stations[(index + delta + stations.count) % stations.count])
     }
 
     // Radio semantics: play always rejoins the broadcast now; there is no pause point.

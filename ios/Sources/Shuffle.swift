@@ -92,7 +92,7 @@ extension ShufflePlayer: AVPictureInPictureSampleBufferPlaybackDelegate {
         MainActor.assumeIsolated { !(self.radio?.isPlaying ?? false) }
     }
     nonisolated func pictureInPictureController(_ controller: AVPictureInPictureController, didTransitionToRenderSize newRenderSize: CMVideoDimensions) {}
-    // PiP's skip buttons move between songs, like the shuffle's ⏮ ⏭.
+    // PiP's skip buttons change station, like the shuffle's ⏮ ⏭.
     nonisolated func pictureInPictureController(_ controller: AVPictureInPictureController, skipByInterval skipInterval: CMTime, completion completionHandler: @escaping () -> Void) {
         Task { @MainActor in
             self.radio?.skip(skipInterval.seconds < 0 ? -1 : 1)
