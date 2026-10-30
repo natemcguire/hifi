@@ -67,6 +67,9 @@ audio and lock-screen controls.
    certificate needs the Account Holder; the script explains the manual step), then
    `withkeys ios/scripts/build-dmg.sh` signs, notarizes and staples `download/HIFI.dmg`,
    which the site serves at `/download`.
+6. Another Mac of yours: `withkeys ios/scripts/send-mac.sh HOST` builds that DMG, copies it
+   over SSH and installs it in `/Applications` (`--reuse` sends the last build). That Mac needs
+   no checkout.
 
 Music and visuals roadmap: `docs/generative-radio.md`.
 
