@@ -2,3 +2,6 @@ build/
 HIFI.xcodeproj/
 Config/
 scripts/devices.local
+
+# App Review screen recordings (large; kept on disk, not in git)
+Review/

@@ -106,6 +106,17 @@ struct IPodView: View {
             case "setup": spotify.showSetup = true; spotify.showConnect = true
             default: break
             }
+            // App Review: `-tour 1` walks the app by itself for a screen recording. `-armTour 1`
+            // quits and makes the next ordinary launch run it once, so a Control Center screen
+            // recording started by hand catches the whole tour (ios/scripts/record-review.sh).
+            let defaults = UserDefaults.standard
+            if defaults.bool(forKey: "armTour") {
+                defaults.set(true, forKey: "tourArmed")
+                exit(0)
+            } else if defaults.bool(forKey: "tour") || defaults.bool(forKey: "tourArmed") {
+                defaults.removeObject(forKey: "tourArmed")
+                Task { await tour() }
+            }
             #endif
         }
         // A video station needs the screen: playing one jumps to Now Playing.
@@ -503,6 +514,81 @@ struct IPodView: View {
 private extension Array {
     subscript(safe index: Int) -> Element? { indices.contains(index) ? self[index] : nil }
 }
+
+#if DEBUG
+// The review tour: the same wheel presses a listener makes, paced for a two-minute
+// recording on a real iPhone. Radio with its live songs, HIFI TV, next station from the
+// wheel, 101X Chillville, Synth Sounds with pause and play, Playlists and the Spotify
+// connect page, Settings, About, and back to Now Playing. Debug builds only.
+extension IPodView {
+    fileprivate func tour() async {
+        func pause(_ seconds: Double) async { try? await Task.sleep(for: .seconds(seconds)) }
+        func press(_ region: WheelRegion) {
+            flashWheel(region)
+            Feedback.click()
+            switch region {
+            case .center: select()
+            case .menu: menu()
+            case .play: playPause()
+            case .next: radio.skip(1)
+            case .previous: radio.skip(-1)
+            }
+        }
+        // Scrolls the highlight to a row, one click at a time.
+        func go(to target: Int) async {
+            while (selection[page] ?? 0) != target {
+                rotate((selection[page] ?? 0) < target ? 1 : -1)
+                await pause(0.35)
+            }
+            await pause(0.7)
+        }
+        func open(_ index: Int, settle: Double) async {
+            await go(to: index)
+            press(.center)
+            await pause(settle)
+        }
+        func back(_ settle: Double = 1) async { press(.menu); await pause(settle) }
+
+        await pause(2.5)
+        // Radio: the live stations and the song on each; tune one in.
+        let live = stations("radio")
+        await open(1, settle: 3)
+        if let i = live.firstIndex(where: { $0.id == "sonic-universe" }) { await open(i, settle: 9) }
+        for _ in 0..<3 { rotate(1); await pause(0.25) }  // on Now Playing the wheel is the volume
+        await pause(1)
+        for _ in 0..<3 { rotate(-1); await pause(0.25) }
+        await pause(2.5)
+        press(.next); await pause(6)  // the next station, from the wheel
+        await back(1.5)
+        if let i = live.firstIndex(where: \.isVideo) { await open(i, settle: 12) }  // 101X Chillville: official videos
+        await back()  // MENU stops the video
+        await back()
+        // Synth Sounds: our own music on a shared clock, with pause and play.
+        await open(2, settle: 2)
+        if let i = stations("synth").firstIndex(where: { $0.id == "shareware-summer" }) { await open(i, settle: 7) }
+        press(.play); await pause(2)
+        press(.play); await pause(4)
+        await back(0.8); await back()
+        // Playlists, and the page that comes before Spotify's own sign-in.
+        await open(3, settle: 4)
+        if !spotify.isConnected {
+            await open(rows.count - 1, settle: 6)
+            spotify.showConnect = false
+            await pause(1)
+        }
+        await back()
+        // Settings: the clicker off and on, then every row.
+        await open(4, settle: 2.5)
+        press(.center); await pause(1.2)
+        press(.center); await pause(1)
+        await go(to: rows.count - 1); await pause(1.5)
+        await back()
+        await open(5, settle: 3.5)  // About
+        await back()
+        await open(0, settle: 6)  // Now Playing, still on the air
+    }
+}
+#endif
 
 // MARK: Now Playing
 
