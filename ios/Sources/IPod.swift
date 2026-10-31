@@ -112,7 +112,8 @@ struct IPodView: View {
             let defaults = UserDefaults.standard
             if defaults.bool(forKey: "armTour") {
                 defaults.set(true, forKey: "tourArmed")
-                exit(0)
+                defaults.synchronize()  // on disk before the process goes
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { exit(0) }
             } else if defaults.bool(forKey: "tour") || defaults.bool(forKey: "tourArmed") {
                 defaults.removeObject(forKey: "tourArmed")
                 Task { await tour() }

@@ -4,6 +4,8 @@
 # installed on the phone, `devicectl` records the phone's screen over USB or Wi-Fi
 # while the tour presses the wheel by itself, and the video lands in Review/.
 # The phone must be paired, unlocked and awake. Nothing here needs a hand on it.
+# (devicectl hands a `--` to the app as a literal argument, which breaks `-key value`
+# parsing, so the launch arguments are passed bare.)
 # Run as: ios/scripts/record-review.sh [UDID] [seconds]   (defaults: first phone in
 # scripts/devices.local, 110 seconds). Pass --reuse to skip the build.
 #
@@ -44,8 +46,16 @@ xcrun devicectl device install app --device $udid $app >/dev/null
 echo "installed on $udid"
 
 if (( arm )); then
-  xcrun devicectl device process launch --device $udid --terminate-existing $bundle -- -armTour 1 >/dev/null
-  echo "armed: on the phone, start a Control Center screen recording, open HIFI, wait about two minutes, stop."
+  xcrun devicectl device process launch --device $udid --terminate-existing $bundle -armTour 1 >/dev/null
+  sleep 4
+  rm -f /tmp/hifi-prefs.plist
+  xcrun devicectl device copy from --device $udid --domain-type appDataContainer --domain-identifier $bundle \
+    --source Library/Preferences/$bundle.plist --destination /tmp/hifi-prefs.plist >/dev/null 2>&1 || true
+  if plutil -p /tmp/hifi-prefs.plist 2>/dev/null | grep -q '"tourArmed" => 1'; then
+    echo "armed: on the phone, start a Control Center screen recording, open HIFI, wait about two minutes, stop."
+  else
+    echo "not armed: the flag didn't reach the phone's preferences. Is the phone unlocked? Run again."; exit 1
+  fi
   exit 0
 fi
 if ! xcrun devicectl device info details --device $udid 2>/dev/null | grep -q 'com.apple.coredevice.feature.screenrecording'; then
@@ -57,7 +67,7 @@ out=Review/hifi-iphone-review-$(date +%Y%m%d-%H%M).mp4
 xcrun devicectl device capture screen-record --device $udid --destination $out --duration $seconds >/tmp/hifi-record.log 2>&1 &
 recorder=$!
 sleep 3
-xcrun devicectl device process launch --device $udid --terminate-existing $bundle -- -tour 1 >/dev/null
+xcrun devicectl device process launch --device $udid --terminate-existing $bundle -tour 1 >/dev/null
 echo "recording $seconds s while the tour runs…"
 wait $recorder || { cat /tmp/hifi-record.log; exit 1 }
 xcrun devicectl device process launch --device $udid --terminate-existing $bundle >/dev/null 2>&1 || true  # leave the app on its menu, tour off
