@@ -11,8 +11,13 @@ Nothing in this file has been sent to Apple. Nate replies in App Store Connect.
 
 ## The recording
 
-Status on 2026-10-31 evening: the physical-device recording still needs one hand on
-the phone. Everything else is in place.
+Status on 2026-10-31, 18:25: done. Nate recorded the armed tour on his iPhone with a
+Control Center screen recording and has the video he needs (it is on the phone, not in
+this repo). The recording run is over: nothing is recording or building on the mini, and
+the phone's tour is no longer armed (HIFI's preferences carry no `tourArmed` key), so the
+next launch of HIFI behaves normally. Do not record again or resubmit; Nate attaches the
+video to the App Store Connect reply himself. The rest of this section is kept for the
+next time a device recording is needed.
 
 - `xcrun devicectl device capture screen-record` refused Nate's iPhone 17 Pro Max
   (iOS 26.6.1): over Wi-Fi the phone does not offer the Screen Recording capability
