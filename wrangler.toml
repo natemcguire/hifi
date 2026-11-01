@@ -29,3 +29,8 @@ new_sqlite_classes = ["Downloads"]
 binding = "DB"
 database_name = "nsw-hifi"
 database_id = "62be806d-d671-4808-ad84-263809cca29f"
+
+# Nate's Tastemakers (../tastemakers): /tastemakers/* goes there.
+[[services]]
+binding = "TASTEMAKERS"
+service = "nsw-tastemakers"

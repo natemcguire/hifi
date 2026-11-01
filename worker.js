@@ -181,6 +181,8 @@ async function tastemakers(request, env) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Nate's Tastemakers signup form and its API, shared with the other Tastemakers apps.
+    if (url.pathname.startsWith('/tastemakers/')) return env.TASTEMAKERS.fetch(request);
     if (url.pathname === '/api/tastemakers' && request.method === 'POST') return tastemakers(request, env);
     if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', {status:405,headers:{Allow:'GET, HEAD'}});
     if (url.pathname === '/api/now-playing') return nowPlaying(url, env);

@@ -126,3 +126,5 @@ footer .about-open{font-size:13px;color:var(--muted)}
 .tm-note{flex-basis:100%;margin-top:-6px;font-size:14px;color:#c7c7cc}
 .tm-note:empty{display:none}
 .tastemakers.done .tm-row{display:none}
+.tastemakers-slot{max-width:1180px;margin:-12px auto 40px}
+@media (max-width:1212px){.tastemakers-slot{margin-left:16px;margin-right:16px}}

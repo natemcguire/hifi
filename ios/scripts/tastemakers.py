@@ -3,7 +3,9 @@
 
   setup   creates the group and Apple's beta details, gives it the newest build and
           sends that build to Beta App Review (once per version).
-  sync    adds every new signup from the site's D1 table to the group; Apple emails
+  sync    adds every new signup to the group: the shared Nate's Tastemakers list (D1
+          nsw-tastemakers, filled from every Tastemakers app's site) and the older
+          HIFI-only table it replaced; Apple emails
           each one a TestFlight invite. Run every few minutes by the launch agent
           com.nates-software.hifi-tastemakers on the mini.
 
@@ -47,8 +49,8 @@ def group():
     return None
 
 
-def d1(sql):
-    out = subprocess.run(["npx", "--no-install", "wrangler", "d1", "execute", "nsw-hifi", "--remote", "--json", "--command", sql],
+def d1(sql, db="nsw-hifi"):
+    out = subprocess.run(["npx", "--no-install", "wrangler", "d1", "execute", db, "--remote", "--json", "--command", sql],
                          cwd=ROOT, capture_output=True, text=True, check=True).stdout
     return json.loads(out)[0]["results"]
 
@@ -99,31 +101,38 @@ def setup():
     print("group ready:", gid)
 
 
+def invite(gid, email):
+    """Adds one address to the group; returns an error string or None."""
+    try:
+        api("POST", "/v1/betaTesters", {"data": {"type": "betaTesters", "attributes": {"email": email},
+                                                 "relationships": {"betaGroups": {"data": [{"type": "betaGroups", "id": gid}]}}}})
+        return None
+    except RuntimeError as e:
+        # Already a tester (another group or another app): just add them to this group.
+        found = api("GET", "/v1/betaTesters?filter[email]=" + urllib.request.quote(email))["data"] if "409" in str(e) else []
+        if found:
+            api("POST", f"/v1/betaGroups/{gid}/relationships/betaTesters", {"data": [{"type": "betaTesters", "id": found[0]["id"]}]})
+            return None
+        return str(e)[:300]
+
+
 def sync():
     gid = group()
     if not gid:
         sys.exit("No group yet: run setup first")
-    pending = d1("SELECT email FROM tastemakers WHERE invited_at IS NULL ORDER BY created_at LIMIT 100")
-    for row in pending:
-        email = row["email"]
-        try:
-            api("POST", "/v1/betaTesters", {"data": {"type": "betaTesters", "attributes": {"email": email},
-                                                     "relationships": {"betaGroups": {"data": [{"type": "betaGroups", "id": gid}]}}}})
-            error = None
-        except RuntimeError as e:
-            # Already a tester (another group or another app): just add them to this group.
-            found = api("GET", "/v1/betaTesters?filter[email]=" + urllib.request.quote(email))["data"] if "409" in str(e) else []
-            if found:
-                api("POST", f"/v1/betaGroups/{gid}/relationships/betaTesters", {"data": [{"type": "betaTesters", "id": found[0]["id"]}]})
-                error = None
+    q = lambda v: "'" + v.replace("'", "''") + "'"
+    # (database, table, column that records the invite)
+    for db, table, done in (("nsw-tastemakers", "signups", "hifi_invited_at"), ("nsw-hifi", "tastemakers", "invited_at")):
+        pending = d1(f"SELECT email FROM {table} WHERE {done} IS NULL ORDER BY created_at LIMIT 100", db)
+        for row in pending:
+            email = row["email"]
+            error = invite(gid, email)
+            if error:
+                d1(f"UPDATE {table} SET error = {q(error)} WHERE email = {q(email)}", db)
+                print("could not add a signup:", error[:120])
             else:
-                error = str(e)[:300]
-        if error:
-            d1(f"UPDATE tastemakers SET error = '{error.replace(chr(39), chr(39) * 2)}' WHERE email = '{email.replace(chr(39), chr(39) * 2)}'")
-            print("could not add a signup:", error[:120])
-        else:
-            d1(f"UPDATE tastemakers SET invited_at = {int(time.time() * 1000)}, error = NULL WHERE email = '{email.replace(chr(39), chr(39) * 2)}'")
-    print(f"{len(pending)} new signup(s) handled")
+                d1(f"UPDATE {table} SET {done} = {int(time.time() * 1000)}, error = NULL WHERE email = {q(email)}", db)
+        print(f"{db}: {len(pending)} new signup(s) handled")
 
 
 {"setup": setup, "sync": sync}.get(sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit(__doc__))()
