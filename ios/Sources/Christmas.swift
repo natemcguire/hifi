@@ -2,8 +2,10 @@ import SwiftUI
 
 // The Christmas look. On when the catalog says so (stations.json "features": {"christmas": true}),
 // which the apps fetch live, so it switches on and off from the server without a build.
-// Everything here is drawn: no image assets. Nothing takes touches. With Reduce Motion on,
-// the bulbs stay lit, the snow hangs still and the candy cane ring doesn't turn.
+// The iPod itself is not restyled: these are layers laid over it, like a cut-out graphic. Lights
+// across the top of the device, a tinsel garland wrapped round the screen bezel, a wreath on one
+// corner, crossed candy canes on another, snow over everything. Everything here is drawn: no image
+// assets. Nothing takes touches. With Reduce Motion on, the bulbs stay lit and the snow hangs still.
 
 // A string of bulbs on a sagging wire across the top of the device.
 struct ChristmasLights: View {
@@ -57,12 +59,12 @@ struct ChristmasLights: View {
     }
 }
 
-// Tinsel: a dense metallic fringe hugging the screen bezel, short strands radiating
-// outward from a rounded rectangle just outside the screen, shimmering slowly.
+// Tinsel: a dense metallic fringe wrapped round the screen bezel, short strands standing across
+// the screen edge: a few points in over the bezel, more out over the shell, shimmering slowly.
 struct ChristmasTinsel: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let cornerRadius: CGFloat
-    var reach: CGFloat = 10  // how far the fringe stands off the screen
+    var reach: CGFloat = 14  // how far the fringe stands off the screen
 
     private static let strands: [Color] = [Color(hex: "#E4E4E4"), .white, Color(hex: "#9C9C9C"), Color(hex: "#FFD166"),
                                            Color(hex: "#E4E4E4"), .white]
@@ -85,8 +87,9 @@ struct ChristmasTinsel: View {
                     let r1 = Self.noise(i), r2 = Self.noise(i &+ 7919), r3 = Self.noise(i &+ 104729)
                     let angle = normal + (r2 - 0.5) * 0.9
                     let length = reach * (0.55 + r3 * 0.65)
-                    // Strands start a touch inside the bezel so the fringe has no gap.
-                    let from = CGPoint(x: base.x - cos(normal) * 2, y: base.y - sin(normal) * 2)
+                    // Strands start over the bezel (1 to 7 pt in), so the garland wraps the edge.
+                    let inward = 1 + r1 * 6
+                    let from = CGPoint(x: base.x - cos(normal) * inward, y: base.y - sin(normal) * inward)
                     let to = CGPoint(x: base.x + cos(angle) * length, y: base.y + sin(angle) * length)
                     var strand = Path()
                     strand.move(to: from)
@@ -155,7 +158,9 @@ struct Snowfall: View {
                     let sway = sin(CGFloat(t) * (0.6 + b) + a * 6.28) * (6 + c * 10)
                     let x = (a * size.width + sway + size.width).truncatingRemainder(dividingBy: size.width)
                     let flake = Path(ellipseIn: CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2))
-                    canvas.fill(flake, with: .color(.white.opacity(0.35 + ChristmasTinsel.noise(i &+ 1543) * 0.5)))
+                    // A faint rim so the flakes show on the white shell as well as on the screen.
+                    canvas.stroke(flake, with: .color(Color(hex: "#50647f").opacity(0.3)), lineWidth: 0.7)
+                    canvas.fill(flake, with: .color(.white.opacity(0.4 + ChristmasTinsel.noise(i &+ 1543) * 0.5)))
                 }
             }
         }
@@ -202,69 +207,32 @@ struct Wreath: View {
     }
 }
 
-// Candy cane: a crisp striped rim round the outer edge of the click wheel, turning slowly.
-struct CandyRing: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    let diameter: CGFloat
-    var width: CGFloat = 9
+// Two candy canes crossed on a corner of the screen bezel: a white cane with red bands.
+struct CandyCanes: View {
+    let size: CGFloat
 
-    var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 20, paused: reduceMotion)) { context in
-            let turn = reduceMotion ? 0 : context.date.timeIntervalSinceReferenceDate * 6  // degrees per second
-            Rim(width: width)
-                .fill(AngularGradient(stops: Self.stops, center: .center, angle: .degrees(turn)), style: FillStyle(eoFill: true))
-                .overlay(Rim(width: width).stroke(Color.black.opacity(0.18), lineWidth: 0.8))
-        }
-        .frame(width: diameter, height: diameter)
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
-    // White and red at 9-degree steps, hard edges.
-    private static let stops: [Gradient.Stop] = {
-        var stops: [Gradient.Stop] = []
-        let n = 40
-        for i in 0..<n {
-            let a = Double(i) / Double(n), b = Double(i + 1) / Double(n)
-            let color: Color = i % 2 == 0 ? .white : Color(hex: "#E0262B")
-            stops += [.init(color: color, location: a), .init(color: color, location: b)]
-        }
-        return stops
-    }()
-}
-
-// The outer rim of a disc, `width` points wide.
-private struct Rim: Shape {
-    let width: CGFloat
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let outer = min(rect.width, rect.height) / 2
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        path.addEllipse(in: CGRect(x: center.x - outer, y: center.y - outer, width: outer * 2, height: outer * 2))
-        let r = outer - width
-        path.addEllipse(in: CGRect(x: center.x - r, y: center.y - r, width: r * 2, height: r * 2))
-        return path  // filled even-odd, so only the rim shows
-    }
-}
-
-// Diagonal candy stripes for the Now Playing progress fill.
-struct CandyStripes: View {
     var body: some View {
         Canvas { canvas, size in
-            canvas.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.white))
-            let step: CGFloat = 12
-            var x = -size.height - step
-            while x < size.width + step {
-                var band = Path()
-                band.move(to: CGPoint(x: x, y: size.height))
-                band.addLine(to: CGPoint(x: x + size.height, y: 0))
-                band.addLine(to: CGPoint(x: x + size.height + step / 2, y: 0))
-                band.addLine(to: CGPoint(x: x + step / 2, y: size.height))
-                band.closeSubpath()
-                canvas.fill(band, with: .color(Color(hex: "#E0262B")))
-                x += step
+            let s = size.width / 64
+            func cane(rotation: CGFloat, shift: CGPoint) {
+                var c = canvas
+                c.translateBy(x: 32 * s + shift.x, y: 40 * s + shift.y)
+                c.rotate(by: .radians(rotation))
+                c.translateBy(x: -32 * s, y: -40 * s)
+                var path = Path()
+                path.move(to: CGPoint(x: 22 * s, y: 58 * s))
+                path.addLine(to: CGPoint(x: 22 * s, y: 20 * s))
+                path.addArc(center: CGPoint(x: 31 * s, y: 20 * s), radius: 9 * s, startAngle: .degrees(180), endAngle: .degrees(0), clockwise: false)
+                path.addLine(to: CGPoint(x: 40 * s, y: 26 * s))
+                var shadow = c
+                shadow.addFilter(.shadow(color: .black.opacity(0.35), radius: 2, y: 1.5))
+                shadow.stroke(path, with: .color(.white), style: StrokeStyle(lineWidth: 7 * s, lineCap: .round))
+                c.stroke(path, with: .color(Color(hex: "#E0262B")), style: StrokeStyle(lineWidth: 7 * s, lineCap: .butt, dash: [4.5 * s, 5.5 * s]))
             }
+            cane(rotation: -0.38, shift: .zero)
+            cane(rotation: 0.42, shift: CGPoint(x: -2 * s, y: 2 * s))
         }
+        .frame(width: size, height: size)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }

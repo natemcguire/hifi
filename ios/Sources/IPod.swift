@@ -59,7 +59,7 @@ struct IPodView: View {
                     let wheel = min(size.height - pad * 2, size.width * 0.42)
                     HStack(spacing: pad) {
                         screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2)
-                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler, festive: christmas)
+                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
                     }
                     .padding(pad)
                 } else {
@@ -69,7 +69,7 @@ struct IPodView: View {
                     let wheel = min(size.width * 0.8, room * 0.9)
                     VStack(spacing: 0) {
                         screen(width: screenWidth, height: screenHeight)
-                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler, festive: christmas)
+                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
                             .frame(maxHeight: .infinity)
                     }
                     .padding(.horizontal, pad)
@@ -82,13 +82,10 @@ struct IPodView: View {
         .padding(.top, 22)  // clear of the traffic lights in the hidden title bar
         #endif
         .background {
-            ZStack {
-                Shell.body
-                if christmas { Snowfall() }
-            }
-            .ignoresSafeArea()
+            Shell.body.ignoresSafeArea()
         }
-        // The Christmas look: lights along the top (the tinsel and wreath are on the screen; Christmas.swift).
+        // The Christmas look is laid over the iPod, which stays as it is: lights along the top, then
+        // snow over everything (the tinsel, wreath and candy canes sit on the screen; Christmas.swift).
         .overlay(alignment: .top) {
             if christmas {
                 ChristmasLights()
@@ -97,6 +94,9 @@ struct IPodView: View {
                     .padding(.top, 2)
                     #endif
             }
+        }
+        .overlay {
+            if christmas { Snowfall().ignoresSafeArea() }
         }
         .preferredColorScheme(.light)
         .focusable()
@@ -257,11 +257,14 @@ struct IPodView: View {
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black.opacity(0.25), lineWidth: 1))
         .frame(width: width, height: height)
         .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
-        .background {
-            if christmas { ChristmasTinsel(cornerRadius: 18).padding(-10) }  // the fringe stands 10 pt off the bezel
+        .overlay {
+            if christmas { ChristmasTinsel(cornerRadius: 18).padding(-14) }  // the garland wraps the bezel and stands 14 pt off it
         }
         .overlay(alignment: .topTrailing) {
-            if christmas { Wreath(size: rowHeight * 1.5).offset(x: rowHeight * 0.6, y: -rowHeight * 0.65) }  // hangs off the corner, clear of the battery
+            if christmas { Wreath(size: rowHeight * 1.6).offset(x: rowHeight * 0.65, y: -rowHeight * 0.7) }  // hangs off the corner, clear of the battery
+        }
+        .overlay(alignment: .bottomLeading) {
+            if christmas { CandyCanes(size: rowHeight * 2.4).offset(x: -rowHeight * 0.7, y: rowHeight * 0.7) }
         }
     }
 
@@ -372,8 +375,7 @@ struct IPodView: View {
         .frame(height: height)
         .background {
             if selected {
-                LinearGradient(colors: christmas ? [Color(hex: "#D8262C"), Color(hex: "#B01B20")]
-                                                 : [Color(hex: "#7cc0f7"), Color(hex: "#2b78e0"), Color(hex: "#1c64c8")],
+                LinearGradient(colors: [Color(hex: "#7cc0f7"), Color(hex: "#2b78e0"), Color(hex: "#1c64c8")],
                                startPoint: .top, endPoint: .bottom)
                     .matchedGeometryEffect(id: "highlight", in: highlight)
             }
@@ -818,7 +820,7 @@ private struct NowPlaying: View {
             let elapsed = min(radio.elapsed, duration)
             VStack(spacing: 3) {
                 Bar(fraction: duration > 0 ? elapsed / duration : (radio.isPlaying ? 1 : 0), height: rowHeight * 0.3,
-                    live: radio.station.isLive, shimmer: radio.station.isLive && radio.isPlaying, candy: radio.catalog.christmas)
+                    live: radio.station.isLive, shimmer: radio.station.isLive && radio.isPlaying)
                 HStack {
                     Text(radio.station.isLive ? "LIVE" : clock(elapsed))
                     Spacer()
@@ -853,20 +855,15 @@ private struct Bar: View {
     let height: CGFloat
     let live: Bool
     let shimmer: Bool
-    var candy = false  // the Christmas look: a candy cane fill
 
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Rectangle().fill(LinearGradient(colors: [Color(hex: "#d9dde1"), Color(hex: "#f4f6f8")], startPoint: .top, endPoint: .bottom))
-                if candy {
-                    CandyStripes().frame(width: geo.size.width * min(1, max(0, fraction))).clipped()
-                } else {
-                    Rectangle()
-                        .fill(LinearGradient(colors: live ? [Color(hex: "#9fd57a"), Color(hex: "#4f9e2f")] : [Color(hex: "#7cc0f7"), Color(hex: "#1c64c8")],
-                                             startPoint: .top, endPoint: .bottom))
-                        .frame(width: geo.size.width * min(1, max(0, fraction)))
-                }
+                Rectangle()
+                    .fill(LinearGradient(colors: live ? [Color(hex: "#9fd57a"), Color(hex: "#4f9e2f")] : [Color(hex: "#7cc0f7"), Color(hex: "#1c64c8")],
+                                         startPoint: .top, endPoint: .bottom))
+                    .frame(width: geo.size.width * min(1, max(0, fraction)))
                 if shimmer {
                     // A light sweeping across the live bar: on air.
                     TimelineView(.animation) { context in
@@ -900,7 +897,6 @@ struct ClickWheel: View {
     let diameter: CGFloat
     var flash: WheelRegion?
     let handler: Handler
-    var festive = false  // candy cane stripes on the ring (the Christmas look)
     @State private var lastAngle: Double?
     @State private var accumulated = 0.0
     @State private var rotated = false
@@ -920,7 +916,6 @@ struct ClickWheel: View {
                 .fill(LinearGradient(colors: [Color(hex: "#f4f4f4"), Color(hex: "#d8d9db")], startPoint: .top, endPoint: .bottom))
                 .overlay(Circle().stroke(Color.black.opacity(0.12), lineWidth: 1))
                 .shadow(color: .black.opacity(0.08), radius: 1, y: 1)
-            if festive { CandyRing(diameter: diameter) }
             ForEach([WheelRegion.menu, .next, .play, .previous], id: \.self) { region in
                 Wedge(region: region, inner: hub / diameter)
                     .fill(RadialGradient(colors: [Color.black.opacity(0.03), Color.black.opacity(0.13)],
