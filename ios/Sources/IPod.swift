@@ -43,6 +43,8 @@ struct IPodView: View {
     @State private var flashTask: Task<Void, Never>?
     @State private var songTick = 0  // re-reads synth rotations while a list is open
     @State private var shuffleTick = 0  // redraws Settings after a shuffle toggle
+    @State private var query = ""  // the Radio list's search
+    @FocusState private var searchFocused: Bool
     @FocusState private var focused: Bool
     @Namespace private var highlight
 
@@ -83,6 +85,7 @@ struct IPodView: View {
         #if os(macOS)
         .padding(.top, 22)  // clear of the traffic lights in the hidden title bar
         #endif
+        .ignoresSafeArea(.keyboard)  // the search field sits at the top of the screen; the wheel keeps its room
         .background {
             Shell.body.ignoresSafeArea()
         }
@@ -160,12 +163,28 @@ struct IPodView: View {
         #endif
         .onKeyPress(.upArrow) { key(nil) { rotate(-1) } }
         .onKeyPress(.downArrow) { key(nil) { rotate(1) } }
-        .onKeyPress(.leftArrow) { key(.previous) { radio.skip(-1) } }
-        .onKeyPress(.rightArrow) { key(.next) { radio.skip(1) } }
+        .onKeyPress(.leftArrow) { searchFocused ? .ignored : key(.previous) { radio.skip(-1) } }
+        .onKeyPress(.rightArrow) { searchFocused ? .ignored : key(.next) { radio.skip(1) } }
         .onKeyPress(.return) { key(.center) { select() } }
-        .onKeyPress(.escape) { key(.menu) { menu() } }
-        .onKeyPress(.delete) { key(.menu) { menu() } }
-        .onKeyPress(.space) { key(.play) { playPause() } }
+        .onKeyPress(.escape) {
+            // In the search: Escape clears the field first, then backs out of the list.
+            if searchFocused, !query.isEmpty { query = ""; return .handled }
+            return key(.menu) { menu() }
+        }
+        .onKeyPress(.delete) { searchFocused ? .ignored : key(.menu) { menu() } }
+        .onKeyPress(.space) { searchFocused ? .ignored : key(.play) { playPause() } }
+        // Type-ahead from anywhere on the Radio list: the first letter lands in the search field.
+        .onKeyPress(characters: .alphanumerics, phases: .down) { press in
+            guard case .band = page, !searchFocused, !press.modifiers.contains(.command) else { return .ignored }
+            query += press.characters
+            searchFocused = true
+            touched()
+            #if os(macOS)
+            // Focusing a field selects its text on the Mac, which would make the next letter replace this one.
+            Task { for _ in 0..<5 { try? await Task.sleep(for: .milliseconds(30)); Self.moveCaretToEnd() } }
+            #endif
+            return .handled
+        }
         .task(id: page) {
             if page == .playlists { await spotify.refreshPlaylists() }
         }
@@ -208,6 +227,13 @@ struct IPodView: View {
     }
 
     // A key press flashes the matching part of the wheel, so the keyboard shows where it "clicked".
+    #if os(macOS)
+    private static func moveCaretToEnd() {
+        guard let editor = NSApp.keyWindow?.firstResponder as? NSTextView else { return }
+        editor.setSelectedRange(NSRange(location: (editor.string as NSString).length, length: 0))
+    }
+    #endif
+
     private func key(_ region: WheelRegion?, _ action: () -> Void) -> KeyPress.Result {
         if let region { flashWheel(region) }
         touched()
@@ -333,19 +359,62 @@ struct IPodView: View {
     private func list(rowHeight: CGFloat) -> some View {
         let items = rows
         let current = selection[page] ?? 0
-        return ScrollViewReader { proxy in
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    ForEach(Array(items.enumerated()), id: \.offset) { index, row in
-                        rowView(row, selected: index == current, height: rowHeight)
-                            .id(index)
-                            .contentShape(Rectangle())
-                            .onTapGesture { tapRow(index) }
+        return VStack(spacing: 0) {
+            if case .band = page { searchField(height: rowHeight) }
+            ScrollViewReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        ForEach(Array(items.enumerated()), id: \.offset) { index, row in
+                            rowView(row, selected: index == current, height: rowHeight)
+                                .id(index)
+                                .contentShape(Rectangle())
+                                .onTapGesture { tapRow(index) }
+                        }
+                        if items.isEmpty, !query.trimmingCharacters(in: .whitespaces).isEmpty {
+                            Text("No stations match")
+                                .font(.system(size: rowHeight * 0.42, weight: .semibold))
+                                .foregroundStyle(Color(hex: "#8a8f96"))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, rowHeight * 0.4)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
                 }
+                .onChange(of: current) { withAnimation(.easeOut(duration: 0.15)) { proxy.scrollTo(current) } }
             }
-            .onChange(of: current) { withAnimation(.easeOut(duration: 0.15)) { proxy.scrollTo(current) } }
         }
+    }
+
+    // The Radio list's search field: the list narrows as you type (see stations(_:)).
+    private func searchField(height: CGFloat) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: height * 0.4, weight: .semibold))
+                .foregroundStyle(Color(hex: "#8a8f96"))
+            TextField("Search stations", text: $query)
+                .textFieldStyle(.plain)
+                .font(.system(size: height * 0.42, weight: .semibold))
+                .foregroundStyle(Color(hex: "#111"))
+                .focused($searchFocused)
+                .autocorrectionDisabled()
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                .submitLabel(.go)
+                .keyboardType(.webSearch)
+                #endif
+            if !query.isEmpty {
+                Button { query = "" } label: {
+                    Image(systemName: "xmark.circle.fill").font(.system(size: height * 0.4)).foregroundStyle(Color(hex: "#9a9fa6"))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .padding(.horizontal, 8)
+        .frame(height: height)
+        .background(Color.white.opacity(0.55))
+        .overlay(alignment: .bottom) { Color.black.opacity(0.12).frame(height: 1) }
+        .onChange(of: query) { for p in stack { if case .band = p { selection[p] = 0 } } }
     }
 
     private func rowView(_ row: Row, selected: Bool, height: CGFloat) -> some View {
@@ -441,8 +510,16 @@ struct IPodView: View {
 
     private var playlistRows: [SpotifyPlaylist] { [spotify.natePlaylist].compactMap { $0 } + spotify.playlists }
 
-    // Radio is the one list: every station, in catalog order (the band only matters to older builds).
-    private func stations(_ band: String) -> [Station] { radio.stations }
+    // Radio is the one list: every station, in catalog order (the band only matters to older builds),
+    // narrowed by the search: every word typed has to appear in the station's name, line or genre.
+    private func stations(_ band: String) -> [Station] {
+        let words = query.lowercased().split(whereSeparator: \.isWhitespace).map(String.init)
+        guard !words.isEmpty else { return radio.stations }
+        return radio.stations.filter { station in
+            let text = [station.displayName, station.name, station.subtitle ?? "", station.genre].joined(separator: " ").lowercased()
+            return words.allSatisfy { text.contains($0) }
+        }
+    }
 
     // The station's own line if it has one; else "Artist – Song" under a live station,
     // or the current track under a synth station.
@@ -494,9 +571,11 @@ struct IPodView: View {
     }
 
     private func push(_ next: Page) {
-        if case .band(let band) = next, let index = stations(band).firstIndex(of: radio.station) {
-            selection[next] = index
+        if case .band(let band) = next {
+            query = ""  // the list opens whole
+            if let index = stations(band).firstIndex(of: radio.station) { selection[next] = index }
         }
+        searchFocused = false
         forward = true
         withAnimation(.easeInOut(duration: 0.25)) { stack.append(next) }
     }
@@ -510,6 +589,7 @@ struct IPodView: View {
         case .band(let band):
             let list = stations(band)
             guard list.indices.contains(index) else { return }
+            searchFocused = false
             radio.tune(list[index])
             if page != .nowPlaying { push(.nowPlaying) }
         case .playlists:

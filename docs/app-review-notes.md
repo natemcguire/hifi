@@ -58,7 +58,7 @@ HIFI is a free internet radio player drawn as a classic click-wheel music player
 HOW TO USE: drag a finger around the wheel to move the highlight, press the center button to choose, MENU to go back. On Now Playing the wheel is the volume, and the left and right wheel buttons change station.
 
 FEATURES AND WHERE THEY ARE
-- Radio (menu > Radio): one list of every station. Ten live stations, then the four Synth Sounds stations of our own instrumental music. Choose one and it plays, with the song that is on now and HIFI TV behind it. Everyone hears the same point in a Synth Sounds rotation, like a broadcast.
+- Radio (menu > Radio): one list of every station, with a search field above it that narrows the list as you type. Ten live stations, then the four Synth Sounds stations of our own instrumental music. Choose one and it plays, with the song that is on now and HIFI TV behind it. Everyone hears the same point in a Synth Sounds rotation, like a broadcast.
 - 101X Chillville (menu > Radio, last row): a playlist played from each song's official YouTube upload, in YouTube's own embedded player (youtube-nocookie.com), on screen and only while the app is open. MENU stops it.
 - Heart (Now Playing on a live station): saves the song to the listener's Spotify Liked Songs. Without Spotify connected it opens the Connect Spotify page.
 - Playlists (menu > Playlists): the Nate's Software HIFI playlist, and the listener's own Spotify playlists once connected. Choosing one opens it in Spotify.
