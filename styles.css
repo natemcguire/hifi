@@ -200,34 +200,42 @@ svg{display:block}
    it is; the decorations are layers laid over it, like a cut-out graphic: a string of lights across
    the top of the device, a tinsel garland wrapped round the screen bezel, holly on one corner,
    crossed candy canes on another, and snow falling over everything. None of it takes clicks. */
-.lights{position:absolute;left:var(--pad);right:var(--pad);top:0;height:34px;z-index:40;pointer-events:none}
-.lights svg{width:100%;height:34px;overflow:visible}
-.lights .cord{fill:none;stroke:#2d5a3a;stroke-width:2}
-.lights .bulb rect{fill:#4a5450}
-.lights .bulb ellipse{fill:var(--c);filter:drop-shadow(0 0 4px var(--c));animation:twinkle 1.7s ease-in-out infinite;animation-delay:calc(var(--i)*-.41s)}
-@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.4}}
+.lights{position:absolute;left:var(--pad);right:var(--pad);top:0;height:52px;z-index:40;pointer-events:none}
+.lights svg{width:100%;height:52px;overflow:visible}
+.lights .cord{fill:none;stroke:#1f5c2a;stroke-width:3.5;stroke-linecap:round}
+.lights .bulb rect{fill:#3b4a3f;stroke:#1a1a1a;stroke-width:1.6}
+.lights .bulb ellipse{fill:var(--c);stroke:#1a1a1a;stroke-width:1.8;filter:drop-shadow(0 0 5px var(--c));animation:twinkle 1.7s ease-in-out infinite;animation-delay:calc(var(--i)*-.41s)}
+.lights .bulb path{fill:#fff;opacity:.55}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.45}}
+.xmas .device{padding-top:calc(var(--pad) + 40px)}  /* room for the string of lights */
 .xmas .screen{position:relative}
-/* The garland is five rounded rectangles traced 6px outside the screen edge and stroked with short
-   dashes: every dash is a strand standing across the edge, and the layers' different widths give
-   strands of different lengths. They reach 20px out and no more than 8px in, so the glass stays clear. */
-.tinsel{position:absolute;inset:-26px;z-index:30;pointer-events:none;overflow:visible;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+/* The garland: rounded rectangles traced 14px outside the screen edge. Three are stroked with short
+   dashes (every dash a tinsel strand standing across the edge, reaching 22px out and 8px in over the
+   bezel); two more are stroked with round-capped dot dashes, which come out as big outlined beads. */
+.tinsel{position:absolute;inset:-44px;z-index:30;pointer-events:none;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
 .tinsel rect{fill:none}
-.tinsel .s1{stroke:#c9cdd2;stroke-width:28;stroke-dasharray:1.6 2.3;animation:shimmer 9s linear infinite}
-.tinsel .s2{stroke:#fff;stroke-width:24;stroke-dasharray:1.3 4.6;animation:shimmer 7s linear infinite reverse}
-.tinsel .s3{stroke:#8f959c;stroke-width:22;stroke-dasharray:1.2 3.9;animation:shimmer 13s linear infinite}
-.tinsel .s4{stroke:#ffd166;stroke-width:18;stroke-dasharray:1.4 7.3;animation:shimmer 11s linear infinite reverse}
-.tinsel .s5{stroke:#fff;stroke-width:14;stroke-dasharray:1 6.1;animation:shimmer 5s linear infinite}
-.tinsel .core{stroke:#a9aeb4;stroke-width:3}
+.tinsel .s1{stroke:#cdd1d6;stroke-width:44;stroke-dasharray:2.4 3.4;animation:shimmer 11s linear infinite}
+.tinsel .s2{stroke:#fff;stroke-width:40;stroke-dasharray:2 5.3;animation:shimmer 8s linear infinite reverse}
+.tinsel .s3{stroke:#ffd166;stroke-width:36;stroke-dasharray:2.2 7.9;animation:shimmer 13s linear infinite}
+.tinsel .s4{stroke:#8f959c;stroke-width:34;stroke-dasharray:1.8 4.6;animation:shimmer 9s linear infinite reverse}
+.tinsel .bead{stroke-linecap:round;stroke-dasharray:.1 32}
+.tinsel .bo{stroke:#1a1a1a;stroke-width:23}
+.tinsel .b1{stroke:#e8ecf0;stroke-width:18}
+.tinsel .b2{stroke:#e0262b;stroke-width:18;stroke-dashoffset:-16}
+.tinsel .bo2{stroke:#1a1a1a;stroke-width:23;stroke-dashoffset:-16}
 @keyframes shimmer{to{stroke-dashoffset:-60}}
-.holly{position:absolute;right:-24px;top:-26px;width:72px;height:54px;z-index:35;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
-.holly .leaf{fill:#1f7a3a;stroke:#0f4d22;stroke-width:1.2;stroke-linejoin:round}
-.holly .berry{fill:#e0262b;stroke:#8f1217;stroke-width:1}
-.canes{position:absolute;left:-26px;bottom:-26px;width:96px;height:96px;z-index:35;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.holly{position:absolute;right:-44px;top:-46px;width:120px;height:90px;z-index:35;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
+.holly .leaf{fill:#2a9d4a;stroke:#1a1a1a;stroke-width:2.6;stroke-linejoin:round}
+.holly .vein{fill:none;stroke:#176b30;stroke-width:1.6;stroke-linecap:round}
+.holly .berry{fill:#e0262b;stroke:#1a1a1a;stroke-width:2}
+.holly .shine{fill:#fff;opacity:.7}
+.canes{position:absolute;left:-54px;bottom:-54px;width:160px;height:160px;z-index:35;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
 .canes path{fill:none;stroke-width:7}
+.canes .ink{stroke:#1a1a1a;stroke-width:10.4;stroke-linecap:round}
 .canes .white{stroke:#fff;stroke-linecap:round}
 .canes .red{stroke:#e0262b;stroke-dasharray:4.5 5.5}
 .snow{position:fixed;inset:0;z-index:60;overflow:hidden;pointer-events:none}
-.snow i{position:absolute;top:-12px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fff;box-shadow:0 0 0 .6px rgba(80,100,130,.35),0 1px 2px rgba(0,0,0,.2);opacity:var(--o);animation:fall var(--d) linear infinite;animation-delay:var(--t)}
-@keyframes fall{to{transform:translate3d(24px,106vh,0)}}
+.snow i{position:absolute;top:-16px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fff;box-shadow:0 0 0 1.2px rgba(40,60,90,.45),0 1px 2px rgba(0,0,0,.2);opacity:var(--o);animation:fall var(--d) linear infinite;animation-delay:var(--t)}
+@keyframes fall{to{transform:translate3d(28px,106vh,0)}}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

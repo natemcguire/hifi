@@ -76,45 +76,49 @@ function decorate() {
   device.prepend(lights);
   const colors = ['#ff3b30', '#34c759', '#ffcc00', '#5ac8fa', '#ff2d95'];
   const string = () => {
-    const w = Math.max(120, Math.round(lights.clientWidth)), n = Math.max(6, Math.round(w / 48)), step = w / n;
-    let cord = 'M0 4', bulbs = '';
+    const w = Math.max(120, Math.round(lights.clientWidth)), n = Math.max(5, Math.round(w / 66)), step = w / n;
+    let cord = 'M0 5', bulbs = '';
     for (let i = 0; i < n; i++) {
       const mid = step * (i + 0.5);
-      cord += ` Q${mid.toFixed(1)} 20 ${(step * (i + 1)).toFixed(1)} 4`;
-      bulbs += `<g class="bulb" style="--i:${i};--c:${colors[i % colors.length]}" transform="translate(${mid.toFixed(1)} 12)">`
-        + '<rect x="-3" y="-1" width="6" height="5" rx="1.2"/><ellipse cx="0" cy="11" rx="4.8" ry="7.2"/></g>';
+      cord += ` Q${mid.toFixed(1)} 30 ${(step * (i + 1)).toFixed(1)} 5`;
+      bulbs += `<g class="bulb" style="--i:${i};--c:${colors[i % colors.length]}" transform="translate(${mid.toFixed(1)} 17) rotate(${(i % 2 ? 7 : -7)})">`
+        + '<rect x="-5" y="-2.5" width="10" height="8" rx="2"/><ellipse cx="0" cy="18" rx="7.5" ry="12.5"/><path d="M-3.5 10.5c-1.5 2.5-1.8 6-1 9"/></g>';
     }
-    lights.innerHTML = `<svg viewBox="0 0 ${w} 34" preserveAspectRatio="none"><path class="cord" d="${cord}"/>${bulbs}</svg>`;
+    lights.innerHTML = `<svg viewBox="0 0 ${w} 52" preserveAspectRatio="none"><path class="cord" d="${cord}"/>${bulbs}</svg>`;
   };
   string();
   new ResizeObserver(string).observe(lights);
-  // The garland: rounded rectangles traced 2px outside the screen edge, stroked with short dashes,
-  // so each dash is a strand standing across the edge. Four layers of silver, white and gold.
+  // The garland: rounded rectangles traced 14px outside the screen edge, stroked with short dashes
+  // (strands) and with round-capped dot dashes (big outlined beads). styles.css sizes the strokes.
   const tinsel = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   tinsel.setAttribute('class', 'tinsel');
   tinsel.setAttribute('aria-hidden', 'true');
   const garland = () => {
-    const w = screen.offsetWidth + 52, h = screen.offsetHeight + 52;  // the svg is inset -26px
+    const w = screen.offsetWidth + 88, h = screen.offsetHeight + 88;  // the svg is inset -44px
     tinsel.setAttribute('width', w); tinsel.setAttribute('height', h);
-    const rect = cls => `<rect class="${cls}" x="20" y="20" width="${w - 40}" height="${h - 40}" rx="16"/>`;
-    tinsel.innerHTML = rect('s1') + rect('s3') + rect('s2') + rect('s4') + rect('s5') + rect('core');
+    const rect = cls => `<rect class="${cls}" x="30" y="30" width="${w - 60}" height="${h - 60}" rx="22"/>`;
+    tinsel.innerHTML = rect('s1') + rect('s4') + rect('s2') + rect('s3') + rect('bead bo') + rect('bead bo2') + rect('bead b1') + rect('bead b2');
   };
   garland();
   new ResizeObserver(garland).observe(screen);
   screen.append(tinsel);
-  screen.insertAdjacentHTML('beforeend', '<svg class="holly" viewBox="0 0 64 48" aria-hidden="true">'
-    + '<path class="leaf" d="M30 27c-9 2-17-3-21-12 9-3 17 1 21 12zM34 27c9 2 17-3 21-12-9-3-17 1-21 12zM32 28c-3-9 1-18 8-23 3 9 0 17-8 23zM32 28c3-9-1-18-8-23-3 9 0 17 8 23z"/>'
-    + '<circle class="berry" cx="28.5" cy="32" r="4"/><circle class="berry" cx="36" cy="33.5" r="4"/><circle class="berry" cx="32" cy="39" r="4"/></svg>');
-  // Two candy canes crossed on the bottom-left corner: a white cane with red bands over it.
+  // Holly on the top-right corner: two outlined leaves and three berries.
+  screen.insertAdjacentHTML('beforeend', '<svg class="holly" viewBox="0 0 80 60" aria-hidden="true">'
+    + '<path class="leaf" d="M38 34C27 37 15 32 8 20c3-8 10-12 18-10-1 7 1 13 6 18 2 3 4 5 6 6z"/>'
+    + '<path class="leaf" d="M42 34c11 3 23-2 30-14-3-8-10-12-18-10 1 7-1 13-6 18-2 3-4 5-6 6z"/>'
+    + '<path class="vein" d="M12 21c8 3 15 7 24 12M68 21c-8 3-15 7-24 12"/>'
+    + '<circle class="berry" cx="33" cy="41" r="6.5"/><circle class="berry" cx="47" cy="42" r="6.5"/><circle class="berry" cx="40" cy="50" r="6.5"/>'
+    + '<circle class="shine" cx="31" cy="39" r="1.8"/><circle class="shine" cx="45" cy="40" r="1.8"/><circle class="shine" cx="38" cy="48" r="1.8"/></svg>');
+  // Two candy canes crossed on the bottom-left corner: an ink outline, a white cane, red bands.
   const cane = 'M22 58V20a9 9 0 0 1 18 0v6';
+  const canes = `<path class="ink" d="${cane}"/><path class="white" d="${cane}"/><path class="red" d="${cane}"/>`;
   screen.insertAdjacentHTML('beforeend', '<svg class="canes" viewBox="0 0 64 64" aria-hidden="true">'
-    + `<g transform="rotate(-22 32 40)"><path class="white" d="${cane}"/><path class="red" d="${cane}"/></g>`
-    + `<g transform="rotate(24 32 40) translate(-2 2)"><path class="white" d="${cane}"/><path class="red" d="${cane}"/></g></svg>`);
+    + `<g transform="rotate(-24 32 40)">${canes}</g><g transform="rotate(26 32 40) translate(-3 2)">${canes}</g></svg>`);
   const snow = document.createElement('div');
   snow.className = 'snow';
   snow.setAttribute('aria-hidden', 'true');
-  snow.innerHTML = Array.from({ length: 56 }, () => `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--d:${(9 + Math.random() * 11).toFixed(1)}s;`
-    + `--t:${(-Math.random() * 20).toFixed(1)}s;--s:${(2 + Math.random() * 3.5).toFixed(1)}px;--o:${(0.35 + Math.random() * 0.5).toFixed(2)}"></i>`).join('');
+  snow.innerHTML = Array.from({ length: 48 }, () => `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--d:${(10 + Math.random() * 12).toFixed(1)}s;`
+    + `--t:${(-Math.random() * 22).toFixed(1)}s;--s:${(4 + Math.random() * 6).toFixed(1)}px;--o:${(0.6 + Math.random() * 0.4).toFixed(2)}"></i>`).join('');
   document.body.append(snow);
 }
 // Video stations play official YouTube uploads on the screen. They live in
@@ -755,7 +759,7 @@ function touched() {
 // MARK: Layout
 
 function layout() {
-  const width = innerWidth, height = innerHeight - (root.classList.contains('hosted') ? GRIP : 0);
+  const width = innerWidth, height = innerHeight - (root.classList.contains('hosted') ? GRIP : 0) - (document.body.classList.contains('xmas') ? 40 : 0);  // the Christmas lights take 40px
   const wide = width > height * 0.95;
   const pad = Math.max(14, Math.min(width, height) * 0.05);
   let screenWidth, screenHeight, wheel;
