@@ -60,6 +60,43 @@ async function loadCatalog() {
 }
 const catalog = await loadCatalog();
 const isLive = station => Boolean(station.stream);
+
+// MARK: Christmas
+// stations.json carries feature flags, so the look can be switched on for everyone without a
+// release; `?christmas=1` previews it. Lights along the top, tinsel round the screen, a candy-cane
+// wheel, holly on the bezel and snow behind it all; styles.css does the rest under body.xmas.
+if (catalog.features?.christmas || params.get('christmas') === '1') decorate();
+function decorate() {
+  document.body.classList.add('xmas');
+  const device = document.querySelector('.device');
+  const lights = document.createElement('div');
+  lights.className = 'lights';
+  lights.setAttribute('aria-hidden', 'true');
+  device.prepend(lights);
+  const colors = ['#ff3b30', '#34c759', '#ffcc00', '#5ac8fa', '#ff2d95'];
+  const string = () => {
+    const w = Math.max(120, Math.round(lights.clientWidth)), n = Math.max(6, Math.round(w / 40)), step = w / n;
+    let cord = 'M0 4', bulbs = '';
+    for (let i = 0; i < n; i++) {
+      const mid = step * (i + 0.5);
+      cord += ` Q${mid.toFixed(1)} 16 ${(step * (i + 1)).toFixed(1)} 4`;
+      bulbs += `<g class="bulb" style="--i:${i};--c:${colors[i % colors.length]}" transform="translate(${mid.toFixed(1)} 10)">`
+        + '<rect x="-2.2" y="-1" width="4.4" height="4" rx="1"/><ellipse cx="0" cy="8.5" rx="3.6" ry="5.4"/></g>';
+    }
+    lights.innerHTML = `<svg viewBox="0 0 ${w} 26" preserveAspectRatio="none"><path class="cord" d="${cord}"/>${bulbs}</svg>`;
+  };
+  string();
+  new ResizeObserver(string).observe(lights);
+  const snow = document.createElement('div');
+  snow.className = 'snow';
+  snow.setAttribute('aria-hidden', 'true');
+  snow.innerHTML = Array.from({ length: 56 }, () => `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--d:${(9 + Math.random() * 11).toFixed(1)}s;`
+    + `--t:${(-Math.random() * 20).toFixed(1)}s;--s:${(2 + Math.random() * 3.5).toFixed(1)}px;--o:${(0.35 + Math.random() * 0.5).toFixed(2)}"></i>`).join('');
+  document.body.prepend(snow);
+  document.querySelector('.screen').insertAdjacentHTML('beforeend', '<svg class="holly" viewBox="0 0 64 48" aria-hidden="true">'
+    + '<path class="leaf" d="M30 27c-9 2-17-3-21-12 9-3 17 1 21 12zM34 27c9 2 17-3 21-12-9-3-17 1-21 12zM32 28c-3-9 1-18 8-23 3 9 0 17-8 23zM32 28c3-9-1-18-8-23-3 9 0 17 8 23z"/>'
+    + '<circle class="berry" cx="28.5" cy="32" r="4"/><circle class="berry" cx="36" cy="33.5" r="4"/><circle class="berry" cx="32" cy="39" r="4"/></svg>');
+}
 // Video stations play official YouTube uploads on the screen. They live in
 // catalog.videoStations, which the native apps don't read, and load their
 // song list after the player is up.
@@ -70,13 +107,16 @@ async function loadVideoStations() {
       const response = await fetch(station.playlist, { signal: AbortSignal.timeout(15000) });
       const tracks = (await response.json()).filter(track => track.youtube && track.duration > 0);
       if (!tracks.length || catalog.stations.some(s => s.id === station.id)) continue;
-      catalog.stations.push({ ...station, tracks });
-      if (wanted === station.id && !radio.playing) radio.station = catalog.stations.at(-1);
+      const at = catalog.stations.findLastIndex(s => s.band === 'radio') + 1;  // after the live stations, before Synth Sounds
+      catalog.stations.splice(at, 0, { ...station, tracks });
+      if (wanted === station.id && !radio.playing) radio.station = catalog.stations[at];
       changed();
     } catch { /* the station just stays off the list */ }
   }
 }
-const stationsIn = band => catalog.stations.filter(s => s.band === band);
+// One list under Radio: the live stations, 101X Chillville, then Synth Sounds. (`band` stays in the
+// catalog for older native builds, which still show two menus.)
+const stationsIn = () => catalog.stations;
 
 // MARK: Radio (ios/Sources/Radio.swift)
 
@@ -720,13 +760,14 @@ layout();
 // MARK: Menus
 
 const TITLES = { main: 'HIFI', 'band:radio': 'Radio', 'band:synth': 'Synth Sounds', playlists: 'Playlists', nowPlaying: 'Now Playing', settings: 'Settings', about: 'About' };
-const MAIN_PAGES = ['nowPlaying', 'band:radio', 'band:synth', 'playlists', 'settings', 'about'];
+const MAIN_PAGES = ['nowPlaying', 'band:radio', 'playlists', 'settings', 'about'];
 const ui = { stack: ['main'], selection: {}, showVolume: false, view: null };
 const page = () => ui.stack.at(-1);
 let volumeTimer = 0;
 
-// "Artist – Song" under each live station; synth stations show their current track.
+// "Artist – Song" under each live station; a station with its own subtitle shows that instead.
 function songLine(station) {
+  if (station.subtitle) return station.subtitle;
   if (isLive(station)) {
     const song = radio.songs[station.id];
     return song?.title ? [song.artist, song.title].filter(Boolean).join(' – ') : null;
@@ -737,7 +778,7 @@ function songLine(station) {
 }
 
 function rows(p) {
-  if (p === 'main') return [{ title: 'Now Playing', playing: radio.playing }, { title: 'Radio' }, { title: 'Synth Sounds' }, { title: 'Playlists' }, { title: 'Settings' }, { title: 'About' }]
+  if (p === 'main') return [{ title: 'Now Playing', playing: radio.playing }, { title: 'Radio' }, { title: 'Playlists' }, { title: 'Settings' }, { title: 'About' }]
     .map(row => ({ chevron: true, ...row }));
   if (p.startsWith('band:')) return stationsIn(p.slice(5)).map(station => ({ title: stationName(station), playing: radio.playing && station.id === radio.station.id, subtitle: songLine(station) }));
   if (p === 'playlists') {
@@ -1176,7 +1217,7 @@ setInterval(() => { if (page() === 'nowPlaying' && radio.playing) ui.view?.tick(
 setInterval(() => { if (page().startsWith('band:') || page() === 'main') changed(); }, 5000);
 
 // `?page=radio|synth|nowPlaying|playlists|settings|about` opens on that screen.
-const opening = { radio: 'band:radio', synth: 'band:synth', nowPlaying: 'nowPlaying', playlists: 'playlists', settings: 'settings', about: 'about' }[params.get('page')];
+const opening = { radio: 'band:radio', synth: 'band:radio', nowPlaying: 'nowPlaying', playlists: 'playlists', settings: 'settings', about: 'about' }[params.get('page')];
 if (opening) {
   ui.stack.push(opening);
   if (opening.startsWith('band:')) ui.selection[opening] = Math.max(0, stationsIn(opening.slice(5)).indexOf(radio.station));

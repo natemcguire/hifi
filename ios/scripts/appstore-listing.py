@@ -29,12 +29,20 @@ BUNDLE_ID = "com.natesoftware.hifi"
 SHOTS = HERE.parent / "Screenshots"
 PLATFORM = "MAC_OS" if "--mac" in sys.argv else "IOS"
 MAC = PLATFORM == "MAC_OS"
+# Name and subtitle are app-wide (30 characters each) and only change with a version in an
+# editable state. Keywords (100 characters, comma-separated, no repeats of name or subtitle
+# words) and the texts are per version. Promotional text can change any time (--promo).
 LISTING = {
-    "subtitle": "Free listener-supported radio",
-    "promotionalText": "Live radio from Radio Paradise and SomaFM, plus four synth stations of our own, on a click wheel. "
-                       "HIFI TV runs old clips behind every song. Free, no account.",
-    "keywords": "free radio,internet radio,listener supported,somafm,lofi,synth,chill,jazz,indie,retro,click wheel",
-    "description": f"""HIFI is an internet radio player drawn as a classic click-wheel music player. Drag around the wheel to move through the menu, press the center to tune in, press MENU to back out. It costs nothing and never asks you to sign up.
+    "name": "HIFI Radio: Live Music & Lofi",
+    "subtitle": "Free Christmas music, no ads",
+    "promotionalText": "Non-stop unlimited Christmas music, 24/7 with no commercials, on four holiday stations. "
+                       "Plus live radio from Radio Paradise and SomaFM, and our own synth stations.",
+    "keywords": "somafm,paradise,jazz,chill,indie,holiday,xmas,carols,retro,click wheel,player,fm,ambient,synth",
+    "whatsNew": "Four Christmas stations for the season: Mistletoe Soul, Tinsel Strings, Cocoa Lounge and Sleigh Riot. "
+                "One Radio list with every station, each with a line under its name. More HIFI TV clips behind the songs.",
+    "description": f"""This season: non-stop unlimited Christmas music, 24/7 with no commercials. Four holiday stations, all free. Mistletoe Soul plays vintage soul and R&B, Tinsel Strings the orchestras and strings with almost no singing, Cocoa Lounge the cocktail-hour standards, and Sleigh Riot the indie bands. They come from SomaFM, listener-supported and ad-free.
+
+HIFI is an internet radio player drawn as a classic click-wheel music player. Drag around the wheel to move through the menu, press the center to tune in, press MENU to back out. It costs nothing and never asks you to sign up.
 
 The live stations come straight from Radio Paradise and SomaFM, independent broadcasters paid for by their listeners, with Pop Girl Radio from Exclusive Radio alongside. You see the song that is on right now and who made it.
 
@@ -107,6 +115,8 @@ def main():
         sys.exit("No App Store Connect record for com.natesoftware.hifi yet. Create it at appstoreconnect.apple.com first.")
     app = apps[0]
     print("app:", app["id"], app["attributes"]["name"])
+    if "--promo" in sys.argv:
+        return promo(app)
     if MAC:
         version = mac_version(app)
     else:
@@ -127,8 +137,12 @@ def app_wide(app):
         "primaryCategory": {"data": {"type": "appCategories", "id": "MUSIC"}},
         "secondaryCategory": {"data": {"type": "appCategories", "id": "ENTERTAINMENT"}}}}})
     for loc in api("GET", f"/v1/appInfos/{info['id']}/appInfoLocalizations")["data"]:
-        patch("appInfoLocalizations", loc["id"], {"subtitle": LISTING["subtitle"], "privacyPolicyUrl": PRIVACY_URL})
-    print("category, subtitle, privacy policy set")
+        try:
+            patch("appInfoLocalizations", loc["id"], {"name": LISTING["name"], "subtitle": LISTING["subtitle"], "privacyPolicyUrl": PRIVACY_URL})
+            print("name, subtitle, privacy policy set")
+        except SystemExit:
+            # App info is shared by the platforms and locked while any version is in review.
+            print("name and subtitle: locked while a version is in review (" + info["attributes"]["appStoreState"] + "); run again after")
 
     # Age rating: no objectionable content. Live radio plays unfiltered songs, so
     # mild language is possible on the live stations.
@@ -175,7 +189,7 @@ def app_wide(app):
                           "relationships": {"territory": {"data": {"type": "territories", "id": t}}}} for t in territories]})
         print(f"availability: {len(territories)} territories")
 
-    return editable_version(app)
+    return ios_version(app)
 
 
 EDITABLE = ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED", "WAITING_FOR_REVIEW", "INVALID_BINARY")
@@ -184,6 +198,30 @@ EDITABLE = ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADAT
 def editable_version(app):
     return next(v for v in api("GET", f"/v1/apps/{app['id']}/appStoreVersions?filter[platform]={PLATFORM}")["data"]
                 if v["attributes"]["appStoreState"] in EDITABLE)
+
+
+def ios_version(app):
+    """The editable iPhone version, or a new one: --version 1.0.1 creates it."""
+    try:
+        version = editable_version(app)
+        print("ios version:", version["attributes"]["versionString"], version["attributes"]["appStoreState"])
+    except StopIteration:
+        if "--version" not in sys.argv:
+            sys.exit("No editable iPhone version. Add --version <x.y.z> to create the next one.")
+        number = sys.argv[sys.argv.index("--version") + 1]
+        version = api("POST", "/v1/appStoreVersions", {"data": {"type": "appStoreVersions",
+            "attributes": {"platform": "IOS", "versionString": number, "releaseType": "AFTER_APPROVAL"},
+            "relationships": {"app": {"data": {"type": "apps", "id": app["id"]}}}}})["data"]
+        print("ios version created:", number)
+    return version
+
+
+def promo(app):
+    """Promotional text on the live version: the one listing field Apple lets through without a review."""
+    for v in api("GET", f"/v1/apps/{app['id']}/appStoreVersions?filter[platform]={PLATFORM}&filter[appStoreState]=READY_FOR_SALE")["data"]:
+        for loc in api("GET", f"/v1/appStoreVersions/{v['id']}/appStoreVersionLocalizations")["data"]:
+            patch("appStoreVersionLocalizations", loc["id"], {"promotionalText": LISTING["promotionalText"]})
+            print("promotional text updated on", v["attributes"]["versionString"], loc["attributes"]["locale"])
 
 
 def mac_version(app):
@@ -206,7 +244,8 @@ def fill(app, version):
     loc = locs[0] if locs else api("POST", "/v1/appStoreVersionLocalizations", {"data": {"type": "appStoreVersionLocalizations",
         "attributes": {"locale": "en-US"},
         "relationships": {"appStoreVersion": {"data": {"type": "appStoreVersions", "id": version["id"]}}}}})["data"]
-    patch("appStoreVersionLocalizations", loc["id"], {k: v for k, v in LISTING.items() if k != "subtitle"})
+    first = version["attributes"]["versionString"] == "1.0"  # the first version has no What's New
+    patch("appStoreVersionLocalizations", loc["id"], {k: v for k, v in LISTING.items() if k not in ("name", "subtitle") and not (first and k == "whatsNew")})
     print("listing text set for", version["attributes"]["versionString"])
     screenshots(loc["id"])
 

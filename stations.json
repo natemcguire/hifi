@@ -1,5 +1,8 @@
 {
   "epoch": 0,
+  "features": {
+    "christmas": false
+  },
   "catalog": "Original synthesized instrumental catalog with four preserved owner-supplied AI-generated seed recordings. HIFI Studio is a project credit; seed artist names are fictional aliases. Live radio is provided by Radio Paradise and SomaFM (listener-supported; streamed directly, never rehosted).",
   "stations": [
     {
@@ -18,7 +21,9 @@
       "channels": 2,
       "tv": [
         "tv/radio-paradise-1.mp4",
-        "tv/radio-paradise-2.mp4"
+        "tv/radio-paradise-2.mp4",
+        "tv/radio-paradise-3.mp4",
+        "tv/radio-paradise-4.mp4"
       ]
     },
     {
@@ -40,7 +45,9 @@
       "channels": 2,
       "tv": [
         "tv/boot-liquor-1.mp4",
-        "tv/boot-liquor-2.mp4"
+        "tv/boot-liquor-2.mp4",
+        "tv/boot-liquor-3.mp4",
+        "tv/boot-liquor-4.mp4"
       ]
     },
     {
@@ -62,7 +69,9 @@
       "channels": 2,
       "tv": [
         "tv/sonic-universe-1.mp4",
-        "tv/sonic-universe-2.mp4"
+        "tv/sonic-universe-2.mp4",
+        "tv/sonic-universe-3.mp4",
+        "tv/sonic-universe-4.mp4"
       ]
     },
     {
@@ -84,7 +93,9 @@
       "channels": 2,
       "tv": [
         "tv/indie-pop-rocks-1.mp4",
-        "tv/indie-pop-rocks-2.mp4"
+        "tv/indie-pop-rocks-2.mp4",
+        "tv/indie-pop-rocks-3.mp4",
+        "tv/indie-pop-rocks-4.mp4"
       ]
     },
     {
@@ -92,6 +103,7 @@
       "name": "POP GIRL RADIO",
       "band": "radio",
       "frequency": "05",
+      "subtitle": "Taylor all the time",
       "tagline": "Big choruses, every era, all day. Live from Exclusive Radio.",
       "genre": "LIVE / POP",
       "color": "#c9a0dc",
@@ -104,7 +116,9 @@
       "channels": 2,
       "tv": [
         "tv/pop-girl-1.mp4",
-        "tv/pop-girl-2.mp4"
+        "tv/pop-girl-2.mp4",
+        "tv/pop-girl-3.mp4",
+        "tv/pop-girl-4.mp4"
       ]
     },
     {
@@ -126,7 +140,9 @@
       "channels": 2,
       "tv": [
         "tv/mistletoe-soul-1.mp4",
-        "tv/mistletoe-soul-2.mp4"
+        "tv/mistletoe-soul-2.mp4",
+        "tv/mistletoe-soul-3.mp4",
+        "tv/mistletoe-soul-4.mp4"
       ]
     },
     {
@@ -148,7 +164,53 @@
       "channels": 2,
       "tv": [
         "tv/tinsel-strings-1.mp4",
-        "tv/tinsel-strings-2.mp4"
+        "tv/tinsel-strings-2.mp4",
+        "tv/tinsel-strings-3.mp4",
+        "tv/tinsel-strings-4.mp4"
+      ]
+    },
+    {
+      "id": "cocoa-lounge",
+      "name": "COCOA LOUNGE",
+      "band": "radio",
+      "frequency": "08",
+      "tagline": "Christmas Three. Cocktail-hour Christmas: lounge, swing and chillout takes on the standards. Live from SomaFM's Christmas Lounge, listener-supported.",
+      "genre": "CHRISTMAS 3 / LOUNGE · CHILL",
+      "color": "#e8c9a4",
+      "stream": "https://ice6.somafm.com/christmas-128-mp3",
+      "website": "https://somafm.com/christmas/",
+      "provider": "SomaFM",
+      "providerLabel": "Christmas Lounge on SomaFM.com ↗",
+      "support": "https://somafm.com/support/",
+      "nowPlaying": "/api/now-playing?station=cocoa-lounge",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2,
+      "tv": [
+        "tv/cocoa-lounge-1.mp4",
+        "tv/cocoa-lounge-2.mp4"
+      ]
+    },
+    {
+      "id": "sleigh-riot",
+      "name": "SLEIGH RIOT",
+      "band": "radio",
+      "frequency": "09",
+      "tagline": "Christmas Four. Guitar bands doing the holidays their way, indie and alternative. Live from SomaFM's Christmas Rocks!, listener-supported.",
+      "genre": "CHRISTMAS 4 / INDIE · ROCK",
+      "color": "#ffd27a",
+      "stream": "https://ice6.somafm.com/xmasrocks-128-mp3",
+      "website": "https://somafm.com/xmasrocks/",
+      "provider": "SomaFM",
+      "providerLabel": "Christmas Rocks! on SomaFM.com ↗",
+      "support": "https://somafm.com/support/",
+      "nowPlaying": "/api/now-playing?station=sleigh-riot",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2,
+      "tv": [
+        "tv/sleigh-riot-1.mp4",
+        "tv/sleigh-riot-2.mp4"
       ]
     },
     {
@@ -156,6 +218,7 @@
       "name": "DIAL-UP",
       "band": "synth",
       "frequency": "01",
+      "subtitle": "No words, just lo-fi beats",
       "tagline": "Connected at 56k. Stay a while.",
       "genre": "LO-FI / SOFT BREAKS",
       "color": "#b5ed88",
@@ -251,7 +314,9 @@
       ],
       "tv": [
         "tv/dial-up-1.mp4",
-        "tv/dial-up-2.mp4"
+        "tv/dial-up-2.mp4",
+        "tv/dial-up-3.mp4",
+        "tv/dial-up-4.mp4"
       ]
     },
     {
@@ -259,6 +324,7 @@
       "name": "SHAREWARE SUMMER",
       "band": "synth",
       "frequency": "02",
+      "subtitle": "No words, just synth funk",
       "tagline": "An endless trial of the good life.",
       "genre": "SYNTH FUNK / SUNSHINE",
       "color": "#ffcb7e",
@@ -343,7 +409,9 @@
       ],
       "tv": [
         "tv/shareware-summer-1.mp4",
-        "tv/shareware-summer-2.mp4"
+        "tv/shareware-summer-2.mp4",
+        "tv/shareware-summer-3.mp4",
+        "tv/shareware-summer-4.mp4"
       ]
     },
     {
@@ -351,6 +419,7 @@
       "name": "NIGHT BUILD",
       "band": "synth",
       "frequency": "03",
+      "subtitle": "No words, just dark ambient",
       "tagline": "The city sleeps. The build runs.",
       "genre": "DARK AMBIENT / AFTER HOURS",
       "color": "#a5c9ff",
@@ -435,7 +504,9 @@
       ],
       "tv": [
         "tv/night-build-1.mp4",
-        "tv/night-build-2.mp4"
+        "tv/night-build-2.mp4",
+        "tv/night-build-3.mp4",
+        "tv/night-build-4.mp4"
       ]
     },
     {
@@ -443,6 +514,7 @@
       "name": "PIXEL DRIFT",
       "band": "synth",
       "frequency": "04",
+      "subtitle": "No words, just chiptune",
       "tagline": "One more level. No quarters required.",
       "genre": "CHIPTUNE / ARCADE",
       "color": "#f2a8df",
@@ -516,7 +588,9 @@
       ],
       "tv": [
         "tv/pixel-drift-1.mp4",
-        "tv/pixel-drift-2.mp4"
+        "tv/pixel-drift-2.mp4",
+        "tv/pixel-drift-3.mp4",
+        "tv/pixel-drift-4.mp4"
       ]
     }
   ],
@@ -525,7 +599,8 @@
       "id": "101x-chillville",
       "name": "101X CHILLVILLE",
       "band": "radio",
-      "frequency": "08",
+      "frequency": "10",
+      "subtitle": "Downbeat electronic and chill vibes - Sundays",
       "tagline": "The Chillville playlist from Austin's late, great 101X, played from each song's official video.",
       "genre": "CHILL / AUSTIN, RIP 101X",
       "color": "#9fd8ff",
