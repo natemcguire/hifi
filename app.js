@@ -19,6 +19,8 @@ const ICON = {
   play: svg('<path d="M6 3.5v17L20.5 12z"/>'),
   pause: svg('<path d="M5.5 4h4.5v16H5.5zM14 4h4.5v16H14z"/>'),
   chevron: svg('<path d="M8.5 4.5 16 12l-7.5 7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'),
+  search: svg('<circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.8"/><path d="M15.5 15.5 21 21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'),
+  clear: svg('<circle cx="12" cy="12" r="10"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>'),
   speaker: svg(`${SPEAKER}<path class="w1" d="M15.5 8.8a4.6 4.6 0 0 1 0 6.4"/><path class="w2" d="M18.6 5.8a8.8 8.8 0 0 1 0 12.4"/>`),
   speakerLow: svg(SPEAKER),
   speakerHigh: svg(`${SPEAKER}<path class="w1" d="M15.2 9.2a4 4 0 0 1 0 5.6"/><path class="w1" d="M17.8 6.8a7.6 7.6 0 0 1 0 10.4"/><path class="w1" d="M20.4 4.4a11 11 0 0 1 0 15.2"/>`),
@@ -141,6 +143,15 @@ async function loadVideoStations() {
 // One list under Radio: the live stations, 101X Chillville, then Synth Sounds. (`band` stays in the
 // catalog for older native builds, which still show two menus.)
 const stationsIn = () => catalog.stations;
+// The Radio list's search: every word typed has to appear in the station's name, line or genre.
+const stationMatches = (station, words) => {
+  const text = [stationName(station), station.name, station.subtitle, station.genre].filter(Boolean).join(' ').toLowerCase();
+  return words.every(word => text.includes(word));
+};
+const stationsShown = band => {
+  const words = ui.query.toLowerCase().split(/\s+/).filter(Boolean);
+  return words.length ? stationsIn(band).filter(station => stationMatches(station, words)) : stationsIn(band);
+};
 
 // MARK: Radio (ios/Sources/Radio.swift)
 
@@ -785,7 +796,7 @@ layout();
 
 const TITLES = { main: 'HIFI', 'band:radio': 'Radio', 'band:synth': 'Synth Sounds', playlists: 'Playlists', nowPlaying: 'Now Playing', settings: 'Settings', about: 'About' };
 const MAIN_PAGES = ['nowPlaying', 'band:radio', 'playlists', 'settings', 'about'];
-const ui = { stack: ['main'], selection: {}, showVolume: false, view: null };
+const ui = { stack: ['main'], selection: {}, showVolume: false, view: null, query: '' };  // query: the Radio list's search
 const page = () => ui.stack.at(-1);
 let volumeTimer = 0;
 
@@ -804,7 +815,7 @@ function songLine(station) {
 function rows(p) {
   if (p === 'main') return [{ title: 'Now Playing', playing: radio.playing }, { title: 'Radio' }, { title: 'Playlists' }, { title: 'Settings' }, { title: 'About' }]
     .map(row => ({ chevron: true, ...row }));
-  if (p.startsWith('band:')) return stationsIn(p.slice(5)).map(station => ({ title: stationName(station), playing: radio.playing && station.id === radio.station.id, subtitle: songLine(station) }));
+  if (p.startsWith('band:')) return stationsShown(p.slice(5)).map(station => ({ title: stationName(station), playing: radio.playing && station.id === radio.station.id, subtitle: songLine(station) }));
   if (p === 'playlists') {
     // Nate's Software's playlist first, then the listener's own.
     const list = playlistRows().map(playlist => ({ title: playlist.name, subtitle: playlist.detail }));
@@ -827,17 +838,30 @@ const rowHTML = (row, index, selected) => `<div class="row${selected ? ' sel' : 
 
 function listView(p) {
   const el = document.createElement('div');
-  el.className = 'page list-page';
-  el.innerHTML = `<div class="list" role="listbox" aria-label="${escape(TITLES[p])}"><div class="rows"></div><div class="hl" aria-hidden="true"></div></div>${p === 'main' ? '<div class="cover-pane"></div>' : ''}`;
+  const searchable = p.startsWith('band:');
+  el.className = `page list-page${searchable ? ' searchable' : ''}`;
+  // The station list has a search field above it; the list narrows as you type.
+  const search = searchable ? `<div class="search"><span class="mag" aria-hidden="true">${ICON.search}</span>`
+    + '<input class="q" type="search" placeholder="Search stations" aria-label="Search stations" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">'
+    + `<button class="clear" type="button" aria-label="Clear search" hidden>${ICON.clear}</button></div>` : '';
+  el.innerHTML = `${search}<div class="list" role="listbox" aria-label="${escape(TITLES[p])}"><div class="rows"></div><div class="hl" aria-hidden="true"></div>`
+    + `${searchable ? '<div class="empty" hidden>No stations match</div>' : ''}</div>${p === 'main' ? '<div class="cover-pane"></div>' : ''}`;
   const list = el.querySelector('.list'), rowsEl = el.querySelector('.rows'), hl = el.querySelector('.hl'), pane = el.querySelector('.cover-pane');
+  const field = el.querySelector('input.q'), clear = el.querySelector('.clear'), empty = el.querySelector('.empty');
   let html = '', coverFor = null, first = true;
   list.addEventListener('click', event => { const row = event.target.closest('.row'); if (row) tapRow(Number(row.dataset.index)); });
+  if (field) {
+    field.value = ui.query;
+    field.addEventListener('input', () => setQuery(field.value));
+    clear.addEventListener('click', () => { setQuery(''); field.focus(); });
+  }
   return { el, update() {
     const items = rows(p);
     const current = Math.min(ui.selection[p] ?? 0, Math.max(0, items.length - 1));
     const next = items.map((row, index) => rowHTML(row, index, index === current)).join('');
     if (next !== html) { rowsEl.innerHTML = html = next; }
     hl.hidden = !items.length;
+    if (field) { clear.hidden = !ui.query; empty.hidden = items.length > 0 || !ui.query.trim(); }
     hl.style.transition = first ? 'none' : '';
     hl.style.transform = `translateY(${current * 100}%)`;
     const row = rowsEl.children[current];
@@ -982,8 +1006,16 @@ function entered(p) {
   if (p.startsWith('band:')) { void refreshSongs(); songsTimer = setInterval(refreshSongs, 20000); }
 }
 
+// Typing in the Radio list's search field: the list narrows and the highlight goes back to the top.
+function setQuery(value) {
+  ui.query = value;
+  for (const p of ui.stack) if (p.startsWith('band:')) ui.selection[p] = 0;
+  changed();
+}
+
 function push(next) {
   if (next.startsWith('band:')) {
+    ui.query = '';  // the list opens whole
     const index = stationsIn(next.slice(5)).indexOf(radio.station);
     if (index >= 0) ui.selection[next] = index;
   }
@@ -1036,7 +1068,7 @@ function select() {
   const p = page(), index = ui.selection[p] ?? 0;
   if (p === 'main') { if (MAIN_PAGES[index]) push(MAIN_PAGES[index]); }
   else if (p.startsWith('band:')) {
-    const station = stationsIn(p.slice(5))[index];
+    const station = stationsShown(p.slice(5))[index];
     if (!station) return;
     tune(station);
     if (page() !== 'nowPlaying') push('nowPlaying');  // a video station already went there
@@ -1180,7 +1212,21 @@ document.querySelector('.device').addEventListener('wheel', event => {
 addEventListener('keydown', event => {
   if (event.altKey || event.ctrlKey || event.metaKey) return;
   if (spotify.showConnect) { if (event.key === 'Escape') { event.preventDefault(); menu(); } return; }
-  if (event.target.closest?.('input, textarea, button.heart, button.curate')) return;
+  const field = event.target.closest?.('input, textarea, button.heart, button.curate');
+  if (field && !field.classList.contains('q')) return;
+  if (field) {
+    // Typing in the station search: up, down and Enter still drive the list; Escape clears, then backs out.
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (field.value) { field.value = ''; setQuery(''); } else { field.blur(); flash('menu'); feedback.click(); touched(); menu(); }
+      return;
+    }
+    if (!['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) return;
+  } else if (page().startsWith('band:') && event.key.length === 1 && event.key !== ' ') {
+    // Type-ahead from anywhere on the Radio list: the first letter lands in the search field.
+    const q = ui.view?.el.querySelector('input.q');
+    if (q) { q.focus(); return; }
+  }
   const keys = {
     ArrowUp: [null, () => rotate(-1)], ArrowDown: [null, () => rotate(1)],
     ArrowLeft: ['previous', () => skip(-1)], ArrowRight: ['next', () => skip(1)],

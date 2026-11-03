@@ -44,6 +44,17 @@ svg{display:block}
 .list{position:relative;flex:1;min-width:0;overflow-y:auto;scrollbar-width:none}
 .list::-webkit-scrollbar{display:none}
 .rows{position:relative;z-index:1}
+.page.searchable{flex-direction:column}
+.searchable .list{min-height:0}
+.search{flex:none;display:flex;align-items:center;gap:6px;height:var(--row);padding:0 8px;border-bottom:1px solid rgba(0,0,0,.12);background:rgba(255,255,255,.55)}
+.search .mag{display:flex;color:#8a8f96}
+.search .mag svg{width:calc(var(--row)*.42);height:calc(var(--row)*.42)}
+.search input{flex:1;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;font:inherit;font-size:calc(var(--row)*.42);font-weight:600;color:var(--ink);outline:none;-webkit-appearance:none;appearance:none;-webkit-user-select:text;user-select:text}
+.search input::placeholder{color:#9a9fa6;font-weight:500}
+.search input::-webkit-search-cancel-button,.search input::-webkit-search-decoration{display:none;-webkit-appearance:none}
+.search .clear{display:flex;margin:0;padding:0;border:0;background:transparent;color:#9a9fa6;cursor:pointer}
+.search .clear svg{width:calc(var(--row)*.4);height:calc(var(--row)*.4);fill:currentColor}
+.empty{padding:calc(var(--row)*.4) 10px;font-size:calc(var(--row)*.42);font-weight:600;color:#8a8f96}
 .hl{position:absolute;left:0;right:0;top:0;height:var(--row);background:linear-gradient(#7cc0f7,#2b78e0 50%,#1c64c8);transition:transform .1s ease-out}
 .row{height:var(--row);display:flex;align-items:center;gap:6px;padding:0 10px;font-size:calc(var(--row)*.48);font-weight:600;white-space:nowrap;cursor:pointer}
 .row .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
