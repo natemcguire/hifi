@@ -6,7 +6,10 @@ screenshots, review contact, and (with --submit) the build and review submission
 The app record itself must exist first: Apple's API cannot create apps, so it is
 made once by hand in App Store Connect (bundle ID com.natesoftware.hifi).
 
-Run as: withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--submit]
+Run as: withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--mac] [--submit]
+With --mac it fills the Mac App Store version of the same record (created if missing),
+skipping the app-wide parts (category, age rating, price, territories) the iPhone
+submission already set, and submits the newest processed Mac build.
 Review contact comes from HIFI_REVIEW_FIRST, HIFI_REVIEW_LAST, HIFI_REVIEW_EMAIL and
 HIFI_REVIEW_PHONE, or the same keys in scripts/devices.local (never committed).
 """
@@ -24,46 +27,46 @@ api = ns["api"]
 
 BUNDLE_ID = "com.natesoftware.hifi"
 SHOTS = HERE.parent / "Screenshots"
+PLATFORM = "MAC_OS" if "--mac" in sys.argv else "IOS"
+MAC = PLATFORM == "MAC_OS"
 LISTING = {
     "subtitle": "Free listener-supported radio",
-    "promotionalText": "Free, listener-supported radio on a click wheel, now with HIFI TV: every station plays its own old-TV clips. No ads, no account.",
+    "promotionalText": "Live radio from Radio Paradise and SomaFM, plus four synth stations of our own, on a click wheel. "
+                       "HIFI TV runs old clips behind every song. Free, no account.",
     "keywords": "free radio,internet radio,listener supported,somafm,lofi,synth,chill,jazz,indie,retro,click wheel",
-    "description": """HIFI is free, listener-supported internet radio on a click wheel.
+    "description": f"""HIFI is an internet radio player drawn as a classic click-wheel music player. Drag around the wheel to move through the menu, press the center to tune in, press MENU to back out. It costs nothing and never asks you to sign up.
 
-No subscription, no ads, no account. The live stations are independent, listener-supported radio from Radio Paradise and SomaFM, streamed straight from the stations, and HIFI is free.
+The live stations come straight from Radio Paradise and SomaFM, independent broadcasters paid for by their listeners, with Pop Girl Radio from Exclusive Radio alongside. You see the song that is on right now and who made it.
 
-Spin the wheel to pick a station, press the center to tune in, and the music is already playing. Our original stations run on a shared clock, so tuning in drops you into the rotation wherever it is right now, like real radio.
-
-SYNTH SOUNDS: four stations of original instrumental music for working, coding and drifting off.
-• Dial-Up: lo-fi soft breaks, rain on the window
+The Synth Sounds stations are instrumental music we made for HIFI. They run on a shared clock, so tuning in drops you wherever the rotation is, the way a real radio does.
+• Dial-Up: lo-fi beats, soft breaks, rain on the window
 • Shareware Summer: warm synth funk
-• Night Build: dark ambient for after hours
-• Pixel Drift: bright chiptune
+• Night Build: dark ambient for late hours
+• Pixel Drift: chiptune
 
-RADIO: live, listener-supported internet radio from Radio Paradise and SomaFM, plus Exclusive Radio, with the song that's playing right now. Including POP GIRL RADIO: big choruses, every era, all day. If you love a station, support it at radioparadise.com or somafm.com/support.
+HIFI TV plays old-TV clips behind Now Playing, with the song and station on a sheet of clear glass over the picture.
 
-HIFI TV: every station has its own old-TV clips playing behind Now Playing, under the song and station on a sheet of clear glass.
+101X Chillville keeps the chill playlist from Austin's 101X going: 670 songs, each played from its official video.
 
-101X CHILLVILLE: Austin's 101X Chillville playlist, 670 chill songs, each played from its official video.
+Connect Spotify if you want to. The heart next to a live song saves it to your Liked Songs, and your playlists show up on the click wheel, with the Nate's Software HIFI playlist up top. Spotify's own page handles the sign-in; we never see your password.
 
-HEART IT: tap the heart next to a song on the radio and it's saved to your Spotify Liked Songs.
+Also in the box:
+{"• Change stations from the wheel, your keyboard's media keys or Control Center" if MAC else "• Change stations from the wheel, the lock screen or your headphones"}
+{"• Song, artist and station in Now Playing, drawn like the old screen" if MAC else "• Song, artist and station on the lock screen, drawn like the old screen"}
+{"• The window sits in a corner and keeps playing while you work" if MAC else "• Picture in Picture: leave the app and HIFI shrinks into a small clip-on player"}
+• Keeps playing in the background
+• No ads, no tracking
 
-PLAYLISTS: connect Spotify and your playlists show up right on the click wheel, with the Nate's Software HIFI playlist up top.
+If a live station becomes a habit, support it at radioparadise.com or somafm.com/support.
 
-• Change stations with the wheel, the lock screen or your headphones
-• Song, artist and station on the lock screen, drawn like a classic Now Playing screen
-• Picture in Picture: go home and HIFI shrinks into a tiny clip-on player you can park in a corner
-• Plays in the background
-• No ads, no tracking. Spotify is optional; the radio needs no account
-
-Free forever, made for fun by Nate's Software. Bring your own headphones.""",
+Made by Nate's Software.""",
     "supportUrl": "https://github.com/natemcguire/hifi/issues",
     "marketingUrl": "https://hifi.nates-software.com/",
 }
 PRIVACY_URL = "https://hifi.nates-software.com/privacy"
 COPYRIGHT = "2026 Nate McGuire"
 # iPhone 6.9" and iPad 13" sets; App Store Connect scales them for smaller devices.
-SETS = {"APP_IPHONE_67": "iphone", "APP_IPAD_PRO_3GEN_129": "ipad"}
+SETS = {"APP_DESKTOP": "mac"} if MAC else {"APP_IPHONE_67": "iphone", "APP_IPAD_PRO_3GEN_129": "ipad"}
 
 
 def local(key):
@@ -104,6 +107,16 @@ def main():
         sys.exit("No App Store Connect record for com.natesoftware.hifi yet. Create it at appstoreconnect.apple.com first.")
     app = apps[0]
     print("app:", app["id"], app["attributes"]["name"])
+    if MAC:
+        version = mac_version(app)
+    else:
+        version = app_wide(app)
+    fill(app, version)
+
+
+def app_wide(app):
+    """Category, age rating, price and territories (shared by every platform), then the
+    editable iPhone version."""
     api("PATCH", f"/v1/apps/{app['id']}", {"data": {"type": "apps", "id": app["id"], "attributes": {
         "contentRightsDeclaration": "USES_THIRD_PARTY_CONTENT"}}})
 
@@ -162,11 +175,37 @@ def main():
                           "relationships": {"territory": {"data": {"type": "territories", "id": t}}}} for t in territories]})
         print(f"availability: {len(territories)} territories")
 
-    # The 1.0 version: copyright, listing text, screenshots, review contact.
-    version = next(v for v in api("GET", f"/v1/apps/{app['id']}/appStoreVersions?filter[platform]=IOS")["data"]
-                   if v["attributes"]["appStoreState"] in ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED"))
+    return editable_version(app)
+
+
+EDITABLE = ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED", "WAITING_FOR_REVIEW", "INVALID_BINARY")
+
+
+def editable_version(app):
+    return next(v for v in api("GET", f"/v1/apps/{app['id']}/appStoreVersions?filter[platform]={PLATFORM}")["data"]
+                if v["attributes"]["appStoreState"] in EDITABLE)
+
+
+def mac_version(app):
+    """The Mac App Store version 1.0 under the same record, made on first run."""
+    try:
+        version = editable_version(app)
+        print("mac version:", version["attributes"]["versionString"], version["attributes"]["appStoreState"])
+    except StopIteration:
+        version = api("POST", "/v1/appStoreVersions", {"data": {"type": "appStoreVersions",
+            "attributes": {"platform": "MAC_OS", "versionString": "1.0", "releaseType": "AFTER_APPROVAL"},
+            "relationships": {"app": {"data": {"type": "apps", "id": app["id"]}}}}})["data"]
+        print("mac version created: 1.0")
+    return version
+
+
+def fill(app, version):
+    """The version: copyright, listing text, screenshots, review contact, and with --submit the build."""
     patch("appStoreVersions", version["id"], {"copyright": COPYRIGHT})
-    loc = api("GET", f"/v1/appStoreVersions/{version['id']}/appStoreVersionLocalizations")["data"][0]
+    locs = api("GET", f"/v1/appStoreVersions/{version['id']}/appStoreVersionLocalizations")["data"]
+    loc = locs[0] if locs else api("POST", "/v1/appStoreVersionLocalizations", {"data": {"type": "appStoreVersionLocalizations",
+        "attributes": {"locale": "en-US"},
+        "relationships": {"appStoreVersion": {"data": {"type": "appStoreVersions", "id": version["id"]}}}}})["data"]
     patch("appStoreVersionLocalizations", loc["id"], {k: v for k, v in LISTING.items() if k != "subtitle"})
     print("listing text set for", version["attributes"]["versionString"])
     screenshots(loc["id"])
@@ -180,7 +219,9 @@ def main():
                        "the app is open; leaving Now Playing stops it. "
                        "Spotify is optional: the heart next to a live song and the Playlists menu ask the listener to connect "
                        "their own Spotify account (Spotify's own sign-in page, PKCE, no password reaches us). Everything else "
-                       "works without it."}
+                       "works without it."
+                       + (" This is the Mac version of the iPhone app already on the App Store: the same player in a "
+                          "resizable window, sandboxed, with the media keys and Control Center for playback." if MAC else "")}
     existing = api("GET", f"/v1/appStoreVersions/{version['id']}/appStoreReviewDetail")
     if existing.get("data"):
         patch("appStoreReviewDetails", existing["data"]["id"], detail)
@@ -226,7 +267,7 @@ def screenshots(localization):
 
 
 def submit(app, version):
-    builds = api("GET", f"/v1/builds?filter[app]={app['id']}&sort=-uploadedDate&limit=1")["data"]
+    builds = api("GET", f"/v1/builds?filter[app]={app['id']}&filter[preReleaseVersion.platform]={PLATFORM}&sort=-uploadedDate&limit=1")["data"]
     if not builds or builds[0]["attributes"]["processingState"] != "VALID":
         sys.exit("No processed build yet; wait for App Store Connect to finish processing the upload.")
     build = builds[0]
@@ -234,9 +275,10 @@ def submit(app, version):
         "relationships": {"build": {"data": {"type": "builds", "id": build["id"]}}}}})
     print("build attached:", build["attributes"]["version"])
     # Reuse a submission an earlier, refused run left open.
-    submission = next(iter(api("GET", f"/v1/reviewSubmissions?filter[app]={app['id']}&filter[state]=READY_FOR_REVIEW")["data"]), None) \
+    submission = next((s for s in api("GET", f"/v1/reviewSubmissions?filter[app]={app['id']}&filter[state]=READY_FOR_REVIEW")["data"]
+                       if s["attributes"].get("platform") == PLATFORM), None) \
         or api("POST", "/v1/reviewSubmissions", {"data": {"type": "reviewSubmissions",
-            "attributes": {"platform": "IOS"}, "relationships": {"app": {"data": {"type": "apps", "id": app["id"]}}}}})["data"]
+            "attributes": {"platform": PLATFORM}, "relationships": {"app": {"data": {"type": "apps", "id": app["id"]}}}}})["data"]
     api("POST", "/v1/reviewSubmissionItems", {"data": {"type": "reviewSubmissionItems", "relationships": {
         "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": submission["id"]}},
         "appStoreVersion": {"data": {"type": "appStoreVersions", "id": version["id"]}}}}})

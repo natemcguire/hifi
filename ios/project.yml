@@ -72,6 +72,8 @@ targets:
       path: Config/Info-Mac.plist
       properties:
         CFBundleDisplayName: HIFI
+        LSApplicationCategoryType: public.app-category.music
+        ITSAppUsesNonExemptEncryption: false
         # nswhifi:// brings Spotify's sign-in back to the app, even when the
         # browser doing the sign-in (Chrome, say) opens it as a plain link.
         CFBundleURLTypes:

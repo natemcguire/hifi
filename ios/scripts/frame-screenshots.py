@@ -2,8 +2,11 @@
 """Turns the raw simulator captures in Screenshots/raw/{iphone,ipad} into App Store
 screenshots in Screenshots/{iphone,ipad}: a headline on a colored backdrop with the
 app's screen in a rounded frame below. Same pixel sizes as the captures, so App
-Store Connect takes them as-is. Needs Pillow.
+Store Connect takes them as-is. With --mac, the window captures in Screenshots/raw/mac
+(scripts/mac-screenshots.sh) become 2880x1800 Mac App Store screenshots in
+Screenshots/mac: the headline on the left, the window on the right. Needs Pillow.
 """
+import sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -86,6 +89,45 @@ def frame(raw, out, slide):
     canvas.paste(screen, (x, space_top), mask)
     canvas.save(out, optimize=True)
 
+
+def frame_mac(raw, out, slide):
+    """2880x1800: the headline and subline on the left, the captured window (its own
+    rounded corners and traffic lights) on the right, lifted with a shadow."""
+    headline, subline, top, bottom = slide
+    W, H = 2880, 1800
+    window = Image.open(raw).convert("RGBA")
+    canvas = gradient((W, H), top, bottom).convert("RGBA")
+    draw = ImageDraw.Draw(canvas)
+    big, small = font(150, "Heavy"), font(52, "Medium")
+    column = 1180
+    lines = headline.split("\n")
+    sub = wrap(draw, subline, small, column)
+    block = len(lines) * round(big.size * 1.08) + 36 + len(sub) * round(small.size * 1.35)
+    x, y = 200, (H - block) // 2
+    for line in lines:
+        draw.text((x, y), line, font=big, fill="white", anchor="la")
+        y += round(big.size * 1.08)
+    y += 36
+    for line in sub:
+        draw.text((x, y), line, font=small, fill=(255, 255, 255, 230), anchor="la")
+        y += round(small.size * 1.35)
+    sh = H - 240
+    sw = round(window.width * sh / window.height)
+    window = window.resize((sw, sh), Image.LANCZOS)
+    wx, wy = W - sw - 260, (H - sh) // 2
+    shadow = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(shadow).rounded_rectangle((wx, wy + 40, wx + sw, wy + sh + 40), 24, fill=140)
+    canvas.alpha_composite(Image.merge("RGBA", (*[Image.new("L", (W, H), 0)] * 3, shadow.filter(ImageFilter.GaussianBlur(50)))))
+    canvas.alpha_composite(window, (wx, wy))
+    canvas.convert("RGB").save(out, optimize=True)
+
+
+if "--mac" in sys.argv:
+    (SHOTS / "mac").mkdir(exist_ok=True)
+    for raw in sorted((SHOTS / "raw" / "mac").glob("*.png")):
+        frame_mac(raw, SHOTS / "mac" / raw.name, SLIDES[raw.stem])
+        print("framed mac", raw.name)
+    sys.exit()
 
 for kind in ("iphone", "ipad"):
     (SHOTS / kind).mkdir(exist_ok=True)

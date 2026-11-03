@@ -88,6 +88,16 @@ struct IPodView: View {
         .onAppear {
             focused = true
             #if DEBUG
+            #if os(macOS)
+            // Mac App Store screenshots: `-shotSize 840x1400` sizes the window (ios/scripts/mac-screenshots.sh).
+            if let spec = UserDefaults.standard.string(forKey: "shotSize"), let window = NSApp.windows.first {
+                let parts = spec.split(separator: "x").compactMap { Double($0) }
+                if parts.count == 2 {
+                    window.setContentSize(NSSize(width: parts[0], height: parts[1]))
+                    window.center()
+                }
+            }
+            #endif
             // App Store screenshots: `-screenshot home|tv|synthTV|radio|synth|nowPlaying|live|playlists|connect` opens that page.
             switch UserDefaults.standard.string(forKey: "screenshot") {
             case "radio": stack = [.main, .band("radio")]
