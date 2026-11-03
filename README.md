@@ -70,6 +70,12 @@ audio and lock-screen controls.
 6. Another Mac of yours: `withkeys ios/scripts/send-mac.sh HOST` builds that DMG, copies it
    over SSH and installs it in `/Applications` (`--reuse` sends the last build). That Mac needs
    no checkout.
+7. App Store: `withkeys ios/scripts/upload-appstore.sh` archives and uploads the iPhone build;
+   `withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--submit]` fills the listing.
+   For the Mac App Store (same record, universal bundle ID): `make-signing.py --mac-store`
+   once, `ios/scripts/mac-screenshots.sh` then `frame-screenshots.py --mac` for the
+   2880x1800 screenshots, `withkeys ios/scripts/upload-mac-appstore.sh` for the sandboxed
+   build, and `appstore-listing.py --mac [--submit]` for the Mac version.
 
 Music and visuals roadmap: `docs/generative-radio.md`.
 
