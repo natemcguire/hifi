@@ -133,16 +133,16 @@ def app_wide(app):
     # Category, subtitle, privacy policy (the app info that's still editable).
     info = next(i for i in api("GET", f"/v1/apps/{app['id']}/appInfos")["data"]
                 if i["attributes"]["appStoreState"] not in ("READY_FOR_SALE", "REPLACED_WITH_NEW_INFO"))
+    # App info is shared by the platforms and locked while any version is in review.
+    if info["attributes"]["appStoreState"] in ("IN_REVIEW", "WAITING_FOR_REVIEW", "PENDING_DEVELOPER_RELEASE", "PROCESSING_FOR_APP_STORE"):
+        print("name, subtitle, category, age rating: locked while a version is in review (" + info["attributes"]["appStoreState"] + "); run again after")
+        return ios_version(app)
     api("PATCH", f"/v1/appInfos/{info['id']}", {"data": {"type": "appInfos", "id": info["id"], "relationships": {
         "primaryCategory": {"data": {"type": "appCategories", "id": "MUSIC"}},
         "secondaryCategory": {"data": {"type": "appCategories", "id": "ENTERTAINMENT"}}}}})
     for loc in api("GET", f"/v1/appInfos/{info['id']}/appInfoLocalizations")["data"]:
-        try:
-            patch("appInfoLocalizations", loc["id"], {"name": LISTING["name"], "subtitle": LISTING["subtitle"], "privacyPolicyUrl": PRIVACY_URL})
-            print("name, subtitle, privacy policy set")
-        except SystemExit:
-            # App info is shared by the platforms and locked while any version is in review.
-            print("name and subtitle: locked while a version is in review (" + info["attributes"]["appStoreState"] + "); run again after")
+        patch("appInfoLocalizations", loc["id"], {"name": LISTING["name"], "subtitle": LISTING["subtitle"], "privacyPolicyUrl": PRIVACY_URL})
+    print("name, subtitle, privacy policy set")
 
     # Age rating: no objectionable content. Live radio plays unfiltered songs, so
     # mild language is possible on the live stations.

@@ -329,8 +329,7 @@ final class Radio: ObservableObject {
             info[MPMediaItemPropertyPlaybackDuration] = track.duration
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = max(0, player.currentTime().seconds.isFinite ? player.currentTime().seconds : 0)
         }
-        let band = stations.filter { $0.band == station.band }
-        let position = "\((band.firstIndex(of: station) ?? 0) + 1) of \(band.count)"
+        let position = "\((stations.firstIndex(of: station) ?? 0) + 1) of \(stations.count)"
         let art = Artwork.screen(station: station, title: displayTitle, artist: displayArtist, position: position)
         info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: art.size) { _ in art }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info

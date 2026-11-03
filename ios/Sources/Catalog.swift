@@ -8,8 +8,21 @@ struct Catalog: Decodable {
     // Stations that play official videos (101X Chillville). Older builds don't read
     // this list, so they never see a station they can't play.
     let videoStations: [Station]?
+    // Server-side switches (stations.json "features"); absent means off.
+    let features: Features?
 
-    var all: [Station] { stations + (videoStations ?? []) }
+    // One list, the order the Radio menu shows: live stations, the video station, then Synth Sounds.
+    var all: [Station] {
+        stations.filter { $0.band != "synth" } + (videoStations ?? []) + stations.filter { $0.band == "synth" }
+    }
+
+    // The Christmas look: on from the server, or `-christmas 1` in a Debug build (screenshots).
+    var christmas: Bool {
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "christmas") { return true }
+        #endif
+        return features?.christmas ?? false
+    }
 
     static let base = URL(string: "https://hifi.nates-software.com/")!
 
@@ -30,11 +43,16 @@ struct Catalog: Decodable {
     }
 }
 
+struct Features: Decodable, Equatable {
+    let christmas: Bool?
+}
+
 struct Station: Decodable, Identifiable, Equatable {
     let id: String
     let name: String
     let band: String
     let frequency: String
+    let subtitle: String?  // a fixed line under the name in the list, instead of the song
     let tagline: String
     let genre: String
     let color: String

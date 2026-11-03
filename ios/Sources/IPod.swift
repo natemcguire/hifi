@@ -47,6 +47,7 @@ struct IPodView: View {
     @Namespace private var highlight
 
     private var page: Page { stack.last ?? .main }
+    private var christmas: Bool { radio.catalog.christmas }
 
     var body: some View {
         GeometryReader { geo in
@@ -58,7 +59,7 @@ struct IPodView: View {
                     let wheel = min(size.height - pad * 2, size.width * 0.42)
                     HStack(spacing: pad) {
                         screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2)
-                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
+                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler, festive: christmas)
                     }
                     .padding(pad)
                 } else {
@@ -68,7 +69,7 @@ struct IPodView: View {
                     let wheel = min(size.width * 0.8, room * 0.9)
                     VStack(spacing: 0) {
                         screen(width: screenWidth, height: screenHeight)
-                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
+                        ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler, festive: christmas)
                             .frame(maxHeight: .infinity)
                     }
                     .padding(.horizontal, pad)
@@ -80,7 +81,23 @@ struct IPodView: View {
         #if os(macOS)
         .padding(.top, 22)  // clear of the traffic lights in the hidden title bar
         #endif
-        .background(Shell.body.ignoresSafeArea())
+        .background {
+            ZStack {
+                Shell.body
+                if christmas { Snowfall() }
+            }
+            .ignoresSafeArea()
+        }
+        // The Christmas look: lights along the top (the tinsel and wreath are on the screen; Christmas.swift).
+        .overlay(alignment: .top) {
+            if christmas {
+                ChristmasLights()
+                    #if os(macOS)
+                    .padding(.leading, 72)  // past the traffic lights
+                    .padding(.top, 2)
+                    #endif
+            }
+        }
         .preferredColorScheme(.light)
         .focusable()
         .focused($focused)
@@ -100,8 +117,7 @@ struct IPodView: View {
             #endif
             // App Store screenshots: `-screenshot home|tv|synthTV|radio|synth|nowPlaying|live|playlists|connect` opens that page.
             switch UserDefaults.standard.string(forKey: "screenshot") {
-            case "radio": stack = [.main, .band("radio")]
-            case "synth": stack = [.main, .band("synth")]
+            case "radio", "synth": stack = [.main, .band("radio")]
             case "nowPlaying": radio.start(); stack = [.main, .nowPlaying]
             case "settings": stack = [.main, .settings]
             case "playlists": stack = [.main, .playlists]
@@ -241,6 +257,12 @@ struct IPodView: View {
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black.opacity(0.25), lineWidth: 1))
         .frame(width: width, height: height)
         .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
+        .background {
+            if christmas { ChristmasTinsel(cornerRadius: 18).padding(-10) }  // the fringe stands 10 pt off the bezel
+        }
+        .overlay(alignment: .topTrailing) {
+            if christmas { Wreath(size: rowHeight * 1.5).offset(x: rowHeight * 0.6, y: -rowHeight * 0.65) }  // hangs off the corner, clear of the battery
+        }
     }
 
     @ViewBuilder
@@ -295,7 +317,7 @@ struct IPodView: View {
     private var title: String {
         switch page {
         case .main: "HIFI"
-        case .band(let band): band == "synth" ? "Synth Sounds" : "Radio"
+        case .band: "Radio"
         case .playlists: "Playlists"
         case .nowPlaying: "Now Playing"
         case .settings: "Settings"
@@ -350,7 +372,9 @@ struct IPodView: View {
         .frame(height: height)
         .background {
             if selected {
-                LinearGradient(colors: [Color(hex: "#7cc0f7"), Color(hex: "#2b78e0"), Color(hex: "#1c64c8")], startPoint: .top, endPoint: .bottom)
+                LinearGradient(colors: christmas ? [Color(hex: "#D8262C"), Color(hex: "#B01B20")]
+                                                 : [Color(hex: "#7cc0f7"), Color(hex: "#2b78e0"), Color(hex: "#1c64c8")],
+                               startPoint: .top, endPoint: .bottom)
                     .matchedGeometryEffect(id: "highlight", in: highlight)
             }
         }
@@ -378,13 +402,13 @@ struct IPodView: View {
 
     // MARK: Menu model
 
-    private static let mainPages: [Page] = [.nowPlaying, .band("radio"), .band("synth"), .playlists, .settings, .about]
+    private static let mainPages: [Page] = [.nowPlaying, .band("radio"), .playlists, .settings, .about]
 
     private var rows: [Row] {
         switch page {
         case .main:
             return [Row(title: "Now Playing", playing: radio.isPlaying), Row(title: "Radio"),
-                    Row(title: "Synth Sounds"), Row(title: "Playlists"), Row(title: "Settings"), Row(title: "About")]
+                    Row(title: "Playlists"), Row(title: "Settings"), Row(title: "About")]
         case .band(let band):
             return stations(band).map { Row(title: $0.displayName, chevron: false,
                                             playing: radio.isPlaying && $0.id == radio.station.id,
@@ -413,11 +437,14 @@ struct IPodView: View {
 
     private var playlistRows: [SpotifyPlaylist] { [spotify.natePlaylist].compactMap { $0 } + spotify.playlists }
 
-    private func stations(_ band: String) -> [Station] { radio.stations.filter { $0.band == band } }
+    // Radio is the one list: every station, in catalog order (the band only matters to older builds).
+    private func stations(_ band: String) -> [Station] { radio.stations }
 
-    // "Artist – Song" under each live station; synth stations show their current track.
+    // The station's own line if it has one; else "Artist – Song" under a live station,
+    // or the current track under a synth station.
     private func songLine(_ station: Station) -> String? {
         _ = songTick
+        if let subtitle = station.subtitle { return subtitle }
         if station.isLive {
             guard let song = radio.songs[station.id], let title = song.title, !title.isEmpty else { return nil }
             return [song.artist, title].compactMap { $0?.isEmpty == false ? $0 : nil }.joined(separator: " – ")
@@ -529,8 +556,8 @@ private extension Array {
 #if DEBUG
 // The review tour: the same wheel presses a listener makes, paced for a two-minute
 // recording on a real iPhone. Radio with its live songs, HIFI TV, next station from the
-// wheel, 101X Chillville, Synth Sounds with pause and play, Playlists and the Spotify
-// connect page, Settings, About, and back to Now Playing. Debug builds only.
+// wheel, 101X Chillville, a Synth Sounds station with pause and play, Playlists and the
+// Spotify connect page, Settings, About, and back to Now Playing. Debug builds only.
 extension IPodView {
     fileprivate func tour() async {
         func pause(_ seconds: Double) async { try? await Task.sleep(for: .seconds(seconds)) }
@@ -575,13 +602,13 @@ extension IPodView {
         await back()  // MENU stops the video
         await back()
         // Synth Sounds: our own music on a shared clock, with pause and play.
-        await open(2, settle: 2)
-        if let i = stations("synth").firstIndex(where: { $0.id == "shareware-summer" }) { await open(i, settle: 7) }
+        await open(1, settle: 2)
+        if let i = live.firstIndex(where: { $0.id == "shareware-summer" }) { await open(i, settle: 7) }
         press(.play); await pause(2)
         press(.play); await pause(4)
         await back(0.8); await back()
         // Playlists, and the page that comes before Spotify's own sign-in.
-        await open(3, settle: 4)
+        await open(2, settle: 4)
         if !spotify.isConnected {
             await open(rows.count - 1, settle: 6)
             spotify.showConnect = false
@@ -589,12 +616,12 @@ extension IPodView {
         }
         await back()
         // Settings: the clicker off and on, then every row.
-        await open(4, settle: 2.5)
+        await open(3, settle: 2.5)
         press(.center); await pause(1.2)
         press(.center); await pause(1)
         await go(to: rows.count - 1); await pause(1.5)
         await back()
-        await open(5, settle: 3.5)  // About
+        await open(4, settle: 3.5)  // About
         await back()
         await open(0, settle: 6)  // Now Playing, still on the air
     }
@@ -781,9 +808,8 @@ private struct NowPlaying: View {
     }
 
     private var position: String {
-        let list = radio.stations.filter { $0.band == radio.station.band }
-        let index = (list.firstIndex(of: radio.station) ?? 0) + 1
-        return "\(index) of \(list.count)"
+        let index = (radio.stations.firstIndex(of: radio.station) ?? 0) + 1
+        return "\(index) of \(radio.stations.count)"
     }
 
     private var progress: some View {
@@ -792,7 +818,7 @@ private struct NowPlaying: View {
             let elapsed = min(radio.elapsed, duration)
             VStack(spacing: 3) {
                 Bar(fraction: duration > 0 ? elapsed / duration : (radio.isPlaying ? 1 : 0), height: rowHeight * 0.3,
-                    live: radio.station.isLive, shimmer: radio.station.isLive && radio.isPlaying)
+                    live: radio.station.isLive, shimmer: radio.station.isLive && radio.isPlaying, candy: radio.catalog.christmas)
                 HStack {
                     Text(radio.station.isLive ? "LIVE" : clock(elapsed))
                     Spacer()
@@ -827,15 +853,20 @@ private struct Bar: View {
     let height: CGFloat
     let live: Bool
     let shimmer: Bool
+    var candy = false  // the Christmas look: a candy cane fill
 
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Rectangle().fill(LinearGradient(colors: [Color(hex: "#d9dde1"), Color(hex: "#f4f6f8")], startPoint: .top, endPoint: .bottom))
-                Rectangle()
-                    .fill(LinearGradient(colors: live ? [Color(hex: "#9fd57a"), Color(hex: "#4f9e2f")] : [Color(hex: "#7cc0f7"), Color(hex: "#1c64c8")],
-                                         startPoint: .top, endPoint: .bottom))
-                    .frame(width: geo.size.width * min(1, max(0, fraction)))
+                if candy {
+                    CandyStripes().frame(width: geo.size.width * min(1, max(0, fraction))).clipped()
+                } else {
+                    Rectangle()
+                        .fill(LinearGradient(colors: live ? [Color(hex: "#9fd57a"), Color(hex: "#4f9e2f")] : [Color(hex: "#7cc0f7"), Color(hex: "#1c64c8")],
+                                             startPoint: .top, endPoint: .bottom))
+                        .frame(width: geo.size.width * min(1, max(0, fraction)))
+                }
                 if shimmer {
                     // A light sweeping across the live bar: on air.
                     TimelineView(.animation) { context in
@@ -869,6 +900,7 @@ struct ClickWheel: View {
     let diameter: CGFloat
     var flash: WheelRegion?
     let handler: Handler
+    var festive = false  // candy cane stripes on the ring (the Christmas look)
     @State private var lastAngle: Double?
     @State private var accumulated = 0.0
     @State private var rotated = false
@@ -888,6 +920,7 @@ struct ClickWheel: View {
                 .fill(LinearGradient(colors: [Color(hex: "#f4f4f4"), Color(hex: "#d8d9db")], startPoint: .top, endPoint: .bottom))
                 .overlay(Circle().stroke(Color.black.opacity(0.12), lineWidth: 1))
                 .shadow(color: .black.opacity(0.08), radius: 1, y: 1)
+            if festive { CandyRing(diameter: diameter) }
             ForEach([WheelRegion.menu, .next, .play, .previous], id: \.self) { region in
                 Wedge(region: region, inner: hub / diameter)
                     .fill(RadialGradient(colors: [Color.black.opacity(0.03), Color.black.opacity(0.13)],
