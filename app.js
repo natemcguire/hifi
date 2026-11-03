@@ -63,39 +63,59 @@ const isLive = station => Boolean(station.stream);
 
 // MARK: Christmas
 // stations.json carries feature flags, so the look can be switched on for everyone without a
-// release; `?christmas=1` previews it. Lights along the top, tinsel round the screen, a candy-cane
-// wheel, holly on the bezel and snow behind it all; styles.css does the rest under body.xmas.
+// release; `?christmas=1` previews it. The iPod is left as it is: the decorations are layers over it
+// (lights along the top, a tinsel garland round the screen, holly and candy canes on the bezel, snow
+// over everything); styles.css draws them under body.xmas.
 if (catalog.features?.christmas || params.get('christmas') === '1') decorate();
 function decorate() {
   document.body.classList.add('xmas');
-  const device = document.querySelector('.device');
+  const device = document.querySelector('.device'), screen = document.querySelector('.screen');
   const lights = document.createElement('div');
   lights.className = 'lights';
   lights.setAttribute('aria-hidden', 'true');
   device.prepend(lights);
   const colors = ['#ff3b30', '#34c759', '#ffcc00', '#5ac8fa', '#ff2d95'];
   const string = () => {
-    const w = Math.max(120, Math.round(lights.clientWidth)), n = Math.max(6, Math.round(w / 40)), step = w / n;
+    const w = Math.max(120, Math.round(lights.clientWidth)), n = Math.max(6, Math.round(w / 48)), step = w / n;
     let cord = 'M0 4', bulbs = '';
     for (let i = 0; i < n; i++) {
       const mid = step * (i + 0.5);
-      cord += ` Q${mid.toFixed(1)} 16 ${(step * (i + 1)).toFixed(1)} 4`;
-      bulbs += `<g class="bulb" style="--i:${i};--c:${colors[i % colors.length]}" transform="translate(${mid.toFixed(1)} 10)">`
-        + '<rect x="-2.2" y="-1" width="4.4" height="4" rx="1"/><ellipse cx="0" cy="8.5" rx="3.6" ry="5.4"/></g>';
+      cord += ` Q${mid.toFixed(1)} 20 ${(step * (i + 1)).toFixed(1)} 4`;
+      bulbs += `<g class="bulb" style="--i:${i};--c:${colors[i % colors.length]}" transform="translate(${mid.toFixed(1)} 12)">`
+        + '<rect x="-3" y="-1" width="6" height="5" rx="1.2"/><ellipse cx="0" cy="11" rx="4.8" ry="7.2"/></g>';
     }
-    lights.innerHTML = `<svg viewBox="0 0 ${w} 26" preserveAspectRatio="none"><path class="cord" d="${cord}"/>${bulbs}</svg>`;
+    lights.innerHTML = `<svg viewBox="0 0 ${w} 34" preserveAspectRatio="none"><path class="cord" d="${cord}"/>${bulbs}</svg>`;
   };
   string();
   new ResizeObserver(string).observe(lights);
+  // The garland: rounded rectangles traced 2px outside the screen edge, stroked with short dashes,
+  // so each dash is a strand standing across the edge. Four layers of silver, white and gold.
+  const tinsel = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  tinsel.setAttribute('class', 'tinsel');
+  tinsel.setAttribute('aria-hidden', 'true');
+  const garland = () => {
+    const w = screen.offsetWidth + 52, h = screen.offsetHeight + 52;  // the svg is inset -26px
+    tinsel.setAttribute('width', w); tinsel.setAttribute('height', h);
+    const rect = cls => `<rect class="${cls}" x="20" y="20" width="${w - 40}" height="${h - 40}" rx="16"/>`;
+    tinsel.innerHTML = rect('s1') + rect('s3') + rect('s2') + rect('s4') + rect('s5') + rect('core');
+  };
+  garland();
+  new ResizeObserver(garland).observe(screen);
+  screen.append(tinsel);
+  screen.insertAdjacentHTML('beforeend', '<svg class="holly" viewBox="0 0 64 48" aria-hidden="true">'
+    + '<path class="leaf" d="M30 27c-9 2-17-3-21-12 9-3 17 1 21 12zM34 27c9 2 17-3 21-12-9-3-17 1-21 12zM32 28c-3-9 1-18 8-23 3 9 0 17-8 23zM32 28c3-9-1-18-8-23-3 9 0 17 8 23z"/>'
+    + '<circle class="berry" cx="28.5" cy="32" r="4"/><circle class="berry" cx="36" cy="33.5" r="4"/><circle class="berry" cx="32" cy="39" r="4"/></svg>');
+  // Two candy canes crossed on the bottom-left corner: a white cane with red bands over it.
+  const cane = 'M22 58V20a9 9 0 0 1 18 0v6';
+  screen.insertAdjacentHTML('beforeend', '<svg class="canes" viewBox="0 0 64 64" aria-hidden="true">'
+    + `<g transform="rotate(-22 32 40)"><path class="white" d="${cane}"/><path class="red" d="${cane}"/></g>`
+    + `<g transform="rotate(24 32 40) translate(-2 2)"><path class="white" d="${cane}"/><path class="red" d="${cane}"/></g></svg>`);
   const snow = document.createElement('div');
   snow.className = 'snow';
   snow.setAttribute('aria-hidden', 'true');
   snow.innerHTML = Array.from({ length: 56 }, () => `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--d:${(9 + Math.random() * 11).toFixed(1)}s;`
     + `--t:${(-Math.random() * 20).toFixed(1)}s;--s:${(2 + Math.random() * 3.5).toFixed(1)}px;--o:${(0.35 + Math.random() * 0.5).toFixed(2)}"></i>`).join('');
-  document.body.prepend(snow);
-  document.querySelector('.screen').insertAdjacentHTML('beforeend', '<svg class="holly" viewBox="0 0 64 48" aria-hidden="true">'
-    + '<path class="leaf" d="M30 27c-9 2-17-3-21-12 9-3 17 1 21 12zM34 27c9 2 17-3 21-12-9-3-17 1-21 12zM32 28c-3-9 1-18 8-23 3 9 0 17-8 23zM32 28c3-9-1-18-8-23-3 9 0 17 8 23z"/>'
-    + '<circle class="berry" cx="28.5" cy="32" r="4"/><circle class="berry" cx="36" cy="33.5" r="4"/><circle class="berry" cx="32" cy="39" r="4"/></svg>');
+  document.body.append(snow);
 }
 // Video stations play official YouTube uploads on the screen. They live in
 // catalog.videoStations, which the native apps don't read, and load their

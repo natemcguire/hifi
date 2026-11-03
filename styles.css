@@ -196,30 +196,38 @@ svg{display:block}
 .steps input{width:100%;padding:12px;border:0;border-radius:10px;background:#f2f2f4;font:15px ui-monospace,Menlo,monospace;color:#111;outline-color:#1db954}
 .setup-links{display:flex;justify-content:space-between}
 
-/* Christmas (body.xmas, from stations.json features.christmas): snow behind a night sky, a string of
-   lights along the top of the device, tinsel round the screen, holly on the bezel, a candy-cane wheel. */
-@property --tinsel{syntax:'<angle>';inherits:false;initial-value:0deg}
-.xmas{background:radial-gradient(ellipse 80% 50% at 50% 110%,#1e4a30,transparent),linear-gradient(#0a1830,#132a4a 55%,#0c2c25)}
-.xmas .ipod{z-index:1}
-.snow{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.snow i{position:absolute;top:-12px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fff;opacity:var(--o);animation:fall var(--d) linear infinite;animation-delay:var(--t)}
-@keyframes fall{to{transform:translate3d(24px,106vh,0)}}
-.lights{position:absolute;left:var(--pad);right:var(--pad);top:0;height:26px;z-index:4;pointer-events:none}
-.lights svg{width:100%;height:26px}
-.lights .cord{fill:none;stroke:#2d5a3a;stroke-width:1.5}
-.lights .bulb rect{fill:#9aa0a6}
-.lights .bulb ellipse{fill:var(--c);filter:drop-shadow(0 0 3px var(--c));animation:twinkle 1.7s ease-in-out infinite;animation-delay:calc(var(--i)*-.41s)}
+/* Christmas (body.xmas, from stations.json features.christmas). The iPod itself is left exactly as
+   it is; the decorations are layers laid over it, like a cut-out graphic: a string of lights across
+   the top of the device, a tinsel garland wrapped round the screen bezel, holly on one corner,
+   crossed candy canes on another, and snow falling over everything. None of it takes clicks. */
+.lights{position:absolute;left:var(--pad);right:var(--pad);top:0;height:34px;z-index:40;pointer-events:none}
+.lights svg{width:100%;height:34px;overflow:visible}
+.lights .cord{fill:none;stroke:#2d5a3a;stroke-width:2}
+.lights .bulb rect{fill:#4a5450}
+.lights .bulb ellipse{fill:var(--c);filter:drop-shadow(0 0 4px var(--c));animation:twinkle 1.7s ease-in-out infinite;animation-delay:calc(var(--i)*-.41s)}
 @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.4}}
-.xmas .screen{position:relative;z-index:0}
-.xmas .screen::before{content:"";position:absolute;inset:-10px;z-index:-1;border-radius:18px;background:repeating-conic-gradient(from var(--tinsel) at 50% 50%,#e4e4e4 0 1.6deg,#fafafa 1.6deg 2.4deg,#9c9c9c 2.4deg 4deg,#ffd166 4deg 4.7deg,#c9c9c9 4.7deg 6.4deg);box-shadow:0 0 0 1px rgba(0,0,0,.25),0 8px 22px rgba(0,0,0,.45);animation:tinsel 14s linear infinite}
-@keyframes tinsel{to{--tinsel:360deg}}
-.holly{position:absolute;right:-14px;top:-16px;width:46px;height:34px;z-index:2;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.xmas .screen{position:relative}
+/* The garland is five rounded rectangles traced 6px outside the screen edge and stroked with short
+   dashes: every dash is a strand standing across the edge, and the layers' different widths give
+   strands of different lengths. They reach 20px out and no more than 8px in, so the glass stays clear. */
+.tinsel{position:absolute;inset:-26px;z-index:30;pointer-events:none;overflow:visible;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.tinsel rect{fill:none}
+.tinsel .s1{stroke:#c9cdd2;stroke-width:28;stroke-dasharray:1.6 2.3;animation:shimmer 9s linear infinite}
+.tinsel .s2{stroke:#fff;stroke-width:24;stroke-dasharray:1.3 4.6;animation:shimmer 7s linear infinite reverse}
+.tinsel .s3{stroke:#8f959c;stroke-width:22;stroke-dasharray:1.2 3.9;animation:shimmer 13s linear infinite}
+.tinsel .s4{stroke:#ffd166;stroke-width:18;stroke-dasharray:1.4 7.3;animation:shimmer 11s linear infinite reverse}
+.tinsel .s5{stroke:#fff;stroke-width:14;stroke-dasharray:1 6.1;animation:shimmer 5s linear infinite}
+.tinsel .core{stroke:#a9aeb4;stroke-width:3}
+@keyframes shimmer{to{stroke-dashoffset:-60}}
+.holly{position:absolute;right:-24px;top:-26px;width:72px;height:54px;z-index:35;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 .holly .leaf{fill:#1f7a3a;stroke:#0f4d22;stroke-width:1.2;stroke-linejoin:round}
 .holly .berry{fill:#e0262b;stroke:#8f1217;stroke-width:1}
-.xmas .hl{background:linear-gradient(#ff7b7b,#d8262c 50%,#b01b20)}
-.xmas .bar{background:linear-gradient(#fff6f6,#dfc3c3);border-bottom-color:#8a6b6b}
-.xmas .wheel::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(#fff 0 9deg,#e0262b 9deg 18deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 calc(100% - 9px));mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 calc(100% - 9px));animation:spin 36s linear infinite;pointer-events:none}
-@keyframes spin{to{transform:rotate(360deg)}}
-.xmas .progress .fill{background:repeating-linear-gradient(135deg,#e0262b 0 5px,#fff 5px 10px)}
+.canes{position:absolute;left:-26px;bottom:-26px;width:96px;height:96px;z-index:35;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.canes path{fill:none;stroke-width:7}
+.canes .white{stroke:#fff;stroke-linecap:round}
+.canes .red{stroke:#e0262b;stroke-dasharray:4.5 5.5}
+.snow{position:fixed;inset:0;z-index:60;overflow:hidden;pointer-events:none}
+.snow i{position:absolute;top:-12px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fff;box-shadow:0 0 0 .6px rgba(80,100,130,.35),0 1px 2px rgba(0,0,0,.2);opacity:var(--o);animation:fall var(--d) linear infinite;animation-delay:var(--t)}
+@keyframes fall{to{transform:translate3d(24px,106vh,0)}}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
