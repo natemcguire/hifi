@@ -54,18 +54,20 @@ struct IPodView: View {
             let size = geo.size
             let wide = size.width > size.height * 0.95
             let pad = max(14, min(size.width, size.height) * 0.05)
+            let lights: CGFloat = christmas ? 40 : 0  // the string of lights needs room above the screen
             ZStack {
                 if wide {
-                    let wheel = min(size.height - pad * 2, size.width * 0.42)
+                    let wheel = min(size.height - pad * 2 - lights, size.width * 0.42)
                     HStack(spacing: pad) {
-                        screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2)
+                        screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2 - lights)
                         ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
                     }
                     .padding(pad)
+                    .padding(.top, lights)
                 } else {
                     let screenWidth = size.width - pad * 2
-                    let screenHeight = min(screenWidth * 0.82, size.height * 0.5)
-                    let room = size.height - screenHeight - pad * 2
+                    let screenHeight = min(screenWidth * 0.82, (size.height - lights) * 0.5)
+                    let room = size.height - screenHeight - pad * 2 - lights
                     let wheel = min(size.width * 0.8, room * 0.9)
                     VStack(spacing: 0) {
                         screen(width: screenWidth, height: screenHeight)
@@ -73,7 +75,7 @@ struct IPodView: View {
                             .frame(maxHeight: .infinity)
                     }
                     .padding(.horizontal, pad)
-                    .padding(.top, pad)
+                    .padding(.top, pad + lights)
                 }
             }
             .frame(width: size.width, height: size.height)
@@ -258,13 +260,13 @@ struct IPodView: View {
         .frame(width: width, height: height)
         .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
         .overlay {
-            if christmas { ChristmasTinsel(cornerRadius: 18).padding(-14) }  // the garland wraps the bezel and stands 14 pt off it
+            if christmas { ChristmasTinsel(cornerRadius: 18).padding(-24) }  // the garland wraps the bezel and stands 24 pt off it
         }
         .overlay(alignment: .topTrailing) {
-            if christmas { Wreath(size: rowHeight * 1.6).offset(x: rowHeight * 0.65, y: -rowHeight * 0.7) }  // hangs off the corner, clear of the battery
+            if christmas { Wreath(size: rowHeight * 2.6).offset(x: rowHeight * 1.1, y: -rowHeight * 1.1) }  // hangs off the corner, clear of the battery
         }
         .overlay(alignment: .bottomLeading) {
-            if christmas { CandyCanes(size: rowHeight * 2.4).offset(x: -rowHeight * 0.7, y: rowHeight * 0.7) }
+            if christmas { CandyCanes(size: rowHeight * 4).offset(x: -rowHeight * 1.3, y: rowHeight * 1.3) }
         }
     }
 
