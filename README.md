@@ -19,7 +19,7 @@ No build tools needed just to hack on the player: `python3 -m http.server 8080`,
 
 ## What it does
 
-- **Radio** tab: Radio Paradise, three SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!) and Pop Girl Radio from Exclusive Radio, streamed straight from their servers. Nothing is proxied or rehosted.
+- **Radio** tab: Radio Paradise, five SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!, and for the season Mistletoe Soul and Tinsel Strings, SomaFM's Jolly Ol' Soul and Department Store Christmas) and Pop Girl Radio from Exclusive Radio, streamed straight from their servers. Nothing is proxied or rehosted.
 - **Synth Sounds** tab: Dial-Up, Shareware Summer, Night Build and Pixel Drift, procedurally composed MP3s in `tracks/`. Each one plays like a broadcast: the current track is picked from wall-clock time, so everyone hears the same thing.
 - `/player` (`index.html`, `app.js`, `styles.css`) is the same white click-wheel iPod as the native apps in `ios/Sources/IPod.swift`: drag the ring to scroll, center to choose, MENU to go back; on Now Playing the wheel is the volume. Arrow keys, Return, Escape and Space work too. It uses the Media Session API for lock-screen and media-key controls.
 - Spotify: listeners sign in with PKCE through `https://nates-software.com/hifi/spotify/callback` (state `web.…`), which hands the code to `/spotify` (`spotify.js`) to finish in the browser. The ♥ saves live songs to their Liked Songs; their playlists show under Playlists.

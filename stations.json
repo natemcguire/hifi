@@ -108,6 +108,50 @@
       ]
     },
     {
+      "id": "mistletoe-soul",
+      "name": "MISTLETOE SOUL",
+      "band": "radio",
+      "frequency": "06",
+      "tagline": "Christmas One. Soul and R&B Christmas records from the sixties and seventies, all day long. Live from SomaFM's Jolly Ol' Soul, listener-supported.",
+      "genre": "CHRISTMAS 1 / SOUL · R&B",
+      "color": "#ff8f8f",
+      "stream": "https://ice6.somafm.com/jollysoul-128-mp3",
+      "website": "https://somafm.com/jollysoul/",
+      "provider": "SomaFM",
+      "providerLabel": "Jolly Ol' Soul on SomaFM.com ↗",
+      "support": "https://somafm.com/support/",
+      "nowPlaying": "/api/now-playing?station=mistletoe-soul",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2,
+      "tv": [
+        "tv/mistletoe-soul-1.mp4",
+        "tv/mistletoe-soul-2.mp4"
+      ]
+    },
+    {
+      "id": "tinsel-strings",
+      "name": "TINSEL STRINGS",
+      "band": "radio",
+      "frequency": "07",
+      "tagline": "Christmas Two. Orchestras, strings and pianos from the old department-store records, almost no singing. Live from SomaFM's Department Store Christmas, listener-supported.",
+      "genre": "CHRISTMAS 2 / INSTRUMENTAL",
+      "color": "#b4e6c4",
+      "stream": "https://ice6.somafm.com/deptstore-128-mp3",
+      "website": "https://somafm.com/deptstore/",
+      "provider": "SomaFM",
+      "providerLabel": "Department Store Christmas on SomaFM.com ↗",
+      "support": "https://somafm.com/support/",
+      "nowPlaying": "/api/now-playing?station=tinsel-strings",
+      "bitrate": 128,
+      "sampleRate": 44100,
+      "channels": 2,
+      "tv": [
+        "tv/tinsel-strings-1.mp4",
+        "tv/tinsel-strings-2.mp4"
+      ]
+    },
+    {
       "id": "dial-up",
       "name": "DIAL-UP",
       "band": "synth",
@@ -481,7 +525,7 @@
       "id": "101x-chillville",
       "name": "101X CHILLVILLE",
       "band": "radio",
-      "frequency": "06",
+      "frequency": "08",
       "tagline": "The Chillville playlist from Austin's late, great 101X, played from each song's official video.",
       "genre": "CHILL / AUSTIN, RIP 101X",
       "color": "#9fd8ff",

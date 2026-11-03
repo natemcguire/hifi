@@ -58,7 +58,7 @@ HIFI is a free internet radio player drawn as a classic click-wheel music player
 HOW TO USE: drag a finger around the wheel to move the highlight, press the center button to choose, MENU to go back. On Now Playing the wheel is the volume, and the left and right wheel buttons change station.
 
 FEATURES AND WHERE THEY ARE
-- Radio (menu > Radio): six live stations. Choose one and it plays, with the song that is on now and HIFI TV behind it.
+- Radio (menu > Radio): eight live stations. Choose one and it plays, with the song that is on now and HIFI TV behind it.
 - Synth Sounds (menu > Synth Sounds): four stations of our own instrumental music. Everyone hears the same point in the rotation, like a broadcast.
 - 101X Chillville (menu > Radio, last row): a playlist played from each song's official YouTube upload, in YouTube's own embedded player (youtube-nocookie.com), on screen and only while the app is open. MENU stops it.
 - Heart (Now Playing on a live station): saves the song to the listener's Spotify Liked Songs. Without Spotify connected it opens the Connect Spotify page.
@@ -78,9 +78,9 @@ RIGHTS: Synth Sounds are original recordings owned by Nate McGuire (Nate's Softw
 
 ### Purpose and audience
 
-HIFI is a radio receiver, not a music library. It plays six live internet radio stations
-(Radio Paradise, three SomaFM channels, Pop Girl Radio from Exclusive Radio, and the
-101X Chillville video playlist) and four original instrumental stations, on a screen
+HIFI is a radio receiver, not a music library. It plays eight live internet radio stations
+(Radio Paradise, five SomaFM channels including two holiday ones, Pop Girl Radio from
+Exclusive Radio, and the 101X Chillville video playlist) and four original instrumental stations, on a screen
 styled like a click-wheel iPod. It is free, has no in-app purchases and no ads. It is
 for people who want music on while they work, cook or drive; nothing in it is aimed at
 children. The age rating was declared with Infrequent/Mild Profanity because live radio

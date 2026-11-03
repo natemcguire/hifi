@@ -17,7 +17,7 @@ async function radioParadiseNowPlaying() {
 }
 // SomaFM publishes each channel's recent songs (newest first) at a public,
 // keyless endpoint. It gives no time remaining, so the relay caches briefly.
-const SOMAFM = { 'boot-liquor': 'bootliquor', 'sonic-universe': 'sonicuniverse', 'indie-pop-rocks': 'indiepop' };
+const SOMAFM = { 'boot-liquor': 'bootliquor', 'sonic-universe': 'sonicuniverse', 'indie-pop-rocks': 'indiepop', 'mistletoe-soul': 'jollysoul', 'tinsel-strings': 'deptstore' };
 const somaCache = new Map();
 async function somaFmNowPlaying(channel) {
   const cached = somaCache.get(channel);
