@@ -2,18 +2,21 @@
 # Archives HIFI for the App Store and uploads it to App Store Connect, signed with
 # HIFI's own distribution identity (scripts/make-signing.py --store).
 # Run as: withkeys ios/scripts/upload-appstore.sh [--no-upload]
-# With HIFI_ARCHIVE_HOST=<host> the compile runs there unsigned (keeping the mini's
-# CPU free) and only signing and upload happen here; the signing keys never leave.
+# The compile runs unsigned on HIFI_ARCHIVE_HOST (default HIFI_BUILD_HOST, then the relay
+# Mac from devices.local), keeping the mini's CPU free; only signing and upload happen
+# here, so the signing keys never leave. HIFI_ARCHIVE_HOST=local compiles here.
 # Needs ASC_API_KEY_ID, ASC_API_KEY_ISSUER_ID, ASC_API_KEY_PATH for the upload.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+[[ -f scripts/devices.local ]] && source scripts/devices.local
+HIFI_ARCHIVE_HOST=${HIFI_ARCHIVE_HOST:-${HIFI_BUILD_HOST:-${HIFI_RELAY_HOST:-local}}}
 signing=$HOME/.config/hifi-signing
 keychain=$HOME/Library/Keychains/hifi-build.keychain-db
 identity=$(cat $signing/dist-identity)
 build=$(date -u +%Y%m%d%H%M)   # always increasing, as App Store Connect requires
 security unlock-keychain -p "$(cat $signing/keychain-password)" $keychain
 rm -rf build/archive
-if [[ -n ${HIFI_ARCHIVE_HOST:-} ]]; then
+if [[ $HIFI_ARCHIVE_HOST != local ]]; then
   ssh $HIFI_ARCHIVE_HOST 'mkdir -p ~/Library/Caches/hifi-build/ios'  # the Air's own disk: its ~/Projects is this Mac's, shared
   rsync -a --delete --exclude build --exclude devices.local --exclude __pycache__ --exclude HIFI.xcodeproj ./ ${HIFI_ARCHIVE_HOST}:Library/Caches/hifi-build/ios/
   rsync -a ../stations.json ${HIFI_ARCHIVE_HOST}:Library/Caches/hifi-build/stations.json

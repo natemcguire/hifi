@@ -58,7 +58,9 @@ npm run release    # clean commit required; builds, deploys the nsw-hifi Worker,
 audio and lock-screen controls.
 
 1. Set your Apple team in `ios/project.yml` and your bundle IDs.
-2. `cp ios/scripts/devices.example ios/scripts/devices.local` and list your iPhones.
+2. `cp ios/scripts/devices.example ios/scripts/devices.local`, list your iPhones and name the Mac
+   that compiles (`HIFI_BUILD_HOST`). The DMG, App Store and screenshot scripts compile there
+   unsigned and sign here; the keys stay on this Mac. `HIFI_BUILD_HOST=local` compiles here.
 3. `ios/scripts/make-signing.py` (App Store Connect API key) creates a dedicated certificate,
    keychain and profile; add `--mac` for the Mac certificate.
 4. `ios/scripts/build-iphone.sh && ios/scripts/install-iphone.sh`, or
@@ -70,7 +72,7 @@ audio and lock-screen controls.
 6. Another Mac of yours: `withkeys ios/scripts/send-mac.sh HOST` builds that DMG, copies it
    over SSH and installs it in `/Applications` (`--reuse` sends the last build). That Mac needs
    no checkout.
-7. App Store: `withkeys ios/scripts/upload-appstore.sh` archives and uploads the iPhone build;
+7. App Store: `withkeys ios/scripts/upload-appstore.sh` compiles and uploads the iPhone build;
    `withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--submit]` fills the listing.
    For the Mac App Store (same record, universal bundle ID): `make-signing.py --mac-store`
    once, `ios/scripts/mac-screenshots.sh` then `frame-screenshots.py --mac` for the

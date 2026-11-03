@@ -4,20 +4,38 @@
 # (`-shotSize`), each window captured to Screenshots/raw/mac. Frame them with
 # scripts/frame-screenshots.py --mac. Needs the hifi-build keychain (make-signing.py --mac)
 # and a logged-in display; the shell doing this must be allowed to record the screen.
+# The compile runs unsigned on HIFI_BUILD_HOST (default the relay Mac from devices.local)
+# so this Mac stays quiet; HIFI_BUILD_HOST=local compiles here. Signing happens here.
 # Run as: ios/scripts/mac-screenshots.sh [--reuse]   (--reuse skips the build)
 set -euo pipefail
 cd "$(dirname "$0")/.."
+[[ -f scripts/devices.local ]] && source scripts/devices.local
 signing=$HOME/.config/hifi-signing
 keychain=$HOME/Library/Keychains/hifi-build.keychain-db
-app=build/mac-shot/Build/Products/Debug/HIFI.app
+host=${HIFI_BUILD_HOST:-${HIFI_RELAY_HOST:-local}}
+app=build/mac-shot/HIFI.app
 pages=(1-main:home 2-tv:tv 3-radio:radio 4-live:live 5-synth:synthTV 6-connect:connect)
 
 if [[ ${1:-} != --reuse ]]; then
-  xcodegen generate --quiet
+  rm -rf $app && mkdir -p build/mac-shot
+  if [[ $host == local ]]; then
+    xcodegen generate --quiet
+    nice -n 15 xcodebuild -project HIFI.xcodeproj -scheme HIFI-Mac -configuration Debug -destination 'platform=macOS,arch=arm64' \
+      -derivedDataPath build/mac-shot/derived CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=YES build -quiet
+    ditto build/mac-shot/derived/Build/Products/Debug/HIFI.app $app
+  else
+    ssh $host 'mkdir -p ~/Library/Caches/hifi-build/ios'  # the Air's own disk: its ~/Projects is this Mac's, shared
+    rsync -a --delete --exclude build --exclude devices.local --exclude __pycache__ --exclude HIFI.xcodeproj ./ ${host}:Library/Caches/hifi-build/ios/
+    rsync -a ../stations.json ${host}:Library/Caches/hifi-build/stations.json
+    ssh $host "cd ~/Library/Caches/hifi-build/ios && xcodegen generate --quiet && \
+      xcodebuild -project HIFI.xcodeproj -scheme HIFI-Mac -configuration Debug -destination 'platform=macOS,arch=arm64' \
+      -derivedDataPath build/mac-shot CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=YES build -quiet"
+    rsync -a --delete ${host}:Library/Caches/hifi-build/ios/build/mac-shot/Build/Products/Debug/HIFI.app build/mac-shot/
+  fi
+  # Signed here with the Mac Developer identity and the store sandbox, so the shots show the sandboxed app.
   security unlock-keychain -p "$(cat $signing/keychain-password)" $keychain
-  nice -n 15 xcodebuild -project HIFI.xcodeproj -scheme HIFI-Mac -configuration Debug -destination 'platform=macOS,arch=arm64' \
-    -derivedDataPath build/mac-shot CODE_SIGN_IDENTITY="$(cat $signing/mac-identity)" "OTHER_CODE_SIGN_FLAGS=--keychain $keychain" \
-    CODE_SIGN_ENTITLEMENTS=Resources/MacStore.entitlements ONLY_ACTIVE_ARCH=YES build -quiet
+  codesign --force --sign "$(cat $signing/mac-identity)" --keychain $keychain --entitlements Resources/MacStore.entitlements $app
+  echo "compiled HIFI (Debug) on $host"
 fi
 
 # The window number of HIFI's one window, for screencapture -l.
