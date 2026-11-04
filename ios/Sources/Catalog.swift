@@ -16,13 +16,9 @@ struct Catalog: Decodable {
         stations.filter { $0.band != "synth" } + (videoStations ?? []) + stations.filter { $0.band == "synth" }
     }
 
-    // The Christmas look: on from the server, or `-christmas 1` in a Debug build (screenshots).
-    var christmas: Bool {
-        #if DEBUG
-        if UserDefaults.standard.bool(forKey: "christmas") { return true }
-        #endif
-        return features?.christmas ?? false
-    }
+    // The Christmas look as the server has it. The app ORs this with the listener's own
+    // "christmas" default (a long press on the title bar, or `-christmas 1` at launch).
+    var christmas: Bool { features?.christmas ?? false }
 
     static let base = URL(string: "https://hifi.nates-software.com/")!
 

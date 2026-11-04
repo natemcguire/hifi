@@ -32,6 +32,9 @@ struct IPodView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("clicker") private var clicker = true
     @AppStorage("backlight") private var backlight = 30  // seconds; 0 = always on
+    // Forces the Christmas look ahead of the server flag: a long press on the title bar
+    // flips it, so a tester can see the season in any build. `-christmas 1` sets it at launch.
+    @AppStorage("christmas") private var forcedChristmas = false
     @State private var stack: [Page] = [.main]
     @State private var selection: [Page: Int] = [:]
     @State private var forward = true
@@ -49,7 +52,7 @@ struct IPodView: View {
     @Namespace private var highlight
 
     private var page: Page { stack.last ?? .main }
-    private var christmas: Bool { radio.catalog.christmas }
+    private var christmas: Bool { radio.catalog.christmas || forcedChristmas }
 
     var body: some View {
         GeometryReader { geo in
@@ -343,6 +346,12 @@ struct IPodView: View {
         .background(LinearGradient(colors: [Color(hex: "#fdfdfd"), Color(hex: "#c5cbd1")], startPoint: .top, endPoint: .bottom))
         .overlay(alignment: .bottom) { Rectangle().fill(Color(hex: "#8d959c")).frame(height: 1) }
         .animation(.easeInOut(duration: 0.2), value: title)
+        .contentShape(Rectangle())
+        .onLongPressGesture(minimumDuration: 1.5) {
+            withAnimation(.easeInOut(duration: 0.4)) { forcedChristmas.toggle() }
+            Feedback.click()
+            touched()
+        }
     }
 
     private var title: String {
