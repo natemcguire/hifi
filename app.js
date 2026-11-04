@@ -115,35 +115,49 @@ function decorate() {
   snow.innerHTML = Array.from({ length: 48 }, () => `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--d:${(10 + Math.random() * 12).toFixed(1)}s;`
     + `--t:${(-Math.random() * 22).toFixed(1)}s;--s:${(4 + Math.random() * 6).toFixed(1)}px;--o:${(0.6 + Math.random() * 0.4).toFixed(2)}"></i>`).join('');
   document.body.append(snow);
-  // A fir wreath round the click wheel: a dark ring of greenery with lighter needles laid over it
-  // and outlined needles bristling from both edges, berries, and a bow at the bottom. Drawn in a
-  // 144-unit box with the ring at radius 55 (the wheel's rim is 50), so it scales with the wheel; the labels sit well inside.
+  // A cedar wreath round the click wheel: feathery sprays of needles sweeping round the ring over a
+  // dense dark core, in four greens from deep to yellow-green, with berry clusters, gold baubles and
+  // a red bow at the bottom. Drawn in a 152-unit box with the ring at radius 55 (the wheel's rim is
+  // 50), so it scales with the wheel; sprays lean outward more than inward, so the labels stay clear.
   const wobble = i => ((Math.sin(i * 12.9898) * 43758.5453) % 1 + 1) % 1;
   const h = (i, k) => wobble(i * 7 + k * 131);
-  const R = 55, B = 11;  // the band sits just outside the wheel's rim, so the labels at 0.68 R stay clear
-  const needle = (a, rho, tilt, length, outward) => {
-    const dir = a + tilt, reach = outward ? length : -length;
-    return `<line x1="${(Math.cos(a) * rho).toFixed(1)}" y1="${(Math.sin(a) * rho).toFixed(1)}" x2="${(Math.cos(a) * rho + Math.cos(dir) * reach).toFixed(1)}" y2="${(Math.sin(a) * rho + Math.sin(dir) * reach).toFixed(1)}"/>`;
-  };
-  const spikes = Array.from({ length: 96 }, (_, i) => {
-    const a = i / 96 * Math.PI * 2 + (h(i, 6) - 0.5) * 0.05, out = i % 2 === 0;
-    return needle(a, R + (out ? B / 2 - 1.5 : -B / 2 + 1.5), (h(i, 8) - 0.5) * 1.1, out ? 3.5 + h(i, 7) * 4 : 2.5 + h(i, 7) * 3, out);
-  }).join('');
-  const needles = [[], []];
-  for (let i = 0; i < 170; i++) {
-    const a = i / 170 * Math.PI * 2 + (h(i, 1) - 0.5) * 0.06, rho = R + (h(i, 2) - 0.5) * B * 0.85;
-    needles[i % 3 === 0 ? 1 : 0].push(needle(a, rho, (h(i, 3) - 0.5) * 1.3, B * (0.4 + h(i, 5) * 0.35), h(i, 4) > 0.5));
+  const R = 55, f = n => n.toFixed(1);
+  const fronds = ['', '', '', ''];
+  for (let k = 0; k < 170; k++) {
+    const shade = Math.min(3, Math.floor(h(k, 7) * 4));
+    const theta = k / 170 * Math.PI * 2 + (h(k, 1) - 0.5) * 0.08, rho = R + (h(k, 2) - 0.5) * 12;
+    const ax = Math.cos(theta) * rho, ay = Math.sin(theta) * rho;
+    const dir = theta + Math.PI / 2 + (h(k, 3) * 0.9 - 0.6);  // + leans inward, - outward
+    const L = 11 + h(k, 4) * 9, bend = (h(k, 5) - 0.5) * 8;
+    const ux = Math.cos(dir), uy = Math.sin(dir), px = -uy, py = ux;
+    const point = t => [ax + ux * L * t + px * bend * 4 * t * (1 - t), ay + uy * L * t + py * bend * 4 * t * (1 - t)];
+    const tip = point(1);
+    let d = `M${f(ax)} ${f(ay)}Q${f(ax + ux * L * 0.5 + px * bend)} ${f(ay + uy * L * 0.5 + py * bend)} ${f(tip[0])} ${f(tip[1])}`;
+    const M = Math.floor(L / 1.0);
+    for (let j = 0; j < M; j++) {
+      const t = j / M, [x, y] = point(t), [nx, ny] = point(Math.min(1, t + 0.05));
+      const psi = Math.atan2(ny - y, nx - x), side = j % 2 ? -1 : 1;
+      const n = (2.4 + h(k * 31 + j, 6) * 2.2) * (1 - 0.55 * t), ang = psi + side * 0.7;
+      d += `M${f(x)} ${f(y)}L${f(x + Math.cos(ang) * n)} ${f(y + Math.sin(ang) * n)}`;
+    }
+    fronds[shade] += d;
   }
-  const berries = Array.from({ length: 13 }, (_, i) => {
-    const a = (i + 0.5) / 13 * Math.PI * 2, reach = R * (0.95 + h(i + 40, 9) * 0.13);
-    const x = Math.cos(a) * reach, y = Math.sin(a) * reach;
-    return `<circle class="berry" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5"/><circle class="shine" cx="${(x - 0.8).toFixed(1)}" cy="${(y - 0.8).toFixed(1)}" r=".7"/>`;
-  }).join('');
+  let trims = '';
+  for (let i = 0; i < 7; i++) {
+    const a = (i + 0.3) / 7 * Math.PI * 2, reach = R + (h(i, 9) - 0.5) * 8;
+    for (let j = 0; j < 3; j++) {
+      const x = Math.cos(a) * reach + Math.cos(j * 2.1) * 2.6, y = Math.sin(a) * reach + Math.sin(j * 2.1) * 2.6;
+      trims += `<circle class="berry" cx="${f(x)}" cy="${f(y)}" r="2.2"/><circle class="shine" cx="${f(x - 0.7)}" cy="${f(y - 0.7)}" r=".6"/>`;
+    }
+  }
+  for (let i = 0; i < 5; i++) {
+    const a = (i + 0.8) / 5 * Math.PI * 2, reach = R + (h(i + 9, 10) - 0.5) * 8, x = Math.cos(a) * reach, y = Math.sin(a) * reach;
+    trims += `<circle class="gold" cx="${f(x)}" cy="${f(y)}" r="3.2"/><circle class="shine" cx="${f(x - 1)}" cy="${f(y - 1)}" r=".9"/>`;
+  }
   const bow = `<g transform="translate(0 ${R})"><ellipse class="bow" cx="-6" cy="0" rx="7" ry="4.3" transform="rotate(-18 -6 0)"/>`
     + '<ellipse class="bow" cx="6" cy="0" rx="7" ry="4.3" transform="rotate(18 6 0)"/><circle class="knot" r="2.8"/></g>';
-  wheelRoom.insertAdjacentHTML('beforeend', `<svg class="wreath" viewBox="-72 -72 144 144" aria-hidden="true">`
-    + `<circle class="ring" r="${R}"/><circle class="edge" r="${R - B / 2}"/><circle class="edge" r="${R + B / 2}"/>`
-    + `<g class="ink">${spikes}</g><g class="n1">${spikes}</g><g class="n1">${needles[0].join('')}</g><g class="n2">${needles[1].join('')}</g>${berries}${bow}</svg>`);
+  wheelRoom.insertAdjacentHTML('beforeend', `<svg class="wreath" viewBox="-76 -76 152 152" aria-hidden="true"><circle class="core" r="${R}"/>`
+    + fronds.map((d, i) => `<path class="f${i}" d="${d}"/>`).join('') + trims + bow + '</svg>');
 }
 // Video stations play official YouTube uploads on the screen. They live in
 // catalog.videoStations, which the native apps don't read, and load their

@@ -240,14 +240,16 @@ svg{display:block}
 .canes .white{stroke:#fff;stroke-linecap:round}
 .canes .red{stroke:#e0262b;stroke-dasharray:4.5 5.5}
 .wheel-room{position:relative}
-.wreath{position:absolute;left:50%;top:50%;width:calc(var(--wheel)*1.44);height:calc(var(--wheel)*1.44);margin:calc(var(--wheel)*-.72);z-index:5;pointer-events:none;filter:drop-shadow(0 2px 1.5px rgba(0,0,0,.3))}
-.wreath .ring{fill:none;stroke:#2a7a3b;stroke-width:12}
-.wreath .edge{fill:none;stroke:#1a1a1a;stroke-width:1.6}
-.wreath .ink line{stroke:#1a1a1a;stroke-width:4.4;stroke-linecap:round}
-.wreath .n1 line{stroke:#43a853;stroke-width:2.2;stroke-linecap:round}
-.wreath .n2 line{stroke:#2e8b3f;stroke-width:2.2;stroke-linecap:round}
-.wreath .berry{fill:#e5343a;stroke:#1a1a1a;stroke-width:.9}
-.wreath .shine{fill:#fff;opacity:.75}
+.wreath{position:absolute;left:50%;top:50%;width:calc(var(--wheel)*1.52);height:calc(var(--wheel)*1.52);margin:calc(var(--wheel)*-.76);z-index:5;pointer-events:none;filter:drop-shadow(0 2px 1.5px rgba(0,0,0,.3))}
+.wreath .core{fill:none;stroke:#27552a;stroke-width:14}
+.wreath path{fill:none;stroke-width:1.4;stroke-linecap:round}
+.wreath .f0{stroke:#2f6b2a}
+.wreath .f1{stroke:#3e8a33}
+.wreath .f2{stroke:#5aa23e}
+.wreath .f3{stroke:#7fb548}
+.wreath .berry{fill:#d7262f;stroke:#1a1a1a;stroke-width:.8}
+.wreath .gold{fill:#e3b23c;stroke:#8a6a1a;stroke-width:.9}
+.wreath .shine{fill:#fff;opacity:.8}
 .wreath .bow{fill:#d7262f;stroke:#1a1a1a;stroke-width:1.1}
 .wreath .knot{fill:#b51f27;stroke:#1a1a1a;stroke-width:1.1}
 .snow{position:fixed;inset:0;z-index:60;overflow:hidden;pointer-events:none}

@@ -189,59 +189,70 @@ struct Snowfall: View {
     }
 }
 
-// A fir wreath round the click wheel: a dark ring of greenery with lighter needles laid over
-// it and outlined needles bristling from both edges, berries, and a bow at the bottom. Drawn in a
-// 144-unit box with the ring at radius 55 (the wheel's rim is 50), so it scales with the wheel. The labels sit well
-// inside the rim, so the ring leaves them clear; touches pass through.
+// A cedar wreath round the click wheel: feathery sprays of needles sweeping round the ring over
+// a dense dark core, in four greens from deep to yellow-green, with berry clusters, gold baubles
+// and a red bow at the bottom. Drawn in a 152-unit box with the ring at radius 55 (the wheel's rim
+// is 50), so it scales with the wheel; sprays lean outward more than inward, so MENU and the
+// arrows at 0.68 R stay clear. Touches pass through.
 struct WheelWreath: View {
     let diameter: CGFloat
 
     var body: some View {
         Canvas { canvas, size in
-            let s = size.width / 144
+            let s = size.width / 152
             let c = CGPoint(x: size.width / 2, y: size.height / 2)
-            let ink = Color(hex: "#1a1a1a"), dark = Color(hex: "#2a7a3b"), mid = Color(hex: "#2e8b3f"), light = Color(hex: "#43a853")
-            let R = 55.0, B = 11.0  // the band sits just outside the wheel's rim, so the labels at 0.68 R stay clear
+            let ink = Color(hex: "#1a1a1a")
+            let greens = [Color(hex: "#2f6b2a"), Color(hex: "#3e8a33"), Color(hex: "#5aa23e"), Color(hex: "#7fb548")]
+            let R = 55.0
             func h(_ i: Int, _ k: Int) -> Double { Double(ChristmasTinsel.noise(i * 7 + k * 131)) }
             func at(_ x: Double, _ y: Double) -> CGPoint { CGPoint(x: c.x + x * s, y: c.y + y * s) }
-            func ring(_ r: Double) -> Path { Path(ellipseIn: CGRect(x: c.x - r * s, y: c.y - r * s, width: 2 * r * s, height: 2 * r * s)) }
-            func needle(_ a: Double, from rho: Double, tilt: Double, length: Double, outward: Bool, into path: inout Path) {
-                let base = at(cos(a) * rho, sin(a) * rho)
-                let dir = a + tilt, reach = outward ? length : -length
-                path.move(to: base)
-                path.addLine(to: at(cos(a) * rho + cos(dir) * reach, sin(a) * rho + sin(dir) * reach))
+            func disc(_ x: Double, _ y: Double, _ r: Double) -> Path { Path(ellipseIn: CGRect(x: c.x + (x - r) * s, y: c.y + (y - r) * s, width: 2 * r * s, height: 2 * r * s)) }
+            // The dense core the sprays grow from.
+            canvas.stroke(disc(0, 0, R), with: .color(Color(hex: "#27552a")), lineWidth: 14 * s)
+            // Sprays: a curved stem along the ring with needles swept toward its tip, darker shades first.
+            var fronds = [Path(), Path(), Path(), Path()]
+            let N = 170
+            for k in 0..<N {
+                let shade = min(3, Int(h(k, 7) * 4))
+                let theta = Double(k) / Double(N) * 2 * .pi + (h(k, 1) - 0.5) * 0.08
+                let rho = R + (h(k, 2) - 0.5) * 12
+                let ax = cos(theta) * rho, ay = sin(theta) * rho
+                let dir = theta + .pi / 2 + (h(k, 3) * 0.9 - 0.6)  // + leans inward, - outward
+                let L = 11 + h(k, 4) * 9, bend = (h(k, 5) - 0.5) * 8
+                let ux = cos(dir), uy = sin(dir), px = -uy, py = ux
+                func point(_ t: Double) -> (Double, Double) { (ax + ux * L * t + px * bend * 4 * t * (1 - t), ay + uy * L * t + py * bend * 4 * t * (1 - t)) }
+                var stem = Path()
+                stem.move(to: at(ax, ay))
+                stem.addQuadCurve(to: at(point(1).0, point(1).1), control: at(ax + ux * L * 0.5 + px * bend, ay + uy * L * 0.5 + py * bend))
+                fronds[shade].addPath(stem)
+                let M = Int(L / 1.0)
+                for j in 0..<M {
+                    let t = Double(j) / Double(M), (x, y) = point(t), (nx, ny) = point(min(1, t + 0.05))
+                    let psi = atan2(ny - y, nx - x), side = j % 2 == 0 ? 1.0 : -1.0
+                    let n = (2.4 + h(k * 31 + j, 6) * 2.2) * (1 - 0.55 * t), ang = psi + side * 0.7
+                    fronds[shade].move(to: at(x, y))
+                    fronds[shade].addLine(to: at(x + cos(ang) * n, y + sin(ang) * n))
+                }
             }
-            // The ring of greenery, inked on both edges.
-            canvas.stroke(ring(R), with: .color(dark), lineWidth: B * s)
-            canvas.stroke(ring(R - B / 2), with: .color(ink), lineWidth: 1.6 * s)
-            canvas.stroke(ring(R + B / 2), with: .color(ink), lineWidth: 1.6 * s)
-            // Needles bristling from the outer and inner edges: ink under green, so the silhouette is spiky.
-            var spikes = Path()
-            for i in 0..<96 {
-                let a = Double(i) / 96 * 2 * .pi + (h(i, 6) - 0.5) * 0.05, out = i % 2 == 0
-                needle(a, from: R + (out ? B / 2 - 1.5 : -B / 2 + 1.5), tilt: (h(i, 8) - 0.5) * 1.1, length: out ? 3.5 + h(i, 7) * 4 : 2.5 + h(i, 7) * 3, outward: out, into: &spikes)
+            for (i, path) in fronds.enumerated() {
+                canvas.stroke(path, with: .color(greens[i]), style: StrokeStyle(lineWidth: 1.4 * s, lineCap: .round))
             }
-            canvas.stroke(spikes, with: .color(ink), style: StrokeStyle(lineWidth: 4.4 * s, lineCap: .round))
-            canvas.stroke(spikes, with: .color(light), style: StrokeStyle(lineWidth: 2.2 * s, lineCap: .round))
-            // Needles across the band, in two greens.
-            var n1 = Path(), n2 = Path()
-            for i in 0..<170 {
-                let a = Double(i) / 170 * 2 * .pi + (h(i, 1) - 0.5) * 0.06
-                let rho = R + (h(i, 2) - 0.5) * B * 0.85
-                let tilt = (h(i, 3) - 0.5) * 1.3, length = B * (0.4 + h(i, 5) * 0.35), outward = h(i, 4) > 0.5
-                if i % 3 == 0 { needle(a, from: rho, tilt: tilt, length: length, outward: outward, into: &n2) }
-                else { needle(a, from: rho, tilt: tilt, length: length, outward: outward, into: &n1) }
+            // Berry clusters and gold baubles.
+            for i in 0..<7 {
+                let a = (Double(i) + 0.3) / 7 * 2 * .pi, reach = R + (h(i, 9) - 0.5) * 8
+                for j in 0..<3 {
+                    let x = cos(a) * reach + cos(Double(j) * 2.1) * 2.6, y = sin(a) * reach + sin(Double(j) * 2.1) * 2.6
+                    canvas.fill(disc(x, y, 2.2), with: .color(Color(hex: "#d7262f")))
+                    canvas.stroke(disc(x, y, 2.2), with: .color(ink), lineWidth: 0.8 * s)
+                    canvas.fill(disc(x - 0.7, y - 0.7, 0.6), with: .color(.white.opacity(0.8)))
+                }
             }
-            canvas.stroke(n1, with: .color(light), style: StrokeStyle(lineWidth: 2.2 * s, lineCap: .round))
-            canvas.stroke(n2, with: .color(mid), style: StrokeStyle(lineWidth: 2.2 * s, lineCap: .round))
-            // Berries.
-            for i in 0..<13 {
-                let a = (Double(i) + 0.5) / 13 * 2 * .pi, reach = R * (0.95 + h(i + 40, 9) * 0.13)
-                let p = at(cos(a) * reach, sin(a) * reach), r = 2.5 * s
-                let berry = Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: 2 * r, height: 2 * r))
-                canvas.fill(berry, with: .color(Color(hex: "#e5343a")))
-                canvas.stroke(berry, with: .color(ink), lineWidth: 0.9 * s)
-                canvas.fill(Path(ellipseIn: CGRect(x: p.x - 1.5 * s, y: p.y - 1.5 * s, width: 1.4 * s, height: 1.4 * s)), with: .color(.white.opacity(0.75)))
+            for i in 0..<5 {
+                let a = (Double(i) + 0.8) / 5 * 2 * .pi, reach = R + (h(i + 9, 10) - 0.5) * 8
+                let x = cos(a) * reach, y = sin(a) * reach
+                canvas.fill(disc(x, y, 3.2), with: .color(Color(hex: "#e3b23c")))
+                canvas.stroke(disc(x, y, 3.2), with: .color(Color(hex: "#8a6a1a")), lineWidth: 0.9 * s)
+                canvas.fill(disc(x - 1, y - 1, 0.9), with: .color(.white.opacity(0.8)))
             }
             // The bow, at the bottom (the garland would cover it at the top on a phone).
             for (dx, rot) in [(-6.0, -0.31), (6.0, 0.31)] {
@@ -250,11 +261,10 @@ struct WheelWreath: View {
                 canvas.fill(loop, with: .color(Color(hex: "#d7262f")))
                 canvas.stroke(loop, with: .color(ink), lineWidth: 1.1 * s)
             }
-            let knot = Path(ellipseIn: CGRect(x: c.x - 2.8 * s, y: c.y + R * s - 2.8 * s, width: 5.6 * s, height: 5.6 * s))
-            canvas.fill(knot, with: .color(Color(hex: "#b51f27")))
-            canvas.stroke(knot, with: .color(ink), lineWidth: 1.1 * s)
+            canvas.fill(disc(0, R, 2.8), with: .color(Color(hex: "#b51f27")))
+            canvas.stroke(disc(0, R, 2.8), with: .color(ink), lineWidth: 1.1 * s)
         }
-        .frame(width: diameter * 1.44, height: diameter * 1.44)
+        .frame(width: diameter * 1.52, height: diameter * 1.52)
         .shadow(color: .black.opacity(0.3), radius: 2, y: 1.5)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
