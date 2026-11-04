@@ -189,47 +189,72 @@ struct Snowfall: View {
     }
 }
 
-// A wreath round the click wheel: sprigs along the rim, berries, a bow at the bottom. The
-// labels sit well inside the rim, so the ring leaves them clear; touches pass through.
+// A fir wreath round the click wheel: a dark ring of greenery with lighter needles laid over
+// it and outlined needles bristling from both edges, berries, and a bow at the bottom. Drawn in a
+// 144-unit box with the ring at radius 55 (the wheel's rim is 50), so it scales with the wheel. The labels sit well
+// inside the rim, so the ring leaves them clear; touches pass through.
 struct WheelWreath: View {
     let diameter: CGFloat
 
     var body: some View {
-        let r = diameter / 2
-        let sprig = diameter * 0.12
-        let count = max(12, Int((2 * .pi * r) / (sprig * 0.62)))
-        ZStack {
-            ForEach(0..<count, id: \.self) { i in
-                let angle = Double(i) / Double(count) * 2 * .pi
-                let wobble = ChristmasTinsel.noise(i) * 0.22
-                Circle()
-                    .fill(i % 2 == 0 ? Color(hex: "#2e8b3f") : Color(hex: "#43a853"))
-                    .overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 2.2))
-                    .frame(width: sprig * (1 + wobble), height: sprig * (1 + wobble))
-                    .offset(x: cos(angle) * r * (1 + wobble * 0.3), y: sin(angle) * r * (1 + wobble * 0.3))
+        Canvas { canvas, size in
+            let s = size.width / 144
+            let c = CGPoint(x: size.width / 2, y: size.height / 2)
+            let ink = Color(hex: "#1a1a1a"), dark = Color(hex: "#2a7a3b"), mid = Color(hex: "#2e8b3f"), light = Color(hex: "#43a853")
+            let R = 55.0, B = 11.0  // the band sits just outside the wheel's rim, so the labels at 0.68 R stay clear
+            func h(_ i: Int, _ k: Int) -> Double { Double(ChristmasTinsel.noise(i * 7 + k * 131)) }
+            func at(_ x: Double, _ y: Double) -> CGPoint { CGPoint(x: c.x + x * s, y: c.y + y * s) }
+            func ring(_ r: Double) -> Path { Path(ellipseIn: CGRect(x: c.x - r * s, y: c.y - r * s, width: 2 * r * s, height: 2 * r * s)) }
+            func needle(_ a: Double, from rho: Double, tilt: Double, length: Double, outward: Bool, into path: inout Path) {
+                let base = at(cos(a) * rho, sin(a) * rho)
+                let dir = a + tilt, reach = outward ? length : -length
+                path.move(to: base)
+                path.addLine(to: at(cos(a) * rho + cos(dir) * reach, sin(a) * rho + sin(dir) * reach))
             }
-            ForEach(0..<(count / 3), id: \.self) { i in
-                let angle = (Double(i) + 0.5) * 3 / Double(count) * 2 * .pi
-                let reach = r * (0.95 + ChristmasTinsel.noise(i + 40) * 0.13)
-                Circle()
-                    .fill(Color(hex: "#e5343a"))
-                    .overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 1.6))
-                    .overlay(alignment: .topLeading) { Circle().fill(.white.opacity(0.75)).frame(width: sprig * 0.13, height: sprig * 0.13).offset(x: sprig * 0.1, y: sprig * 0.08) }
-                    .frame(width: sprig * 0.42, height: sprig * 0.42)
-                    .offset(x: cos(angle) * reach, y: sin(angle) * reach)
+            // The ring of greenery, inked on both edges.
+            canvas.stroke(ring(R), with: .color(dark), lineWidth: B * s)
+            canvas.stroke(ring(R - B / 2), with: .color(ink), lineWidth: 1.6 * s)
+            canvas.stroke(ring(R + B / 2), with: .color(ink), lineWidth: 1.6 * s)
+            // Needles bristling from the outer and inner edges: ink under green, so the silhouette is spiky.
+            var spikes = Path()
+            for i in 0..<96 {
+                let a = Double(i) / 96 * 2 * .pi + (h(i, 6) - 0.5) * 0.05, out = i % 2 == 0
+                needle(a, from: R + (out ? B / 2 - 1.5 : -B / 2 + 1.5), tilt: (h(i, 8) - 0.5) * 1.1, length: out ? 3.5 + h(i, 7) * 4 : 2.5 + h(i, 7) * 3, outward: out, into: &spikes)
+            }
+            canvas.stroke(spikes, with: .color(ink), style: StrokeStyle(lineWidth: 4.4 * s, lineCap: .round))
+            canvas.stroke(spikes, with: .color(light), style: StrokeStyle(lineWidth: 2.2 * s, lineCap: .round))
+            // Needles across the band, in two greens.
+            var n1 = Path(), n2 = Path()
+            for i in 0..<170 {
+                let a = Double(i) / 170 * 2 * .pi + (h(i, 1) - 0.5) * 0.06
+                let rho = R + (h(i, 2) - 0.5) * B * 0.85
+                let tilt = (h(i, 3) - 0.5) * 1.3, length = B * (0.4 + h(i, 5) * 0.35), outward = h(i, 4) > 0.5
+                if i % 3 == 0 { needle(a, from: rho, tilt: tilt, length: length, outward: outward, into: &n2) }
+                else { needle(a, from: rho, tilt: tilt, length: length, outward: outward, into: &n1) }
+            }
+            canvas.stroke(n1, with: .color(light), style: StrokeStyle(lineWidth: 2.2 * s, lineCap: .round))
+            canvas.stroke(n2, with: .color(mid), style: StrokeStyle(lineWidth: 2.2 * s, lineCap: .round))
+            // Berries.
+            for i in 0..<13 {
+                let a = (Double(i) + 0.5) / 13 * 2 * .pi, reach = R * (0.95 + h(i + 40, 9) * 0.13)
+                let p = at(cos(a) * reach, sin(a) * reach), r = 2.5 * s
+                let berry = Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: 2 * r, height: 2 * r))
+                canvas.fill(berry, with: .color(Color(hex: "#e5343a")))
+                canvas.stroke(berry, with: .color(ink), lineWidth: 0.9 * s)
+                canvas.fill(Path(ellipseIn: CGRect(x: p.x - 1.5 * s, y: p.y - 1.5 * s, width: 1.4 * s, height: 1.4 * s)), with: .color(.white.opacity(0.75)))
             }
             // The bow, at the bottom (the garland would cover it at the top on a phone).
-            HStack(spacing: -sprig * 0.14) {
-                Ellipse().fill(Color(hex: "#d7262f")).overlay(Ellipse().stroke(Color(hex: "#1a1a1a"), lineWidth: 2))
-                    .frame(width: sprig * 1.1, height: sprig * 0.7).rotationEffect(.degrees(-18))
-                Circle().fill(Color(hex: "#b51f27")).overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 2))
-                    .frame(width: sprig * 0.46, height: sprig * 0.46).zIndex(1)
-                Ellipse().fill(Color(hex: "#d7262f")).overlay(Ellipse().stroke(Color(hex: "#1a1a1a"), lineWidth: 2))
-                    .frame(width: sprig * 1.1, height: sprig * 0.7).rotationEffect(.degrees(18))
+            for (dx, rot) in [(-6.0, -0.31), (6.0, 0.31)] {
+                let loop = Path(ellipseIn: CGRect(x: -7 * s, y: -4.3 * s, width: 14 * s, height: 8.6 * s))
+                    .applying(CGAffineTransform(translationX: c.x + dx * s, y: c.y + R * s).rotated(by: rot))
+                canvas.fill(loop, with: .color(Color(hex: "#d7262f")))
+                canvas.stroke(loop, with: .color(ink), lineWidth: 1.1 * s)
             }
-            .offset(y: r)
+            let knot = Path(ellipseIn: CGRect(x: c.x - 2.8 * s, y: c.y + R * s - 2.8 * s, width: 5.6 * s, height: 5.6 * s))
+            canvas.fill(knot, with: .color(Color(hex: "#b51f27")))
+            canvas.stroke(knot, with: .color(ink), lineWidth: 1.1 * s)
         }
-        .frame(width: diameter, height: diameter)
+        .frame(width: diameter * 1.44, height: diameter * 1.44)
         .shadow(color: .black.opacity(0.3), radius: 2, y: 1.5)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
