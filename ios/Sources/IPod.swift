@@ -65,6 +65,7 @@ struct IPodView: View {
                     HStack(spacing: pad) {
                         screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2)
                         ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
+                            .overlay { if christmas { WheelWreath(diameter: wheel) } }
                     }
                     .padding(pad)
                 } else {
@@ -75,6 +76,7 @@ struct IPodView: View {
                     VStack(spacing: 0) {
                         screen(width: screenWidth, height: screenHeight)
                         ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
+                            .overlay { if christmas { WheelWreath(diameter: wheel) } }
                             .frame(maxHeight: .infinity)
                     }
                     .padding(.horizontal, pad)
@@ -91,14 +93,14 @@ struct IPodView: View {
             Shell.body.ignoresSafeArea()
         }
         // The Christmas look is laid over the iPod, which stays exactly where it is (nothing moves to make
-        // room): lights draped along the top edge, then
-        // snow over everything (the tinsel, wreath and candy canes sit on the screen; Christmas.swift).
+        // room): lights up in the status bar strip (the title bar on the Mac), clear of the garland, then
+        // snow over everything (the tinsel and candy canes sit on the screen, the wreath on the wheel).
         .overlay(alignment: .top) {
             if christmas {
                 ChristmasLights()
+                    .ignoresSafeArea(edges: .top)
                     #if os(macOS)
                     .padding(.leading, 72)  // past the traffic lights
-                    .padding(.top, 2)
                     #endif
             }
         }
@@ -289,9 +291,6 @@ struct IPodView: View {
         .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
         .overlay {
             if christmas { ChristmasTinsel(cornerRadius: 18).padding(-24) }  // the garland wraps the bezel and stands 24 pt off it
-        }
-        .overlay(alignment: .topTrailing) {
-            if christmas { Wreath(size: rowHeight * 2.6).offset(x: rowHeight * 1.1, y: -rowHeight * 1.1) }  // hangs off the corner, clear of the battery
         }
         .overlay(alignment: .bottomLeading) {
             if christmas { CandyCanes(size: rowHeight * 4).offset(x: -rowHeight * 1.3, y: rowHeight * 1.3) }

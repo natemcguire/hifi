@@ -209,9 +209,9 @@ svg{display:block}
 
 /* Christmas (body.xmas, from stations.json features.christmas). The iPod itself is left exactly as
    it is; the decorations are layers laid over it, like a cut-out graphic: a string of lights across
-   the top of the device, a tinsel garland wrapped round the screen bezel, holly on one corner,
+   the top of the device, a tinsel garland wrapped round the screen bezel, a wreath round the wheel,
    crossed candy canes on another, and snow falling over everything. None of it takes clicks. */
-.lights{position:absolute;left:var(--pad);right:var(--pad);top:-6px;height:52px;z-index:40;pointer-events:none}  /* draped over the top edge; nothing moves for it */
+.lights{position:absolute;left:var(--pad);right:var(--pad);top:calc(var(--pad) - 88px);height:52px;z-index:40;pointer-events:none}  /* above the garland, in the desktop host's grip strip; nothing moves for it */
 .lights svg{width:100%;height:52px;overflow:visible}
 .lights .cord{fill:none;stroke:#1f5c2a;stroke-width:3.5;stroke-linecap:round}
 .lights .bulb rect{fill:#3b4a3f;stroke:#1a1a1a;stroke-width:1.6}
@@ -234,16 +234,20 @@ svg{display:block}
 .tinsel .b2{stroke:#e0262b;stroke-width:18;stroke-dashoffset:-16}
 .tinsel .bo2{stroke:#1a1a1a;stroke-width:23;stroke-dashoffset:-16}
 @keyframes shimmer{to{stroke-dashoffset:-60}}
-.holly{position:absolute;right:-44px;top:-46px;width:120px;height:90px;z-index:35;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
-.holly .leaf{fill:#2a9d4a;stroke:#1a1a1a;stroke-width:2.6;stroke-linejoin:round}
-.holly .vein{fill:none;stroke:#176b30;stroke-width:1.6;stroke-linecap:round}
-.holly .berry{fill:#e0262b;stroke:#1a1a1a;stroke-width:2}
-.holly .shine{fill:#fff;opacity:.7}
 .canes{position:absolute;left:-54px;bottom:-54px;width:160px;height:160px;z-index:35;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
 .canes path{fill:none;stroke-width:7}
 .canes .ink{stroke:#1a1a1a;stroke-width:10.4;stroke-linecap:round}
 .canes .white{stroke:#fff;stroke-linecap:round}
 .canes .red{stroke:#e0262b;stroke-dasharray:4.5 5.5}
+.wheel-room{position:relative}
+.wreath{position:absolute;left:50%;top:50%;width:calc(var(--wheel)*1.2);height:calc(var(--wheel)*1.2);margin:calc(var(--wheel)*-.6);z-index:5;pointer-events:none;filter:drop-shadow(0 2px 1.5px rgba(0,0,0,.3))}
+.wreath .sprig{stroke:#1a1a1a;stroke-width:1.1}
+.wreath .g1{fill:#2e8b3f}
+.wreath .g2{fill:#43a853}
+.wreath .berry{fill:#e5343a;stroke:#1a1a1a;stroke-width:.9}
+.wreath .shine{fill:#fff;opacity:.75}
+.wreath .bow{fill:#d7262f;stroke:#1a1a1a;stroke-width:1.1}
+.wreath .knot{fill:#b51f27;stroke:#1a1a1a;stroke-width:1.1}
 .snow{position:fixed;inset:0;z-index:60;overflow:hidden;pointer-events:none}
 .snow i{position:absolute;top:-16px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fff;box-shadow:0 0 0 1.2px rgba(40,60,90,.45),0 1px 2px rgba(0,0,0,.2);opacity:var(--o);animation:fall var(--d) linear infinite;animation-delay:var(--t)}
 @keyframes fall{to{transform:translate3d(28px,106vh,0)}}

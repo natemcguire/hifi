@@ -66,12 +66,12 @@ const isLive = station => Boolean(station.stream);
 // MARK: Christmas
 // stations.json carries feature flags, so the look can be switched on for everyone without a
 // release; `?christmas=1` previews it. The iPod is left as it is: the decorations are layers over it
-// (lights along the top, a tinsel garland round the screen, holly and candy canes on the bezel, snow
+// (lights along the top, a tinsel garland round the screen, candy canes on the bezel, a wreath round the wheel, snow
 // over everything); styles.css draws them under body.xmas.
 if (catalog.features?.christmas || params.get('christmas') === '1') decorate();
 function decorate() {
   document.body.classList.add('xmas');
-  const device = document.querySelector('.device'), screen = document.querySelector('.screen');
+  const device = document.querySelector('.device'), screen = document.querySelector('.screen'), wheelRoom = document.querySelector('.wheel-room');
   const lights = document.createElement('div');
   lights.className = 'lights';
   lights.setAttribute('aria-hidden', 'true');
@@ -104,13 +104,6 @@ function decorate() {
   garland();
   new ResizeObserver(garland).observe(screen);
   screen.append(tinsel);
-  // Holly on the top-right corner: two outlined leaves and three berries.
-  screen.insertAdjacentHTML('beforeend', '<svg class="holly" viewBox="0 0 80 60" aria-hidden="true">'
-    + '<path class="leaf" d="M38 34C27 37 15 32 8 20c3-8 10-12 18-10-1 7 1 13 6 18 2 3 4 5 6 6z"/>'
-    + '<path class="leaf" d="M42 34c11 3 23-2 30-14-3-8-10-12-18-10 1 7-1 13-6 18-2 3-4 5-6 6z"/>'
-    + '<path class="vein" d="M12 21c8 3 15 7 24 12M68 21c-8 3-15 7-24 12"/>'
-    + '<circle class="berry" cx="33" cy="41" r="6.5"/><circle class="berry" cx="47" cy="42" r="6.5"/><circle class="berry" cx="40" cy="50" r="6.5"/>'
-    + '<circle class="shine" cx="31" cy="39" r="1.8"/><circle class="shine" cx="45" cy="40" r="1.8"/><circle class="shine" cx="38" cy="48" r="1.8"/></svg>');
   // Two candy canes crossed on the bottom-left corner: an ink outline, a white cane, red bands.
   const cane = 'M22 58V20a9 9 0 0 1 18 0v6';
   const canes = `<path class="ink" d="${cane}"/><path class="white" d="${cane}"/><path class="red" d="${cane}"/>`;
@@ -122,6 +115,21 @@ function decorate() {
   snow.innerHTML = Array.from({ length: 48 }, () => `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--d:${(10 + Math.random() * 12).toFixed(1)}s;`
     + `--t:${(-Math.random() * 22).toFixed(1)}s;--s:${(4 + Math.random() * 6).toFixed(1)}px;--o:${(0.6 + Math.random() * 0.4).toFixed(2)}"></i>`).join('');
   document.body.append(snow);
+  // A wreath round the click wheel: sprigs along the rim, berries, a bow at the bottom. The wheel's
+  // labels sit well inside the rim, so the ring leaves them clear.
+  const wobble = i => ((Math.sin(i * 12.9898) * 43758.5453) % 1 + 1) % 1;
+  const sprigs = Array.from({ length: 40 }, (_, i) => {
+    const a = i / 40 * Math.PI * 2, w = 1 + (wobble(i) - 0.5) * 0.44, reach = 50 * (1 + (wobble(i) - 0.5) * 0.13);
+    return `<circle class="sprig ${i % 2 ? 'g2' : 'g1'}" cx="${(Math.cos(a) * reach).toFixed(1)}" cy="${(Math.sin(a) * reach).toFixed(1)}" r="${(6 * w).toFixed(1)}"/>`;
+  }).join('');
+  const berries = Array.from({ length: 13 }, (_, i) => {
+    const a = (i + 0.5) / 13 * Math.PI * 2, reach = 50 * (0.95 + wobble(i + 40) * 0.13);
+    const x = Math.cos(a) * reach, y = Math.sin(a) * reach;
+    return `<circle class="berry" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5"/><circle class="shine" cx="${(x - 0.8).toFixed(1)}" cy="${(y - 0.8).toFixed(1)}" r=".7"/>`;
+  }).join('');
+  const bow = '<g transform="translate(0 50)"><ellipse class="bow" cx="-6" cy="0" rx="7" ry="4.3" transform="rotate(-18 -6 0)"/>'
+    + '<ellipse class="bow" cx="6" cy="0" rx="7" ry="4.3" transform="rotate(18 6 0)"/><circle class="knot" r="2.8"/></g>';
+  wheelRoom.insertAdjacentHTML('beforeend', `<svg class="wreath" viewBox="-60 -60 120 120" aria-hidden="true">${sprigs}${berries}${bow}</svg>`);
 }
 // Video stations play official YouTube uploads on the screen. They live in
 // catalog.videoStations, which the native apps don't read, and load their

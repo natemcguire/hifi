@@ -189,44 +189,47 @@ struct Snowfall: View {
     }
 }
 
-// A wreath with a red bow, hung on a corner of the screen bezel: outlined like a cartoon.
-struct Wreath: View {
-    let size: CGFloat
+// A wreath round the click wheel: sprigs along the rim, berries, a bow at the bottom. The
+// labels sit well inside the rim, so the ring leaves them clear; touches pass through.
+struct WheelWreath: View {
+    let diameter: CGFloat
 
     var body: some View {
+        let r = diameter / 2
+        let sprig = diameter * 0.12
+        let count = max(12, Int((2 * .pi * r) / (sprig * 0.62)))
         ZStack {
-            // Sprigs: overlapping green circles around a ring, two shades for depth, inked round.
-            ForEach(0..<16, id: \.self) { i in
-                let angle = Double(i) / 16 * 2 * .pi
-                let wobble = ChristmasTinsel.noise(i) * 0.08
+            ForEach(0..<count, id: \.self) { i in
+                let angle = Double(i) / Double(count) * 2 * .pi
+                let wobble = ChristmasTinsel.noise(i) * 0.22
                 Circle()
                     .fill(i % 2 == 0 ? Color(hex: "#2e8b3f") : Color(hex: "#43a853"))
-                    .overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 1.8))
-                    .frame(width: size * (0.26 + wobble), height: size * (0.26 + wobble))
-                    .offset(x: cos(angle) * size * 0.33, y: sin(angle) * size * 0.33)
+                    .overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 2.2))
+                    .frame(width: sprig * (1 + wobble), height: sprig * (1 + wobble))
+                    .offset(x: cos(angle) * r * (1 + wobble * 0.3), y: sin(angle) * r * (1 + wobble * 0.3))
             }
-            // Berries.
-            ForEach(0..<7, id: \.self) { i in
-                let angle = Double(i) / 7 * 2 * .pi + 0.4
+            ForEach(0..<(count / 3), id: \.self) { i in
+                let angle = (Double(i) + 0.5) * 3 / Double(count) * 2 * .pi
+                let reach = r * (0.95 + ChristmasTinsel.noise(i + 40) * 0.13)
                 Circle()
                     .fill(Color(hex: "#e5343a"))
                     .overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 1.6))
-                    .overlay(alignment: .topLeading) { Circle().fill(.white.opacity(0.75)).frame(width: size * 0.035, height: size * 0.035).offset(x: size * 0.025, y: size * 0.02) }
-                    .frame(width: size * 0.11, height: size * 0.11)
-                    .offset(x: cos(angle) * size * 0.36, y: sin(angle) * size * 0.36)
+                    .overlay(alignment: .topLeading) { Circle().fill(.white.opacity(0.75)).frame(width: sprig * 0.13, height: sprig * 0.13).offset(x: sprig * 0.1, y: sprig * 0.08) }
+                    .frame(width: sprig * 0.42, height: sprig * 0.42)
+                    .offset(x: cos(angle) * reach, y: sin(angle) * reach)
             }
-            // The bow, at the bottom.
-            HStack(spacing: -size * 0.04) {
-                Ellipse().fill(Color(hex: "#d7262f")).overlay(Ellipse().stroke(Color(hex: "#1a1a1a"), lineWidth: 1.8))
-                    .frame(width: size * 0.28, height: size * 0.18).rotationEffect(.degrees(-18))
-                Circle().fill(Color(hex: "#b51f27")).overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 1.8))
-                    .frame(width: size * 0.12, height: size * 0.12).zIndex(1)
-                Ellipse().fill(Color(hex: "#d7262f")).overlay(Ellipse().stroke(Color(hex: "#1a1a1a"), lineWidth: 1.8))
-                    .frame(width: size * 0.28, height: size * 0.18).rotationEffect(.degrees(18))
+            // The bow, at the bottom (the garland would cover it at the top on a phone).
+            HStack(spacing: -sprig * 0.14) {
+                Ellipse().fill(Color(hex: "#d7262f")).overlay(Ellipse().stroke(Color(hex: "#1a1a1a"), lineWidth: 2))
+                    .frame(width: sprig * 1.1, height: sprig * 0.7).rotationEffect(.degrees(-18))
+                Circle().fill(Color(hex: "#b51f27")).overlay(Circle().stroke(Color(hex: "#1a1a1a"), lineWidth: 2))
+                    .frame(width: sprig * 0.46, height: sprig * 0.46).zIndex(1)
+                Ellipse().fill(Color(hex: "#d7262f")).overlay(Ellipse().stroke(Color(hex: "#1a1a1a"), lineWidth: 2))
+                    .frame(width: sprig * 1.1, height: sprig * 0.7).rotationEffect(.degrees(18))
             }
-            .offset(y: size * 0.36)
+            .offset(y: r)
         }
-        .frame(width: size, height: size)
+        .frame(width: diameter, height: diameter)
         .shadow(color: .black.opacity(0.3), radius: 2, y: 1.5)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
