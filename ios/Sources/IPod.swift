@@ -59,20 +59,18 @@ struct IPodView: View {
             let size = geo.size
             let wide = size.width > size.height * 0.95
             let pad = max(14, min(size.width, size.height) * 0.05)
-            let lights: CGFloat = christmas ? 40 : 0  // the string of lights needs room above the screen
             ZStack {
                 if wide {
-                    let wheel = min(size.height - pad * 2 - lights, size.width * 0.42)
+                    let wheel = min(size.height - pad * 2, size.width * 0.42)
                     HStack(spacing: pad) {
-                        screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2 - lights)
+                        screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2)
                         ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
                     }
                     .padding(pad)
-                    .padding(.top, lights)
                 } else {
                     let screenWidth = size.width - pad * 2
-                    let screenHeight = min(screenWidth * 0.82, (size.height - lights) * 0.5)
-                    let room = size.height - screenHeight - pad * 2 - lights
+                    let screenHeight = min(screenWidth * 0.82, size.height * 0.5)
+                    let room = size.height - screenHeight - pad * 2
                     let wheel = min(size.width * 0.8, room * 0.9)
                     VStack(spacing: 0) {
                         screen(width: screenWidth, height: screenHeight)
@@ -80,7 +78,7 @@ struct IPodView: View {
                             .frame(maxHeight: .infinity)
                     }
                     .padding(.horizontal, pad)
-                    .padding(.top, pad + lights)
+                    .padding(.top, pad)
                 }
             }
             .frame(width: size.width, height: size.height)
@@ -92,7 +90,8 @@ struct IPodView: View {
         .background {
             Shell.body.ignoresSafeArea()
         }
-        // The Christmas look is laid over the iPod, which stays as it is: lights along the top, then
+        // The Christmas look is laid over the iPod, which stays exactly where it is (nothing moves to make
+        // room): lights draped along the top edge, then
         // snow over everything (the tinsel, wreath and candy canes sit on the screen; Christmas.swift).
         .overlay(alignment: .top) {
             if christmas {

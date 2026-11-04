@@ -211,14 +211,13 @@ svg{display:block}
    it is; the decorations are layers laid over it, like a cut-out graphic: a string of lights across
    the top of the device, a tinsel garland wrapped round the screen bezel, holly on one corner,
    crossed candy canes on another, and snow falling over everything. None of it takes clicks. */
-.lights{position:absolute;left:var(--pad);right:var(--pad);top:0;height:52px;z-index:40;pointer-events:none}
+.lights{position:absolute;left:var(--pad);right:var(--pad);top:-6px;height:52px;z-index:40;pointer-events:none}  /* draped over the top edge; nothing moves for it */
 .lights svg{width:100%;height:52px;overflow:visible}
 .lights .cord{fill:none;stroke:#1f5c2a;stroke-width:3.5;stroke-linecap:round}
 .lights .bulb rect{fill:#3b4a3f;stroke:#1a1a1a;stroke-width:1.6}
 .lights .bulb ellipse{fill:var(--c);stroke:#1a1a1a;stroke-width:1.8;filter:drop-shadow(0 0 5px var(--c));animation:twinkle 1.7s ease-in-out infinite;animation-delay:calc(var(--i)*-.41s)}
 .lights .bulb path{fill:#fff;opacity:.55}
 @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.45}}
-.xmas .device{padding-top:calc(var(--pad) + 40px)}  /* room for the string of lights */
 .xmas .screen{position:relative}
 /* The garland: rounded rectangles traced 14px outside the screen edge. Three are stroked with short
    dashes (every dash a tinsel strand standing across the edge, reaching 22px out and 8px in over the

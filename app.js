@@ -770,7 +770,7 @@ function touched() {
 // MARK: Layout
 
 function layout() {
-  const width = innerWidth, height = innerHeight - (root.classList.contains('hosted') ? GRIP : 0) - (document.body.classList.contains('xmas') ? 40 : 0);  // the Christmas lights take 40px
+  const width = innerWidth, height = innerHeight - (root.classList.contains('hosted') ? GRIP : 0);
   const wide = width > height * 0.95;
   const pad = Math.max(14, Math.min(width, height) * 0.05);
   let screenWidth, screenHeight, wheel;
