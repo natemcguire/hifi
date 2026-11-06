@@ -141,8 +141,9 @@
       "channels": 2
     },
     {
-      "id": "lofi-desk",
-      "name": "LO-FI DESK",
+      "id": "lofi-beats",
+      "name": "LO-FI BEATS TO WORK TO",
+      "label": "Lo-Fi Beats to Work To",
       "band": "radio",
       "frequency": "07",
       "tagline": "Instrumental hip-hop and liquid beats. Live from SomaFM, listener-supported.",
@@ -153,33 +154,33 @@
       "provider": "SomaFM",
       "providerLabel": "Fluid on SomaFM.com ↗",
       "support": "https://somafm.com/support/",
-      "nowPlaying": "/api/now-playing?station=lofi-desk",
+      "nowPlaying": "/api/now-playing?station=lofi-beats",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2
     },
     {
-      "id": "heads-down",
-      "name": "HEADS DOWN",
+      "id": "code-all-night",
+      "name": "CODE ALL NIGHT",
       "band": "radio",
       "frequency": "08",
       "tagline": "Music for hacking: dark, steady electronica. Live from SomaFM, listener-supported.",
-      "genre": "LIVE / FOCUS ELECTRONIC",
+      "genre": "LIVE / DARK ELECTRONICA",
       "color": "#7fc8ff",
       "stream": "https://ice6.somafm.com/defcon-128-mp3",
       "website": "https://somafm.com/defcon/",
       "provider": "SomaFM",
       "providerLabel": "DEF CON Radio on SomaFM.com ↗",
       "support": "https://somafm.com/support/",
-      "nowPlaying": "/api/now-playing?station=heads-down",
+      "nowPlaying": "/api/now-playing?station=code-all-night",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2
     },
     {
-      "id": "out-of-office",
-      "name": "OUT OF OFFICE",
-      "label": "Out of Office",
+      "id": "y2k-chill-out",
+      "name": "Y2K CHILL-OUT",
+      "label": "Y2K Chill-Out",
       "band": "radio",
       "frequency": "09",
       "tagline": "Early-2000s downtempo, the classic chill-out. Live from SomaFM, listener-supported.",
@@ -190,14 +191,14 @@
       "provider": "SomaFM",
       "providerLabel": "Groove Salad Classic on SomaFM.com ↗",
       "support": "https://somafm.com/support/",
-      "nowPlaying": "/api/now-playing?station=out-of-office",
+      "nowPlaying": "/api/now-playing?station=y2k-chill-out",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2
     },
     {
-      "id": "mistletoe-soul",
-      "name": "MISTLETOE SOUL",
+      "id": "soulful-christmas",
+      "name": "SOULFUL CHRISTMAS",
       "band": "radio",
       "frequency": "10",
       "tagline": "Christmas One. Soul and R&B Christmas records from the sixties and seventies, all day long. Live from SomaFM's Jolly Ol' Soul, listener-supported.",
@@ -208,20 +209,21 @@
       "provider": "SomaFM",
       "providerLabel": "Jolly Ol' Soul on SomaFM.com ↗",
       "support": "https://somafm.com/support/",
-      "nowPlaying": "/api/now-playing?station=mistletoe-soul",
+      "nowPlaying": "/api/now-playing?station=soulful-christmas",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2,
       "tv": [
-        "tv/mistletoe-soul-1.mp4",
-        "tv/mistletoe-soul-2.mp4",
-        "tv/mistletoe-soul-3.mp4",
-        "tv/mistletoe-soul-4.mp4"
+        "tv/soulful-christmas-1.mp4",
+        "tv/soulful-christmas-2.mp4",
+        "tv/soulful-christmas-3.mp4",
+        "tv/soulful-christmas-4.mp4"
       ]
     },
     {
-      "id": "tinsel-strings",
-      "name": "TINSEL STRINGS",
+      "id": "christmas-at-the-mall",
+      "name": "CHRISTMAS AT THE MALL",
+      "label": "Christmas at the Mall",
       "band": "radio",
       "frequency": "11",
       "tagline": "Christmas Two. Orchestras, strings and pianos from the old department-store records, almost no singing. Live from SomaFM's Department Store Christmas, listener-supported.",
@@ -232,20 +234,20 @@
       "provider": "SomaFM",
       "providerLabel": "Department Store Christmas on SomaFM.com ↗",
       "support": "https://somafm.com/support/",
-      "nowPlaying": "/api/now-playing?station=tinsel-strings",
+      "nowPlaying": "/api/now-playing?station=christmas-at-the-mall",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2,
       "tv": [
-        "tv/tinsel-strings-1.mp4",
-        "tv/tinsel-strings-2.mp4",
-        "tv/tinsel-strings-3.mp4",
-        "tv/tinsel-strings-4.mp4"
+        "tv/christmas-at-the-mall-1.mp4",
+        "tv/christmas-at-the-mall-2.mp4",
+        "tv/christmas-at-the-mall-3.mp4",
+        "tv/christmas-at-the-mall-4.mp4"
       ]
     },
     {
-      "id": "cocoa-lounge",
-      "name": "COCOA LOUNGE",
+      "id": "fireside-christmas",
+      "name": "FIRESIDE CHRISTMAS",
       "band": "radio",
       "frequency": "12",
       "tagline": "Christmas Three. Cocktail-hour Christmas: lounge, swing and chillout takes on the standards. Live from SomaFM's Christmas Lounge, listener-supported.",
@@ -256,18 +258,19 @@
       "provider": "SomaFM",
       "providerLabel": "Christmas Lounge on SomaFM.com ↗",
       "support": "https://somafm.com/support/",
-      "nowPlaying": "/api/now-playing?station=cocoa-lounge",
+      "nowPlaying": "/api/now-playing?station=fireside-christmas",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2,
       "tv": [
-        "tv/cocoa-lounge-1.mp4",
-        "tv/cocoa-lounge-2.mp4"
+        "tv/fireside-christmas-1.mp4",
+        "tv/fireside-christmas-2.mp4"
       ]
     },
     {
-      "id": "sleigh-riot",
-      "name": "SLEIGH RIOT",
+      "id": "rockin-around-the-tree",
+      "name": "ROCKIN' AROUND THE TREE",
+      "label": "Rockin' Around the Tree",
       "band": "radio",
       "frequency": "13",
       "tagline": "Christmas Four. Guitar bands doing the holidays their way, indie and alternative. Live from SomaFM's Christmas Rocks!, listener-supported.",
@@ -278,13 +281,13 @@
       "provider": "SomaFM",
       "providerLabel": "Christmas Rocks! on SomaFM.com ↗",
       "support": "https://somafm.com/support/",
-      "nowPlaying": "/api/now-playing?station=sleigh-riot",
+      "nowPlaying": "/api/now-playing?station=rockin-around-the-tree",
       "bitrate": 128,
       "sampleRate": 44100,
       "channels": 2,
       "tv": [
-        "tv/sleigh-riot-1.mp4",
-        "tv/sleigh-riot-2.mp4"
+        "tv/rockin-around-the-tree-1.mp4",
+        "tv/rockin-around-the-tree-2.mp4"
       ]
     },
     {

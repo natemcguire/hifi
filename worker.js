@@ -17,7 +17,9 @@ async function radioParadiseNowPlaying() {
 }
 // SomaFM publishes each channel's recent songs (newest first) at a public,
 // keyless endpoint. It gives no time remaining, so the relay caches briefly.
-const SOMAFM = { 'boot-liquor': 'bootliquor', 'sonic-universe': 'sonicuniverse', 'indie-pop-rocks': 'indiepop', 'mistletoe-soul': 'jollysoul', 'tinsel-strings': 'deptstore', 'cocoa-lounge': 'christmas', 'sleigh-riot': 'xmasrocks', 'working-for-the-weekend': 'groovesalad', 'lofi-desk': 'fluid', 'heads-down': 'defcon', 'out-of-office': 'gsclassic' };
+const SOMAFM = { 'boot-liquor': 'bootliquor', 'sonic-universe': 'sonicuniverse', 'indie-pop-rocks': 'indiepop', 'soulful-christmas': 'jollysoul', 'christmas-at-the-mall': 'deptstore', 'fireside-christmas': 'christmas', 'rockin-around-the-tree': 'xmasrocks', 'working-for-the-weekend': 'groovesalad', 'lofi-beats': 'fluid', 'code-all-night': 'defcon', 'y2k-chill-out': 'gsclassic' };
+// The Christmas stations' ids before the 2026-11-06 rename, still in the catalog bundled with shipped app builds.
+Object.assign(SOMAFM, { 'mistletoe-soul': 'jollysoul', 'tinsel-strings': 'deptstore', 'cocoa-lounge': 'christmas', 'sleigh-riot': 'xmasrocks' });
 const somaCache = new Map();
 async function somaFmNowPlaying(channel) {
   const cached = somaCache.get(channel);
@@ -185,6 +187,9 @@ export default {
     if (url.pathname.startsWith('/tastemakers/')) return env.TASTEMAKERS.fetch(request);
     if (url.pathname === '/api/tastemakers' && request.method === 'POST') return tastemakers(request, env);
     if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', {status:405,headers:{Allow:'GET, HEAD'}});
+    // Clips of the Christmas stations under their pre-rename ids, for app builds that still carry them.
+    const oldClip = url.pathname.match(/^\/tv\/(mistletoe-soul|tinsel-strings|cocoa-lounge|sleigh-riot)-(\d+\.mp4)$/);
+    if (oldClip) return Response.redirect(new URL(`/tv/${{ 'mistletoe-soul': 'soulful-christmas', 'tinsel-strings': 'christmas-at-the-mall', 'cocoa-lounge': 'fireside-christmas', 'sleigh-riot': 'rockin-around-the-tree' }[oldClip[1]]}-${oldClip[2]}`, url), 301);
     if (url.pathname === '/api/now-playing') return nowPlaying(url, env);
     if (url.pathname === '/api/spotify-config') {
       const { playlist, clientId } = await spotifyConfig();
