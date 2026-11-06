@@ -69,7 +69,7 @@ final class Radio: ObservableObject {
     func tune(_ next: Station) {
         station = next
         UserDefaults.standard.set(next.id, forKey: "station")
-        liveSong = nil
+        liveSong = songs[next.id]  // what it was playing a moment ago, until its poll says otherwise
         start()
     }
 
@@ -80,6 +80,14 @@ final class Radio: ObservableObject {
     func skip(_ delta: Int) {
         let index = stations.firstIndex { $0.id == station.id } ?? 0
         tune(stations[(index + delta + stations.count) % stations.count])
+    }
+
+    // Next/previous through only the stations with HIFI TV clips, for full-screen TV.
+    func skipTV(_ delta: Int) {
+        let tv = stations.filter { !$0.clips.isEmpty }
+        guard !tv.isEmpty else { return }
+        let index = tv.firstIndex { $0.id == station.id } ?? 0
+        tune(tv[(index + delta + tv.count) % tv.count])
     }
 
     // Radio semantics: play always rejoins the broadcast now; there is no pause point.
@@ -205,6 +213,8 @@ final class Radio: ObservableObject {
             for id in live { group.addTask { (id, await Self.fetchSong(id)) } }
             for await (id, song) in group { if let song { songs[id] = song } }
         }
+        // The station you're on shows its song even before you press play.
+        if station.isLive, liveSong == nil, let song = songs[station.id] { liveSong = song; updateNowPlaying() }
     }
 
     nonisolated private static func fetchSong(_ id: String) async -> LiveSong? {
@@ -302,8 +312,8 @@ final class Radio: ObservableObject {
 
     var displayTitle: String {
         if station.isVideo { return videoSong?.title ?? station.displayName }
-        if station.isLive { return liveSong?.title ?? station.name }
-        return track?.title ?? station.name
+        if station.isLive { return liveSong?.title ?? station.displayName }
+        return track?.title ?? station.displayName
     }
 
     // The Spotify track for the live song, when the station names one. Synth
@@ -321,7 +331,7 @@ final class Radio: ObservableObject {
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: displayTitle,
             MPMediaItemPropertyArtist: displayArtist,
-            MPMediaItemPropertyAlbumTitle: "\(station.name) · HIFI",
+            MPMediaItemPropertyAlbumTitle: "\(station.displayName) · HIFI",
             MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,
             MPNowPlayingInfoPropertyIsLiveStream: station.isLive,
         ]

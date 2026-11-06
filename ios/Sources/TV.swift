@@ -125,7 +125,7 @@ struct SidePanel: View {
                     DotScreen()
                     LinearGradient(colors: [.clear, .black.opacity(0.55)], startPoint: .center, endPoint: .bottom)
                     VStack(spacing: 0.4 * u) {
-                        Text(station.name)
+                        Text(station.displayName)
                             .font(.system(size: 2.8 * u, weight: .heavy, design: .rounded))
                             .foregroundStyle(station.tint)
                         Text(station.genre)
@@ -149,6 +149,137 @@ struct SidePanel: View {
         }
     }
 }
+
+// The full-screen icon: four corner brackets. Out at the corners to go full screen,
+// turned in toward the middle to come back.
+struct CornersIcon: Shape {
+    var inward = false
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let arm = min(rect.width, rect.height) * (inward ? 0.3 : 0.36)  // turned in, the corners keep the middle open
+        for (x, y, dx, dy) in [(rect.minX, rect.minY, 1.0, 1.0), (rect.maxX, rect.minY, -1.0, 1.0),
+                               (rect.maxX, rect.maxY, -1.0, -1.0), (rect.minX, rect.maxY, 1.0, -1.0)] {
+            let bend = inward ? CGPoint(x: x + dx * arm, y: y + dy * arm) : CGPoint(x: x, y: y)
+            path.move(to: CGPoint(x: x, y: y + dy * arm))
+            path.addLine(to: bend)
+            path.addLine(to: CGPoint(x: x + dx * arm, y: y))
+        }
+        return path
+    }
+}
+
+struct FullScreenButton: View {
+    let inward: Bool
+    let size: CGFloat
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            Feedback.click()
+            action()
+        } label: {
+            CornersIcon(inward: inward)
+                .stroke(.white, style: StrokeStyle(lineWidth: max(1.6, size * 0.12), lineCap: .round, lineJoin: .round))
+                .frame(width: size, height: size)
+                .padding(size * 0.3)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .shadow(color: .black.opacity(0.6), radius: 2, y: 1)
+        .accessibilityLabel(inward ? "Exit full screen" : "Full screen")
+    }
+}
+
+// HIFI TV full screen: the station's clip fills the display, the song small in the
+// corner. The inward corners, a tap anywhere or Escape bring the iPod back.
+struct FullTV: View {
+    @EnvironmentObject private var radio: Radio
+    let close: () -> Void
+
+    var body: some View {
+        ZStack {
+            ZStack {
+                Color.black
+                TimelineView(.periodic(from: .now, by: 5)) { context in
+                    if let clip = tvClip(radio.station, at: context.date) { LoopingVideo(url: clip) }
+                }
+                DotScreen()
+                LinearGradient(stops: [.init(color: .clear, location: 0.6), .init(color: .black.opacity(0.5), location: 1)],
+                               startPoint: .top, endPoint: .bottom)
+            }
+            .ignoresSafeArea()
+            VStack(alignment: .leading) {
+                HStack {
+                    Spacer()
+                    Text("HIFI TV").font(.system(size: 17, weight: .black).italic())
+                }
+                Spacer()
+                HStack(alignment: .bottom, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(radio.displayTitle).font(.system(size: 20, weight: .bold)).lineLimit(1)
+                        Text(radio.displayArtist).font(.system(size: 16, weight: .semibold)).opacity(0.9).lineLimit(1)
+                        Text(radio.station.displayName)
+                            .font(.system(size: 12, weight: .bold)).tracking(0.6)
+                            .foregroundStyle(radio.station.tint)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 0)
+                    FullScreenButton(inward: true, size: 24, action: close)
+                }
+            }
+            .foregroundStyle(.white)
+            .shadow(color: .black.opacity(0.7), radius: 2.5, y: 1)
+            .padding(20)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture(perform: close)
+        // Swipe left for the next station, right for the one before, through the stations with clips.
+        .gesture(DragGesture(minimumDistance: 30).onEnded { drag in
+            let x = drag.translation.width
+            guard abs(x) > 60, abs(x) > abs(drag.translation.height) * 1.5 else { return }
+            Feedback.click()
+            radio.skipTV(x < 0 ? 1 : -1)
+        })
+        .animation(.easeInOut(duration: 0.3), value: radio.station.id)
+        .environment(\.colorScheme, .dark)
+        // A station without clips (skipped to from the lock screen, say) has nothing to fill the screen with.
+        .onChange(of: radio.station.clips.isEmpty) { _, empty in if empty { close() } }
+        #if os(iOS)
+        .statusBarHidden()
+        .persistentSystemOverlays(.hidden)
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true  // a TV doesn't lock itself
+            OrientationLock.set(.landscape)  // and it's wide
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+            OrientationLock.set(OrientationLock.normal)
+        }
+        #endif
+    }
+}
+
+#if os(iOS)
+// Which ways the app may turn: whatever Info.plist allows, or landscape only while HIFI TV
+// is full screen. HIFIApp installs it as the app delegate.
+final class OrientationLock: NSObject, UIApplicationDelegate {
+    static let normal: UIInterfaceOrientationMask = UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
+    private static var mask = normal
+
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        Self.mask
+    }
+
+    static func set(_ next: UIInterfaceOrientationMask) {
+        mask = next
+        for case let scene as UIWindowScene in UIApplication.shared.connectedScenes {
+            for window in scene.windows { window.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations() }
+            scene.requestGeometryUpdate(.iOS(interfaceOrientations: next)) { _ in }
+        }
+    }
+}
+#endif
 
 // The fine dot screen of an old set, over the clip.
 struct DotScreen: View {

@@ -3,6 +3,9 @@ import SwiftUI
 @main
 struct HIFIApp: App {
     @StateObject private var radio = Radio()
+    #if os(iOS)
+    @UIApplicationDelegateAdaptor(OrientationLock.self) private var orientation
+    #endif
 
     var body: some Scene {
         WindowGroup {

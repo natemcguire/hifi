@@ -31,6 +31,9 @@ const ICON = {
   next: svg('<path d="M19 5h2.5v14H19z"/><path d="M10.8 5v14l7.8-7z"/><path d="M2.5 5v14l7.8-7z"/>'),
   curate: svg('<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5v9M7.5 12h9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>'),
   curated: svg('<circle cx="12" cy="12" r="10"/><path d="m7.5 12.3 3 3 6-6.3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'),
+  // Four corner brackets: out at the corners for full screen, turned in to come back.
+  fullScreen: svg('<path d="M3.5 10V3.5H10M14 3.5h6.5V10M20.5 14v6.5H14M10 20.5H3.5V14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'),
+  exitFullScreen: svg('<path d="M3.5 9H9V3.5M15 3.5V9h5.5M20.5 15H15v5.5M9 20.5V15H3.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'),
 };
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 // "INDIE POP ROCKS!" → "Indie Pop Rocks!", like Swift's .capitalized.
@@ -209,7 +212,7 @@ const elapsed = () => isLive(radio.station) || !radio.track ? 0 : Math.max(0, pe
 
 function tune(next) {
   radio.station = next;
-  radio.liveSong = null;
+  radio.liveSong = radio.songs[next.id] || null;  // what it was playing a moment ago, until its poll says otherwise
   savePrefs();
   start();
 }
@@ -231,6 +234,13 @@ function notice(text) {
 // round again, like the dial on a radio.
 function skip(delta) {
   const stations = catalog.stations, index = Math.max(0, stations.indexOf(radio.station));
+  tune(stations[(index + delta + stations.length) % stations.length]);
+}
+// Next/previous through only the stations with HIFI TV clips, for full-screen TV.
+function skipTV(delta) {
+  const stations = catalog.stations.filter(station => station.tv?.length);
+  if (!stations.length) return;
+  const index = Math.max(0, stations.indexOf(radio.station));
   tune(stations[(index + delta + stations.length) % stations.length]);
 }
 
@@ -452,6 +462,8 @@ async function refreshSongs() {
     const song = await fetchSong(station.id);
     if (song) radio.songs[station.id] = song;
   }));
+  // The station you're on shows its song even before you press play.
+  if (isLive(radio.station) && !radio.liveSong) radio.liveSong = radio.songs[radio.station.id] || null;
   changed();
 }
 
@@ -506,6 +518,60 @@ function swapClip(bg, clip) {
   if (old.length) old.at(-1).after(next); else bg.prepend(next);
   next.play().catch(() => {});
 }
+// HIFI TV full screen: the station's clip fills the display, the song small in the corner.
+// The inward corners, a click anywhere or Escape bring the iPod back. Where the browser can
+// (desktop, iPad) it goes truly full screen; on an iPhone it fills the page.
+const fullTV = (() => {
+  let el = null;
+  const close = () => {
+    if (!el) return;
+    const node = el;
+    el = null;
+    try { screen.orientation?.unlock?.(); } catch {}
+    if (document.fullscreenElement === node) document.exitFullscreen?.().catch(() => {});
+    node.remove();
+  };
+  const tv = {
+    get open() { return Boolean(el); },
+    show() {
+      if (el) return;
+      el = document.createElement('div');
+      el.className = 'tv-screen';
+      el.innerHTML = `<div class="np-bg" aria-hidden="true"></div><div class="tv-words"><b></b><span></span><i></i></div>`
+        + `<button class="tv-full" type="button" aria-label="Exit full screen">${ICON.exitFullScreen}</button>`;
+      el.addEventListener('click', event => { event.stopPropagation(); feedback.click(); close(); });
+      // Swipe left for the next station, right for the one before, through the stations with clips.
+      let from = null;
+      el.addEventListener('touchstart', event => { from = event.touches.length === 1 ? event.touches[0] : null; }, { passive: true });
+      el.addEventListener('touchend', event => {
+        const to = event.changedTouches[0];
+        if (!from || !to) return;
+        const x = to.clientX - from.clientX, y = to.clientY - from.clientY;
+        from = null;
+        if (Math.abs(x) > 60 && Math.abs(x) > Math.abs(y) * 1.5) { event.preventDefault(); feedback.click(); skipTV(x < 0 ? 1 : -1); }
+      });
+      document.body.append(el);
+      // Wide, where the browser lets a page turn itself (Android; an iPhone keeps to how it's held).
+      el.requestFullscreen?.().then(() => screen.orientation?.lock?.('landscape')).catch(() => {});
+      tv.update();
+    },
+    close,
+    update() {
+      if (!el) return;
+      const station = radio.station;
+      if (!station.tv?.length) return close();  // a station without clips has nothing to fill the screen with
+      const bg = el.querySelector('.np-bg'), clip = tvClip(station);
+      if (bg.dataset.clip !== clip) { bg.dataset.clip = clip; swapClip(bg, clip); }
+      for (const video of bg.querySelectorAll('video')) if (video.paused) video.play().catch(() => {});
+      el.style.setProperty('--tint', station.color);
+      const [title, artist, name] = el.querySelectorAll('.tv-words>*');
+      title.textContent = displayTitle(); artist.textContent = displayArtist(); name.textContent = stationName(station);
+    },
+  };
+  // Leaving the browser's full screen (Escape, the system gesture) closes it too.
+  document.addEventListener('fullscreenchange', () => { if (el && document.fullscreenElement !== el) close(); });
+  return tv;
+})();
 const coverPNGs = new Map();
 function coverPNG(station) {
   if (coverPNGs.has(station.id)) return coverPNGs.get(station.id);
@@ -537,7 +603,7 @@ function updateMediaSession() {
   if (key !== lastMeta) {
     lastMeta = key;
     try {
-      navigator.mediaSession.metadata = new MediaMetadata({ title: displayTitle(), artist: displayArtist(), album: `${radio.station.name} · HIFI`,
+      navigator.mediaSession.metadata = new MediaMetadata({ title: displayTitle(), artist: displayArtist(), album: `${stationName(radio.station)} · HIFI`,
         artwork: [{ src: coverPNG(radio.station), sizes: '512x512', type: 'image/png' }] });
     } catch { /* metadata is a nicety */ }
   }
@@ -916,7 +982,7 @@ function listView(p) {
         swapClip(pane, clip);
         let label = pane.querySelector('.pane-text');
         if (!label) { label = document.createElement('div'); label.className = 'pane-text'; pane.append(label); }
-        label.innerHTML = `<b style="color:${escape(station.color)}">${escape(station.name)}</b><span>${escape(station.genre)}</span>`;
+        label.innerHTML = `<b style="color:${escape(station.color)}">${escape(stationName(station))}</b><span>${escape(station.genre)}</span>`;
       } else {
         pane.innerHTML = coverSVG(station);
         if (!first) pane.firstChild.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-in-out' });
@@ -934,12 +1000,14 @@ function nowPlayingView() {
     + `<button class="heart" type="button" hidden></button><button class="curate" type="button" hidden></button></div>`
     + `<div class="np-artist"></div><div class="np-station"></div><div class="np-problem" role="status"></div></div></div>`
     + `<div class="np-bottom"><div class="progress"><div class="track"><div class="fill"></div></div><div class="labels"><span class="l"></span><span class="m"></span><span class="r"></span></div></div>`
-    + `<div class="volume" aria-hidden="true">${ICON.speakerLow}<div class="track"><div class="fill"></div></div>${ICON.speakerHigh}</div></div>`;
+    + `<div class="volume" aria-hidden="true">${ICON.speakerLow}<div class="track"><div class="fill"></div></div>${ICON.speakerHigh}</div>`
+    + `<button class="tv-full" type="button" aria-label="Full screen">${ICON.fullScreen}</button></div>`;
   const q = selector => el.querySelector(selector);
   const art = q('.art'), bg = q('.np-bg'), heart = q('.heart'), curateButton = q('.curate');
   heart.addEventListener('click', event => { event.stopPropagation(); touched(); feedback.click(); void toggleHeart(); });
   curateButton.addEventListener('click', event => { event.stopPropagation(); touched(); feedback.click(); curate(); });
-  let coverFor = null, bgFor = null, wordsFor = null, swapTimer = 0, first = true;
+  q('.tv-full').addEventListener('click', event => { event.stopPropagation(); touched(); feedback.click(); fullTV.show(); });
+  let coverFor = null, bgFor = null, wordsFor = null, swapTimer = 0, holdTimer = 0, holdDone = false, first = true;
   const text = (selector, value) => { const node = q(selector); if (node.textContent !== value) node.textContent = value; };
   const view = { el, update() {
     const station = radio.station;
@@ -958,8 +1026,14 @@ function nowPlayingView() {
     }
     if (clip) coverFor = null;
     el.classList.toggle('stopped', !radio.playing);
-    const words = [displayTitle(), displayArtist(), clip ? `${stationName(station)} · ${capitalized(station.genre)}` : stationName(station)];
-    if (words.join('\n') !== wordsFor) {
+    const words = [displayTitle(), displayArtist(), clip ? `${stationName(station)} · ${station.genre}` : stationName(station)];
+    // A live station whose song is still on its way: the words stay as they are until it lands
+    // (or 3 s pass), rather than flash the station's name and genre in between.
+    const waiting = isLive(station) && !radio.liveSong && wordsFor !== null && !holdDone;
+    if (waiting && !holdTimer) holdTimer = setTimeout(() => { holdTimer = 0; holdDone = true; view.update(); }, 3000);
+    if (!waiting) { clearTimeout(holdTimer); holdTimer = 0; }
+    if (radio.liveSong || !isLive(station)) holdDone = false;
+    if (!waiting && words.join('\n') !== wordsFor) {
       const apply = () => { text('.np-title', words[0]); text('.np-artist', words[1]); text('.np-station', words[2]); };
       const details = q('.details');
       // Under HIFI TV the words fade out and back in rather than jump.
@@ -987,6 +1061,7 @@ function nowPlayingView() {
     el.classList.toggle('show-volume', ui.showVolume);
     q('.volume .fill').style.width = `${radio.volume * 100}%`;
     view.tick();
+    fullTV.update();
     first = false;
   }, tick() {
     if (radio.station.tv?.length && bgFor !== tvClip(radio.station)) return view.update();
@@ -998,7 +1073,10 @@ function nowPlayingView() {
     progress.classList.toggle('shimmer', live && radio.playing);
     q('.progress .fill').style.width = `${(duration > 0 ? done / duration : radio.playing ? 1 : 0) * 100}%`;
     text('.l', live ? 'LIVE' : clock(done));
-    text('.m', radio.buffering ? 'Tuning…' : radio.playing ? '' : 'Stopped');
+    // Under HIFI TV a problem takes the middle of the bar's labels, so the card never grows a line.
+    const problem = el.classList.contains('tv-on') && (radio.problem || spotify.problem);
+    text('.m', problem || (radio.buffering ? 'Tuning…' : radio.playing ? '' : 'Stopped'));
+    q('.labels .m').classList.toggle('problem', Boolean(problem));
     text('.r', live ? 'HIFI' : '-' + clock(duration - done));
   } };
   return view;
@@ -1034,13 +1112,13 @@ function show(forward) {
   entered(p);
 }
 
-let songsTimer = 0;
 function entered(p) {
-  clearInterval(songsTimer);
   if (p === 'playlists') void refreshPlaylists();
-  // While a station list is open, keep its song lines current.
-  if (p.startsWith('band:')) { void refreshSongs(); songsTimer = setInterval(refreshSongs, 20000); }
 }
+// Every live station's song, from launch on and every 20 s: the Radio list's song lines, and the
+// song Now Playing shows the moment you tune to a station, without waiting for it.
+void refreshSongs();
+setInterval(refreshSongs, 20000);
 
 // Typing in the Radio list's search field: the list narrows and the highlight goes back to the top.
 function setQuery(value) {
@@ -1248,6 +1326,7 @@ document.querySelector('.device').addEventListener('wheel', event => {
 addEventListener('keydown', event => {
   if (event.altKey || event.ctrlKey || event.metaKey) return;
   if (spotify.showConnect) { if (event.key === 'Escape') { event.preventDefault(); menu(); } return; }
+  if (fullTV.open && event.key === 'Escape') { event.preventDefault(); fullTV.close(); return; }
   const field = event.target.closest?.('input, textarea, button.heart, button.curate');
   if (field && !field.classList.contains('q')) return;
   if (field) {

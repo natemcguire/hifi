@@ -96,7 +96,7 @@ struct LockScreen: View {
                     VStack(alignment: .leading, spacing: 1.6 * u) {
                         Text(title).font(.system(size: 6 * u, weight: .bold)).lineLimit(3)
                         Text(artist).font(.system(size: 4.6 * u, weight: .semibold)).foregroundStyle(Color(hex: "#333")).lineLimit(2)
-                        Text(station.name.capitalized).font(.system(size: 4 * u)).foregroundStyle(Color(hex: "#555")).lineLimit(1)
+                        Text(station.displayName).font(.system(size: 4 * u)).foregroundStyle(Color(hex: "#555")).lineLimit(1)
                     }
                     .minimumScaleFactor(0.5)
                     .frame(maxWidth: .infinity, alignment: .leading)

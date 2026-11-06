@@ -47,6 +47,10 @@ struct IPodView: View {
     @State private var songTick = 0  // re-reads synth rotations while a list is open
     @State private var shuffleTick = 0  // redraws Settings after a shuffle toggle
     @State private var query = ""  // the Radio list's search
+    @State private var fullTV = false  // HIFI TV filling the whole display
+    #if os(macOS)
+    @State private var tvMadeFullScreen = false  // the window went full screen for it, so it comes back out after
+    #endif
     @FocusState private var searchFocused: Bool
     @FocusState private var focused: Bool
     @Namespace private var highlight
@@ -167,10 +171,11 @@ struct IPodView: View {
         #endif
         .onKeyPress(.upArrow) { key(nil) { rotate(-1) } }
         .onKeyPress(.downArrow) { key(nil) { rotate(1) } }
-        .onKeyPress(.leftArrow) { searchFocused ? .ignored : key(.previous) { radio.skip(-1) } }
-        .onKeyPress(.rightArrow) { searchFocused ? .ignored : key(.next) { radio.skip(1) } }
+        .onKeyPress(.leftArrow) { searchFocused ? .ignored : key(.previous) { fullTV ? radio.skipTV(-1) : radio.skip(-1) } }
+        .onKeyPress(.rightArrow) { searchFocused ? .ignored : key(.next) { fullTV ? radio.skipTV(1) : radio.skip(1) } }
         .onKeyPress(.return) { key(.center) { select() } }
         .onKeyPress(.escape) {
+            if fullTV { fullTV = false; return .handled }
             // In the search: Escape clears the field first, then backs out of the list.
             if searchFocused, !query.isEmpty { query = ""; return .handled }
             return key(.menu) { menu() }
@@ -192,9 +197,9 @@ struct IPodView: View {
         .task(id: page) {
             if page == .playlists { await spotify.refreshPlaylists() }
         }
-        // While a station list is open, keep its song lines current.
-        .task(id: page) {
-            guard case .band = page else { return }
+        // Every live station's song, from launch on and every 20 s: the Radio list's song lines, and
+        // the song Now Playing shows the moment you tune to a station, without waiting for it.
+        .task {
             while !Task.isCancelled {
                 await radio.refreshSongs()
                 songTick += 1
@@ -203,7 +208,20 @@ struct IPodView: View {
         }
         #if os(iOS)
         .fullScreenCover(isPresented: $spotify.showConnect) { SpotifyConnectView(spotify: spotify) }
+        .fullScreenCover(isPresented: $fullTV) { FullTV { fullTV = false }.environmentObject(radio) }
         #else
+        // HIFI TV full screen: the clip fills the window, and the window goes full screen with it.
+        .overlay {
+            if fullTV { FullTV { fullTV = false }.transition(.opacity) }
+        }
+        .animation(.easeOut(duration: 0.25), value: fullTV)
+        .onChange(of: fullTV) { _, on in
+            guard let window = NSApp.keyWindow ?? NSApp.windows.first else { return }
+            let isFull = window.styleMask.contains(.fullScreen)
+            if on, !isFull { tvMadeFullScreen = true; window.toggleFullScreen(nil) }
+            if !on, isFull, tvMadeFullScreen { window.toggleFullScreen(nil) }
+            if !on { tvMadeFullScreen = false }
+        }
         // The Mac gets the same full white page, filling the whole window.
         .overlay {
             if spotify.showConnect {
@@ -300,7 +318,7 @@ struct IPodView: View {
     @ViewBuilder
     private func pageView(_ page: Page, width: CGFloat, rowHeight: CGFloat) -> some View {
         switch page {
-        case .nowPlaying: NowPlaying(rowHeight: rowHeight, showVolume: showVolume)
+        case .nowPlaying: NowPlaying(rowHeight: rowHeight, showVolume: showVolume, fullTV: $fullTV)
         case .about: about(rowHeight: rowHeight)
         default:
             HStack(spacing: 0) {
@@ -727,7 +745,7 @@ private struct Words: Equatable {
     @MainActor init(_ radio: Radio) {
         title = radio.displayTitle
         artist = radio.displayArtist
-        station = radio.station.displayName.uppercased() + "  ·  " + radio.station.genre
+        station = radio.station.displayName + "  ·  " + radio.station.genre
         tint = radio.station.tint
     }
 }
@@ -736,9 +754,11 @@ private struct NowPlaying: View {
     @EnvironmentObject private var radio: Radio
     @State private var shown = Words()
     @State private var wordsOpacity = 1.0
+    @State private var heldWords: Task<Void, Never>?
     @ObservedObject private var spotify = SpotifyAccount.shared
     let rowHeight: CGFloat
     let showVolume: Bool
+    @Binding var fullTV: Bool
 
     var body: some View {
         if radio.station.isVideo, radio.isPlaying {
@@ -780,7 +800,10 @@ private struct NowPlaying: View {
                                 .lineLimit(2)
                             if radio.heartable { heart }
                         }
-                        Text(shown.artist)
+                        // A one-line title and a two-line one take the same room (the spare line above it),
+                        // so the card never jumps.
+                        .frame(minHeight: rowHeight * 1.3, alignment: .bottomLeading)
+                        Text(shown.artist.isEmpty ? " " : shown.artist)
                             .font(.system(size: rowHeight * 0.42, weight: .semibold))
                             .lineLimit(1)
                             .opacity(0.9)
@@ -791,11 +814,12 @@ private struct NowPlaying: View {
                             .lineLimit(1)
                     }
                     .opacity(wordsOpacity)
-                    if let problem = radio.problem ?? spotify.problem {
-                        Text(problem).font(.system(size: rowHeight * 0.32)).foregroundStyle(.orange)
-                    }
-                    ZStack {
-                        if showVolume { volume.transition(.opacity) } else { progress.transition(.opacity) }
+                    HStack(spacing: rowHeight * 0.2) {
+                        ZStack {
+                            // A problem takes the middle of the bar's labels, so the card never grows a line.
+                            if showVolume { volume.transition(.opacity) } else { progress(problem: radio.problem ?? spotify.problem).transition(.opacity) }
+                        }
+                        FullScreenButton(inward: false, size: rowHeight * 0.4) { fullTV = true }
                     }
                     .padding(.top, rowHeight * 0.12)
                 }
@@ -813,10 +837,25 @@ private struct NowPlaying: View {
         // The words fade out and back in when the song or station changes, rather than jump.
         .onAppear { shown = Words(radio) }
         .onChange(of: Words(radio)) { _, next in
-            withAnimation(.easeIn(duration: 0.25)) { wordsOpacity = 0 } completion: {
-                shown = next
-                withAnimation(.easeOut(duration: 0.35)) { wordsOpacity = 1 }
+            heldWords?.cancel()
+            // A live station whose song is still on its way: the words stay as they are until it
+            // lands (or 3 s pass), rather than flash the station's name and genre in between.
+            if radio.station.isLive, radio.liveSong == nil {
+                heldWords = Task {
+                    try? await Task.sleep(for: .seconds(3))
+                    if !Task.isCancelled { showWords(Words(radio)) }
+                }
+                return
             }
+            showWords(next)
+        }
+    }
+
+    private func showWords(_ next: Words) {
+        guard next != shown else { return }
+        withAnimation(.easeIn(duration: 0.25)) { wordsOpacity = 0 } completion: {
+            shown = next
+            withAnimation(.easeOut(duration: 0.35)) { wordsOpacity = 1 }
         }
     }
 
@@ -903,7 +942,9 @@ private struct NowPlaying: View {
         return "\(index) of \(radio.stations.count)"
     }
 
-    private var progress: some View {
+    private var progress: some View { progress(problem: nil) }
+
+    private func progress(problem: String?) -> some View {
         TimelineView(.periodic(from: .now, by: 0.5)) { _ in
             let duration = radio.station.isLive ? 0 : (radio.track?.duration ?? 0)
             let elapsed = min(radio.elapsed, duration)
@@ -913,7 +954,11 @@ private struct NowPlaying: View {
                 HStack {
                     Text(radio.station.isLive ? "LIVE" : clock(elapsed))
                     Spacer()
-                    Text(radio.isBuffering ? "Tuning…" : radio.isPlaying ? "" : "Stopped")
+                    if let problem {
+                        Text(problem).foregroundStyle(.orange).lineLimit(1)
+                    } else {
+                        Text(radio.isBuffering ? "Tuning…" : radio.isPlaying ? "" : "Stopped")
+                    }
                     Spacer()
                     Text(radio.station.isLive ? "HIFI" : "-" + clock(duration - elapsed))
                 }
