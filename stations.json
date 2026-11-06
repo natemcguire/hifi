@@ -138,7 +138,13 @@
       "nowPlaying": "/api/now-playing?station=working-for-the-weekend",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/working-for-the-weekend-1.mp4",
+        "tv/working-for-the-weekend-2.mp4",
+        "tv/working-for-the-weekend-3.mp4",
+        "tv/working-for-the-weekend-4.mp4"
+      ]
     },
     {
       "id": "lofi-beats",
@@ -157,7 +163,13 @@
       "nowPlaying": "/api/now-playing?station=lofi-beats",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/lofi-beats-1.mp4",
+        "tv/lofi-beats-2.mp4",
+        "tv/lofi-beats-3.mp4",
+        "tv/lofi-beats-4.mp4"
+      ]
     },
     {
       "id": "code-all-night",
@@ -175,7 +187,13 @@
       "nowPlaying": "/api/now-playing?station=code-all-night",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/code-all-night-1.mp4",
+        "tv/code-all-night-2.mp4",
+        "tv/code-all-night-3.mp4",
+        "tv/code-all-night-4.mp4"
+      ]
     },
     {
       "id": "y2k-chill-out",
@@ -194,7 +212,13 @@
       "nowPlaying": "/api/now-playing?station=y2k-chill-out",
       "bitrate": 128,
       "sampleRate": 44100,
-      "channels": 2
+      "channels": 2,
+      "tv": [
+        "tv/y2k-chill-out-1.mp4",
+        "tv/y2k-chill-out-2.mp4",
+        "tv/y2k-chill-out-3.mp4",
+        "tv/y2k-chill-out-4.mp4"
+      ]
     },
     {
       "id": "soulful-christmas",
@@ -264,7 +288,9 @@
       "channels": 2,
       "tv": [
         "tv/fireside-christmas-1.mp4",
-        "tv/fireside-christmas-2.mp4"
+        "tv/fireside-christmas-2.mp4",
+        "tv/fireside-christmas-3.mp4",
+        "tv/fireside-christmas-4.mp4"
       ]
     },
     {
@@ -287,7 +313,9 @@
       "channels": 2,
       "tv": [
         "tv/rockin-around-the-tree-1.mp4",
-        "tv/rockin-around-the-tree-2.mp4"
+        "tv/rockin-around-the-tree-2.mp4",
+        "tv/rockin-around-the-tree-3.mp4",
+        "tv/rockin-around-the-tree-4.mp4"
       ]
     },
     {
