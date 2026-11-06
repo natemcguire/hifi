@@ -1,0 +1,22 @@
+[
+  {"id": "working-for-the-weekend-1", "prompt": "1990s VHS footage: an empty open-plan office on a Friday evening, desk lamps still on, a desk fan turning slowly, the window behind showing a city skyline at sunset, nobody there"},
+  {"id": "working-for-the-weekend-2", "prompt": "1980s camcorder footage from the passenger seat: a car leaving the city on a Friday evening, a two-lane road toward green hills at golden hour, telephone poles passing"},
+  {"id": "working-for-the-weekend-3", "prompt": "1990s home video: a backyard hammock on a Saturday afternoon, dappled sunlight through leaves, a paperback face-down on a side table beside a glass of lemonade, gentle sway, nobody around"},
+  {"id": "working-for-the-weekend-4", "prompt": "1990s VHS footage: a rooftop deck at dusk, string lights glowing, two empty lounge chairs, the city lights coming on below, slow pan"},
+  {"id": "lofi-beats-1", "prompt": "1990s VHS footage: rain on a bedroom window at night, a desk lamp glowing over an open notebook and a steaming mug, a small houseplant, nobody there"},
+  {"id": "lofi-beats-2", "prompt": "1990s home video: a record turntable spinning slowly in a dim room, warm lamp light, rain streaking the window behind it, slow push-in"},
+  {"id": "lofi-beats-3", "prompt": "1990s camcorder footage: a cat asleep on a sunny windowsill beside a desk with a cup of coffee and a pair of headphones, soft afternoon light"},
+  {"id": "lofi-beats-4", "prompt": "1990s VHS footage: a quiet city street seen from an apartment window at night, rain falling, headlights passing, blurred colored reflections on the wet road"},
+  {"id": "code-all-night-1", "prompt": "1990s VHS footage: a dark bedroom at 3 a.m. lit only by the green glow of a CRT monitor on a cluttered desk, a beige computer tower with blinking lights, city lights in the window"},
+  {"id": "code-all-night-2", "prompt": "1990s camcorder footage: a narrow server room aisle, racks of machines with rows of blinking green and amber lights, cables, slow dolly forward"},
+  {"id": "code-all-night-3", "prompt": "1990s VHS footage: an empty city intersection at 3 a.m., a traffic light cycling from green to red over wet asphalt, steam rising from a grate, nobody around"},
+  {"id": "code-all-night-4", "prompt": "1990s home video: a desk at night glowing with CRT light, an open pizza box, an unbranded soda can and a mechanical keyboard, slow push-in, nobody there"},
+  {"id": "y2k-chill-out-1", "prompt": "Early-2000s camcorder footage: an empty beach bar at sunset, white lounge cushions and low tables, the sea glowing orange behind, a slow pan"},
+  {"id": "y2k-chill-out-2", "prompt": "Early-2000s home video: a hotel lounge at night with a lava lamp, low leather sofas and soft blue light, nobody there"},
+  {"id": "y2k-chill-out-3", "prompt": "Early-2000s camcorder footage: white curtains blowing on a seaside terrace at sunset, the sun sinking into a calm sea"},
+  {"id": "y2k-chill-out-4", "prompt": "Early-2000s footage from a car at night: driving through a long tunnel, orange lights streaming past overhead in a steady rhythm"},
+  {"id": "fireside-christmas-3", "prompt": "1970s home movie: a crackling fireplace close up, stockings hanging from the mantel, the warm glow lighting a rug, nobody there"},
+  {"id": "fireside-christmas-4", "prompt": "1970s footage: snow falling outside a cabin window at night, a warm lamp inside, Christmas tree lights reflected in the glass"},
+  {"id": "rockin-around-the-tree-3", "prompt": "1990s VHS home video: an electric guitar leaning against an amplifier beside a Christmas tree, the tree lights blinking, nobody playing"},
+  {"id": "rockin-around-the-tree-4", "prompt": "1990s camcorder footage: a basement rec room decked in Christmas lights, a record player and an empty couch, tinsel catching the light, slow pan"}
+]
