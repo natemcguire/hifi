@@ -1033,6 +1033,7 @@ private struct NowPlaying: View {
             Image(systemName: liked ? "heart.fill" : "heart")
                 .font(.system(size: rowHeight * 0.5, weight: .semibold))
                 .foregroundStyle(Color(hex: "#e5484d"))  // red either way: filled when liked, outlined when not
+                .opacity(liked ? 1 : 0.4)  // the outline sits back until it's yours
                 .contentTransition(.symbolEffect(.replace))
                 .padding(4)
                 .contentShape(Rectangle())
