@@ -31,7 +31,7 @@ final class ShufflePlayer: NSObject, ObservableObject {
         let controller = AVPictureInPictureController(contentSource: source)
         controller.delegate = self
         controller.canStartPictureInPictureAutomaticallyFromInline = automatic
-        controller.requiresLinearPlayback = false
+        controller.requiresLinearPlayback = true  // no skip buttons: the shuffle is for seeing the song and coming back
         self.controller = controller
         watch = radio.objectWillChange.sink { [weak self] _ in
             Task { @MainActor in self?.render(); self?.controller?.invalidatePlaybackState() }
@@ -60,7 +60,7 @@ final class ShufflePlayer: NSObject, ObservableObject {
         guard let radio else { return }
         let shuffle = ShuffleView(station: radio.station, title: radio.displayTitle, artist: radio.displayArtist,
                                   playing: radio.isPlaying, buffering: radio.isBuffering, light: !radio.isPlaying || blink)
-            .frame(width: 360, height: 360)
+            .frame(width: 480, height: 300)
         let renderer = ImageRenderer(content: shuffle)
         renderer.scale = 2
         guard let image = renderer.cgImage, let buffer = SampleBufferView.sampleBuffer(from: image) else { return }
@@ -153,8 +153,9 @@ struct ShuffleHost: UIViewRepresentable {
 }
 #endif
 
-// The 2nd-generation iPod shuffle: an anodized clip in the station's color with
-// the round control pad, its status light, and the song engraved underneath.
+// The 2nd-generation iPod shuffle in white, filling the whole picture so it floats on the
+// home screen as an object, not a window: brushed aluminium, the round control pad on the
+// left, the status light, and the song engraved on the body to its right.
 struct ShuffleView: View {
     let station: Station
     let title: String
@@ -165,58 +166,75 @@ struct ShuffleView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let s = geo.size.width
+            let h = geo.size.height, w = geo.size.width
             ZStack {
-                LinearGradient(colors: [Color(hex: "#2a2d31"), Color(hex: "#111315")], startPoint: .top, endPoint: .bottom)
-                VStack(spacing: s * 0.035) {
-                    ZStack(alignment: .topTrailing) {
-                        RoundedRectangle(cornerRadius: s * 0.07)
-                            .fill(LinearGradient(colors: [station.tint.opacity(0.95), station.tint, station.tint.opacity(0.7)],
-                                                 startPoint: .topLeading, endPoint: .bottomTrailing))
-                            .overlay(RoundedRectangle(cornerRadius: s * 0.07)
-                                .fill(LinearGradient(colors: [.white.opacity(0.35), .clear, .black.opacity(0.18)],
-                                                     startPoint: .top, endPoint: .bottom)))
-                            .overlay(RoundedRectangle(cornerRadius: s * 0.07).stroke(.white.opacity(0.4), lineWidth: s * 0.006))
-                            .shadow(color: .black.opacity(0.5), radius: s * 0.03, y: s * 0.015)
-                        Circle()
-                            .fill(buffering ? Color.orange : light && playing ? Color(hex: "#7dff6a") : light ? Color(hex: "#ffb347") : Color(hex: "#2b3a2b"))
-                            .frame(width: s * 0.03, height: s * 0.03)
-                            .shadow(color: light ? (buffering ? .orange : Color(hex: "#7dff6a")) : .clear, radius: s * 0.015)
-                            .padding(s * 0.045)
-                        pad(s)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // The body: white anodized aluminium with a soft brushed sheen and a bevel at the top edge.
+                LinearGradient(colors: [Color(hex: "#ffffff"), Color(hex: "#f1f2f4"), Color(hex: "#e2e4e7")], startPoint: .top, endPoint: .bottom)
+                LinearGradient(stops: [.init(color: .white.opacity(0.7), location: 0), .init(color: .clear, location: 0.12),
+                                       .init(color: .clear, location: 0.85), .init(color: .black.opacity(0.08), location: 1)],
+                               startPoint: .top, endPoint: .bottom)
+                // A faint brushed grain across the metal.
+                Canvas { context, size in
+                    for i in stride(from: 0, to: Int(size.height), by: 3) {
+                        let y = CGFloat(i)
+                        context.stroke(Path { $0.move(to: CGPoint(x: 0, y: y)); $0.addLine(to: CGPoint(x: size.width, y: y)) },
+                                       with: .color(.black.opacity(i % 2 == 0 ? 0.018 : 0.008)), lineWidth: 1)
                     }
-                    .frame(width: s * 0.66, height: s * 0.66)
-                    VStack(spacing: s * 0.008) {
-                        Text(title).font(.system(size: s * 0.05, weight: .bold)).foregroundStyle(.white)
-                        Text(artist).font(.system(size: s * 0.038, weight: .medium)).foregroundStyle(.white.opacity(0.6))
-                    }
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                    .padding(.horizontal, s * 0.06)
                 }
+                HStack(spacing: h * 0.08) {
+                    pad(h * 0.78)
+                        .padding(.leading, h * 0.11)
+                    VStack(alignment: .leading, spacing: h * 0.03) {
+                        HStack(spacing: h * 0.03) {
+                            Circle()
+                                .fill(buffering ? Color.orange : light && playing ? Color(hex: "#52d04a") : light ? Color(hex: "#ffb347") : Color(hex: "#c9ccd0"))
+                                .frame(width: h * 0.04, height: h * 0.04)
+                                .shadow(color: light ? (buffering ? .orange : Color(hex: "#52d04a")).opacity(0.8) : .clear, radius: h * 0.02)
+                            Text(station.displayName.uppercased())
+                                .font(.system(size: h * 0.055, weight: .semibold))
+                                .tracking(h * 0.008)
+                                .foregroundStyle(Color(hex: "#9ea3a9"))
+                        }
+                        // Engraved: dark ink with a hairline of light beneath, like lettering cut into the metal.
+                        Text(title)
+                            .font(.system(size: h * 0.115, weight: .bold))
+                            .foregroundStyle(Color(hex: "#3a3f45"))
+                            .shadow(color: .white.opacity(0.9), radius: 0, y: 1)
+                            .lineLimit(2)
+                        Text(artist)
+                            .font(.system(size: h * 0.08, weight: .medium))
+                            .foregroundStyle(Color(hex: "#7a8087"))
+                            .shadow(color: .white.opacity(0.9), radius: 0, y: 1)
+                            .lineLimit(1)
+                    }
+                    .minimumScaleFactor(0.55)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.trailing, h * 0.1)
+                }
+                .frame(width: w, height: h)
             }
         }
-        .aspectRatio(1, contentMode: .fit)
+        .aspectRatio(1.6, contentMode: .fit)
     }
 
-    // The ring: + on top, - below, previous and next at the sides, play/pause in the middle.
-    private func pad(_ s: CGFloat) -> some View {
-        let ring = s * 0.46
-        let ink = Color(hex: "#8d9196")
+    // The control pad, engraved not lit: a dished ring with its marks and the plain button in the middle.
+    private func pad(_ ring: CGFloat) -> some View {
+        let ink = Color(hex: "#b4b8bd")
         return ZStack {
             Circle()
-                .fill(LinearGradient(colors: [Color(hex: "#fbfbfb"), Color(hex: "#dedfe2")], startPoint: .top, endPoint: .bottom))
-                .overlay(Circle().stroke(Color(hex: "#b9bcc1"), lineWidth: s * 0.004))
-                .shadow(color: .black.opacity(0.25), radius: s * 0.012, y: s * 0.006)
+                .fill(LinearGradient(colors: [Color(hex: "#e6e8eb"), Color(hex: "#fafafb")], startPoint: .top, endPoint: .bottom))
+                .overlay(Circle().stroke(Color(hex: "#cfd2d6"), lineWidth: ring * 0.008))
+                .shadow(color: .white, radius: ring * 0.02, y: -ring * 0.01)
+                .shadow(color: .black.opacity(0.1), radius: ring * 0.02, y: ring * 0.012)
             Circle()
-                .fill(LinearGradient(colors: [Color(hex: "#f0f1f3"), Color(hex: "#d2d4d8")], startPoint: .top, endPoint: .bottom))
-                .frame(width: ring * 0.42, height: ring * 0.42)
-                .overlay(Image(systemName: playing ? "pause.fill" : "play.fill").font(.system(size: ring * 0.11, weight: .bold)).foregroundStyle(ink))
-            Image(systemName: "plus").font(.system(size: ring * 0.12, weight: .heavy)).foregroundStyle(ink).offset(y: -ring * 0.37)
-            Image(systemName: "minus").font(.system(size: ring * 0.12, weight: .heavy)).foregroundStyle(ink).offset(y: ring * 0.37)
-            Image(systemName: "backward.end.alt.fill").font(.system(size: ring * 0.1)).foregroundStyle(ink).offset(x: -ring * 0.36)
-            Image(systemName: "forward.end.alt.fill").font(.system(size: ring * 0.1)).foregroundStyle(ink).offset(x: ring * 0.36)
+                .fill(LinearGradient(colors: [Color(hex: "#fdfdfd"), Color(hex: "#e9ebee")], startPoint: .top, endPoint: .bottom))
+                .frame(width: ring * 0.4, height: ring * 0.4)
+                .overlay(Circle().stroke(Color(hex: "#d5d8dc"), lineWidth: ring * 0.006))
+                .shadow(color: .black.opacity(0.12), radius: ring * 0.015, y: ring * 0.008)
+            Image(systemName: "plus").font(.system(size: ring * 0.11, weight: .heavy)).foregroundStyle(ink).offset(y: -ring * 0.36)
+            Image(systemName: "minus").font(.system(size: ring * 0.11, weight: .heavy)).foregroundStyle(ink).offset(y: ring * 0.36)
+            Image(systemName: "backward.end.alt.fill").font(.system(size: ring * 0.09)).foregroundStyle(ink).offset(x: -ring * 0.35)
+            Image(systemName: "forward.end.alt.fill").font(.system(size: ring * 0.09)).foregroundStyle(ink).offset(x: ring * 0.35)
         }
         .frame(width: ring, height: ring)
     }

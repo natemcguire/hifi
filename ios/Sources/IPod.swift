@@ -47,6 +47,9 @@ struct IPodView: View {
     @State private var songTick = 0  // re-reads synth rotations while a list is open
     @State private var shuffleTick = 0  // redraws Settings after a shuffle toggle
     @State private var query = ""  // the Radio list's search
+    @State private var searchOpen = false  // the glass search field, open to the left of its icon
+    @State private var searchClosing = false  // the pill is on its way out: no caret, no keyboard
+    @State private var searchArrivedWithPage = false  // the search opened from another page, so the Radio list came with it
     @State private var fullTV = false  // HIFI TV filling the whole display
     #if os(macOS)
     @State private var tvMadeFullScreen = false  // the window went full screen for it, so it comes back out after
@@ -64,10 +67,17 @@ struct IPodView: View {
             let wide = size.width > size.height * 0.95
             let pad = max(14, min(size.width, size.height) * 0.05)
             ZStack {
+                if searchOpen {
+                    Color.clear.contentShape(Rectangle()).onTapGesture { closeSearch() }
+                }
+                let strip = max(44, min(54, min(size.width, size.height) * 0.12))  // the search row under the screen
                 if wide {
                     let wheel = min(size.height - pad * 2, size.width * 0.42)
                     HStack(spacing: pad) {
-                        screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2)
+                        VStack(spacing: 0) {
+                            screen(width: size.width - wheel - pad * 3, height: size.height - pad * 2 - strip)
+                            searchStrip(height: strip)
+                        }
                         ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
                             .overlay { if christmas { WheelWreath(diameter: wheel) } }
                     }
@@ -75,10 +85,11 @@ struct IPodView: View {
                 } else {
                     let screenWidth = size.width - pad * 2
                     let screenHeight = min(screenWidth * 0.82, size.height * 0.5)
-                    let room = size.height - screenHeight - pad * 2
+                    let room = size.height - screenHeight - strip - pad * 2
                     let wheel = min(size.width * 0.8, room * 0.9)
                     VStack(spacing: 0) {
                         screen(width: screenWidth, height: screenHeight)
+                        searchStrip(height: strip)
                         ClickWheel(diameter: wheel, flash: flash, handler: wheelHandler)
                             .overlay { if christmas { WheelWreath(diameter: wheel) } }
                             .frame(maxHeight: .infinity)
@@ -92,7 +103,7 @@ struct IPodView: View {
         #if os(macOS)
         .padding(.top, 22)  // clear of the traffic lights in the hidden title bar
         #endif
-        .ignoresSafeArea(.keyboard)  // the search field sits at the top of the screen; the wheel keeps its room
+        .ignoresSafeArea(.keyboard)  // the search field sits just under the screen; the wheel keeps its room
         .background {
             Shell.body.ignoresSafeArea()
         }
@@ -176,8 +187,9 @@ struct IPodView: View {
         .onKeyPress(.return) { key(.center) { select() } }
         .onKeyPress(.escape) {
             if fullTV { fullTV = false; return .handled }
-            // In the search: Escape clears the field first, then backs out of the list.
+            // In the search: Escape clears the field first, then closes it, then backs out of the list.
             if searchFocused, !query.isEmpty { query = ""; return .handled }
+            if searchOpen { closeSearch(); return .handled }
             return key(.menu) { menu() }
         }
         .onKeyPress(.delete) { searchFocused ? .ignored : key(.menu) { menu() } }
@@ -186,6 +198,7 @@ struct IPodView: View {
         .onKeyPress(characters: .alphanumerics, phases: .down) { press in
             guard case .band = page, !searchFocused, !press.modifiers.contains(.command) else { return .ignored }
             query += press.characters
+            searchOpen = true
             searchFocused = true
             touched()
             #if os(macOS)
@@ -385,7 +398,6 @@ struct IPodView: View {
         let items = rows
         let current = selection[page] ?? 0
         return VStack(spacing: 0) {
-            if case .band = page { searchField(height: rowHeight) }
             ScrollViewReader { proxy in
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
@@ -410,36 +422,118 @@ struct IPodView: View {
         }
     }
 
-    // The Radio list's search field: the list narrows as you type (see stations(_:)).
-    private func searchField(height: CGFloat) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: height * 0.4, weight: .semibold))
-                .foregroundStyle(Color(hex: "#8a8f96"))
-            TextField("Search stations", text: $query)
-                .textFieldStyle(.plain)
-                .font(.system(size: height * 0.42, weight: .semibold))
-                .foregroundStyle(Color(hex: "#111"))
-                .focused($searchFocused)
-                .autocorrectionDisabled()
-                #if os(iOS)
-                .textInputAutocapitalization(.never)
-                .submitLabel(.go)
-                .keyboardType(.webSearch)
-                #endif
-            if !query.isEmpty {
-                Button { query = "" } label: {
-                    Image(systemName: "xmark.circle.fill").font(.system(size: height * 0.4)).foregroundStyle(Color(hex: "#9a9fa6"))
+    // The search, on the iPod's body just under the screen: a faint magnifier at the right; a tap bubbles a
+    // liquid-glass field open across the body, floating over it, and brings up the Radio list, which narrows
+    // and re-ranks as you type.
+    private func searchStrip(height: CGFloat) -> some View {
+        let pill = min(40, height * 0.78)
+        let strip = HStack(spacing: 0) {
+            Spacer(minLength: 0)
+            if searchOpen {
+                HStack(spacing: 8) {
+                    if searchClosing {
+                        // While the pill shrinks away, its words stay but the live field (and its caret) is already gone.
+                        Text(query.isEmpty ? "Search stations" : query)
+                            .font(.system(size: pill * 0.42, weight: .regular))
+                            .foregroundStyle(query.isEmpty ? Color(hex: "#1d1f21").opacity(0.25) : Color(hex: "#1d1f21"))
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    } else {
+                        TextField("Search stations", text: $query)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: pill * 0.42, weight: .regular))
+                            .foregroundStyle(Color(hex: "#1d1f21"))
+                            .focused($searchFocused)
+                            .autocorrectionDisabled()
+                            .onSubmit { select() }
+                            #if os(iOS)
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.go)
+                            .keyboardType(.webSearch)
+                            #endif
+                            .onAppear {
+                                // The keyboard comes up once the pill has opened, not in the middle of it.
+                                Task { try? await Task.sleep(for: .milliseconds(searchArrivedWithPage ? 420 : 260)); searchFocused = true }
+                            }
+                    }
+                    if !query.isEmpty, !searchClosing {
+                        Button { query = "" } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: pill * 0.42))
+                                .foregroundStyle(Color.black.opacity(0.28))
+                                .frame(width: pill, height: pill)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Clear search")
+                    }
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Clear search")
+                .padding(.leading, pill * 0.5)
+                .padding(.trailing, height)  // the magnifier sits in the pill's round end
+                .frame(height: pill)
+                .frame(maxWidth: .infinity)
+                .searchGlass()
+                .transition(.scale(scale: 0.06, anchor: .trailing).combined(with: .opacity))
+                .padding(.trailing, -height)
+                .zIndex(-1)
             }
+            Button {
+                touched()
+                Feedback.click()
+                if searchOpen { closeSearch() } else { openSearch() }
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.black.opacity(searchOpen ? 0.5 : 0.17))
+                    .frame(width: height, height: height)  // a 44 pt touch target round a small glyph
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(searchOpen ? "Close search" : "Search stations")
         }
-        .padding(.horizontal, 8)
         .frame(height: height)
-        .background(Color.white.opacity(0.55))
-        .overlay(alignment: .bottom) { Color.black.opacity(0.12).frame(height: 1) }
+        .animation(.spring(duration: 0.5, bounce: 0.28), value: searchOpen)  // bubbles open
         .onChange(of: query) { for p in stack { if case .band = p { selection[p] = 0 } } }
+        return Group {
+            #if os(iOS)
+            GlassEffectContainer { strip }
+            #else
+            if #available(macOS 26, *) { GlassEffectContainer { strip } } else { strip }
+            #endif
+        }
+    }
+
+    private func openSearch() {
+        if case .band = page {
+            searchArrivedWithPage = false
+            searchOpen = true
+            return
+        }
+        // Searching from another page: the Radio list slides in first, the pill bubbles open as it
+        // lands, then the keyboard. One motion at a time, so none of them stutters the others.
+        searchArrivedWithPage = true
+        query = ""
+        if let index = stations("radio").firstIndex(of: radio.station) { selection[.band("radio")] = index }
+        forward = true
+        withAnimation(.easeInOut(duration: 0.3)) { stack.append(.band("radio")) }
+        Task {
+            try? await Task.sleep(for: .milliseconds(180))
+            searchOpen = true
+        }
+    }
+
+    // Closing runs in order: the caret and keyboard go, then the pill shrinks back into its icon.
+    private func closeSearch() {
+        guard searchOpen, !searchClosing else { return }
+        searchFocused = false
+        searchClosing = true
+        Task {
+            try? await Task.sleep(for: .milliseconds(60))
+            withAnimation(.spring(duration: 0.42, bounce: 0.1)) { searchOpen = false }
+            try? await Task.sleep(for: .milliseconds(420))
+            searchClosing = false
+            query = ""
+        }
     }
 
     private func rowView(_ row: Row, selected: Bool, height: CGFloat) -> some View {
@@ -535,15 +629,10 @@ struct IPodView: View {
 
     private var playlistRows: [SpotifyPlaylist] { [spotify.natePlaylist].compactMap { $0 } + spotify.playlists }
 
-    // Radio is the one list: every station, in catalog order (the band only matters to older builds),
-    // narrowed by the search: every word typed has to appear in the station's name, line or genre.
+    // Radio is the one list: every station, in catalog order (the band only matters to older builds).
+    // With a search typed, the stations that fit it, best first (StationSearch).
     private func stations(_ band: String) -> [Station] {
-        let words = query.lowercased().split(whereSeparator: \.isWhitespace).map(String.init)
-        guard !words.isEmpty else { return radio.stations }
-        return radio.stations.filter { station in
-            let text = [station.displayName, station.name, station.subtitle ?? "", station.genre].joined(separator: " ").lowercased()
-            return words.allSatisfy { text.contains($0) }
-        }
+        StationSearch.rank(radio.stations, query: query)
     }
 
     // The station's own line if it has one; else "Artist – Song" under a live station,
@@ -614,7 +703,7 @@ struct IPodView: View {
         case .band(let band):
             let list = stations(band)
             guard list.indices.contains(index) else { return }
-            searchFocused = false
+            closeSearch()
             radio.tune(list[index])
             if page != .nowPlaying { push(.nowPlaying) }
         case .playlists:
@@ -653,6 +742,7 @@ struct IPodView: View {
         guard stack.count > 1 else { return }
         // Leaving a video stops it, the way MENU stops a movie on an iPod.
         if page == .nowPlaying, radio.station.isVideo, radio.isPlaying { radio.stop() }
+        if case .band = page, searchOpen { closeSearch() }
         forward = false
         withAnimation(.easeInOut(duration: 0.25)) { _ = stack.removeLast() }
     }
@@ -660,6 +750,23 @@ struct IPodView: View {
 
 private extension Array {
     subscript(safe index: Int) -> Element? { indices.contains(index) ? self[index] : nil }
+}
+
+private extension View {
+    // The search field's liquid glass pill on the iPod's body; a frosted pill before macOS 26.
+    @ViewBuilder func searchGlass() -> some View {
+        #if os(iOS)
+        glassEffect(.regular.interactive(), in: Capsule()).glassEffectTransition(.materialize)
+        #else
+        if #available(macOS 26, *) {
+            glassEffect(.regular.interactive(), in: Capsule()).glassEffectTransition(.materialize)
+        } else {
+            background(.ultraThinMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(.white.opacity(0.6), lineWidth: 1))
+                .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+        }
+        #endif
+    }
 }
 
 #if DEBUG
@@ -784,7 +891,10 @@ private struct NowPlaying: View {
                                    .init(color: .clear, location: 0.62), .init(color: .black.opacity(0.4), location: 1)],
                            startPoint: .top, endPoint: .bottom)
             VStack(alignment: .leading, spacing: 8) {
-                HStack {
+                // Top row: the full-screen corners at the left, the HIFI TV wordmark at the right.
+                HStack(alignment: .center) {
+                    FullScreenButton(inward: false, size: rowHeight * 0.38, faded: true) { fullTV = true }
+                        .padding(-rowHeight * 0.38 * 0.3)  // the button's own touch padding, pulled back so the glyph sits on the margin
                     Spacer()
                     Text("HIFI TV")
                         .font(.system(size: rowHeight * 0.36, weight: .black).italic())
@@ -814,12 +924,9 @@ private struct NowPlaying: View {
                             .lineLimit(1)
                     }
                     .opacity(wordsOpacity)
-                    HStack(spacing: rowHeight * 0.2) {
-                        ZStack {
-                            // A problem takes the middle of the bar's labels, so the card never grows a line.
-                            if showVolume { volume.transition(.opacity) } else { progress(problem: radio.problem ?? spotify.problem).transition(.opacity) }
-                        }
-                        FullScreenButton(inward: false, size: rowHeight * 0.4) { fullTV = true }
+                    ZStack {
+                        // A problem takes the middle of the bar's labels, so the card never grows a line.
+                        if showVolume { volume.transition(.opacity) } else { progress(problem: radio.problem ?? spotify.problem).transition(.opacity) }
                     }
                     .padding(.top, rowHeight * 0.12)
                 }
@@ -925,7 +1032,7 @@ private struct NowPlaying: View {
         } label: {
             Image(systemName: liked ? "heart.fill" : "heart")
                 .font(.system(size: rowHeight * 0.5, weight: .semibold))
-                .foregroundStyle(liked ? Color(hex: "#e5484d") : Color(hex: "#555"))
+                .foregroundStyle(Color(hex: "#e5484d"))  // red either way: filled when liked, outlined when not
                 .contentTransition(.symbolEffect(.replace))
                 .padding(4)
                 .contentShape(Rectangle())

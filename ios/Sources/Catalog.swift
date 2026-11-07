@@ -51,6 +51,7 @@ struct Station: Decodable, Identifiable, Equatable {
     let subtitle: String?  // a fixed line under the name in the list, instead of the song
     let tagline: String
     let genre: String
+    let tags: [String]?    // what the station is about, for search (christmas, lofi, work…)
     let color: String
     let stream: String?
     let website: String?

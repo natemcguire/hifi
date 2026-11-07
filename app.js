@@ -182,9 +182,9 @@ async function loadVideoStations() {
 // One list under Radio: the live stations, 101X Chillville, then Synth Sounds. (`band` stays in the
 // catalog for older native builds, which still show two menus.)
 const stationsIn = () => catalog.stations;
-// The Radio list's search: every word typed has to appear in the station's name, line or genre.
+// The Radio list's search: every word typed has to appear in the station's name, line, genre or tags.
 const stationMatches = (station, words) => {
-  const text = [stationName(station), station.name, station.subtitle, station.genre].filter(Boolean).join(' ').toLowerCase();
+  const text = [stationName(station), station.name, station.subtitle, station.genre, ...(station.tags || [])].filter(Boolean).join(' ').toLowerCase();
   return words.every(word => text.includes(word));
 };
 const stationsShown = band => {

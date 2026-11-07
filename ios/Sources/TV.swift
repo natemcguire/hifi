@@ -172,6 +172,7 @@ struct CornersIcon: Shape {
 struct FullScreenButton: View {
     let inward: Bool
     let size: CGFloat
+    var faded = false  // sits quietly in a corner, like the search icon, until you want it
     let action: () -> Void
 
     var body: some View {
@@ -186,7 +187,8 @@ struct FullScreenButton: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .shadow(color: .black.opacity(0.6), radius: 2, y: 1)
+        .shadow(color: .black.opacity(faded ? 0.3 : 0.6), radius: 2, y: 1)
+        .opacity(faded ? 0.42 : 1)
         .accessibilityLabel(inward ? "Exit full screen" : "Full screen")
     }
 }
