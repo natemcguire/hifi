@@ -1,0 +1,668 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "hifi radio",
+      "modelConfiguration": {
+        "fallbackIntentSensitivity": {
+          "level": "LOW"
+        }
+      },
+      "intents": [
+        {
+          "name": "PlayStationIntent",
+          "slots": [
+            {
+              "name": "station",
+              "type": "HIFI_STATION"
+            }
+          ],
+          "samples": [
+            "play {station}",
+            "play {station} radio",
+            "play the {station} station",
+            "put on {station}",
+            "tune to {station}",
+            "tune in to {station}",
+            "switch to {station}",
+            "change to {station}",
+            "go to {station}",
+            "start {station}",
+            "i want {station}",
+            "i want to hear {station}",
+            "something {station}",
+            "play something {station}",
+            "play some {station}",
+            "{station} please",
+            "{station} station",
+            "{station}"
+          ]
+        },
+        {
+          "name": "PlayAnythingIntent",
+          "slots": [],
+          "samples": [
+            "play",
+            "play radio",
+            "play something",
+            "play anything",
+            "start",
+            "start playing",
+            "turn on",
+            "turn on the radio",
+            "resume radio",
+            "keep playing",
+            "play my station",
+            "play where i left off"
+          ]
+        },
+        {
+          "name": "WhatsPlayingIntent",
+          "slots": [],
+          "samples": [
+            "what is playing",
+            "what is this",
+            "what song is this",
+            "who is this",
+            "who sings this",
+            "what is this song",
+            "what am i listening to",
+            "what station is this",
+            "which station is this",
+            "what is on",
+            "what is the song"
+          ]
+        },
+        {
+          "name": "ListStationsIntent",
+          "slots": [],
+          "samples": [
+            "list stations",
+            "list the stations",
+            "what stations are there",
+            "what stations do you have",
+            "which stations are there",
+            "what can i listen to",
+            "what are my options",
+            "stations"
+          ]
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": [
+            "next station",
+            "another station",
+            "something else",
+            "skip station",
+            "change the station",
+            "change station"
+          ]
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": [
+            "previous station",
+            "last station",
+            "go back a station",
+            "back a station"
+          ]
+        },
+        {
+          "name": "AMAZON.ResumeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PauseIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StartOverIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.RepeatIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.LoopOnIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.LoopOffIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ShuffleOnIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ShuffleOffIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "name": "HIFI_STATION",
+          "values": [
+            {
+              "id": "radio-paradise",
+              "name": {
+                "value": "radio paradise",
+                "synonyms": [
+                  "paradise",
+                  "eclectic",
+                  "mix",
+                  "variety",
+                  "classic rock",
+                  "adult alternative",
+                  "world music",
+                  "blues",
+                  "deep cuts",
+                  "curated",
+                  "hand picked",
+                  "dj",
+                  "human dj",
+                  "commercial free",
+                  "no ads",
+                  "listener supported",
+                  "independent",
+                  "california",
+                  "bill goldsmith",
+                  "best of everything",
+                  "discovery",
+                  "old favorites",
+                  "grown up"
+                ]
+              }
+            },
+            {
+              "id": "boot-liquor",
+              "name": {
+                "value": "boot liquor",
+                "synonyms": [
+                  "americana",
+                  "country",
+                  "alt country",
+                  "roots",
+                  "roots rock",
+                  "bluegrass",
+                  "twang",
+                  "outlaw country",
+                  "classic country",
+                  "honky tonk",
+                  "western",
+                  "cowboy",
+                  "acoustic",
+                  "pedal steel",
+                  "fiddle",
+                  "banjo",
+                  "whiskey",
+                  "bourbon",
+                  "liquor",
+                  "saloon",
+                  "texas",
+                  "nashville",
+                  "austin"
+                ]
+              }
+            },
+            {
+              "id": "sonic-universe",
+              "name": {
+                "value": "sonic universe",
+                "synonyms": [
+                  "chill jazz",
+                  "modern jazz",
+                  "nu jazz",
+                  "nujazz",
+                  "contemporary jazz",
+                  "avant garde",
+                  "experimental",
+                  "cosmic",
+                  "spacey",
+                  "space",
+                  "universe",
+                  "sonic",
+                  "cool jazz",
+                  "saxophone",
+                  "sax",
+                  "trumpet",
+                  "upright bass",
+                  "improvisation",
+                  "ecm",
+                  "blue note",
+                  "miles davis",
+                  "coltrane",
+                  "wine"
+                ]
+              }
+            },
+            {
+              "id": "indie-pop-rocks",
+              "name": {
+                "value": "indie pop rocks",
+                "synonyms": [
+                  "indie pop",
+                  "alt rock",
+                  "new releases",
+                  "guitar pop",
+                  "college radio",
+                  "college rock",
+                  "pop rock",
+                  "twee",
+                  "jangle",
+                  "jangle pop",
+                  "lo fi rock",
+                  "shoegaze",
+                  "dream pop",
+                  "catchy",
+                  "hooks",
+                  "2000s indie",
+                  "2010s",
+                  "pitchfork",
+                  "sxsw",
+                  "arcade fire",
+                  "vampire weekend",
+                  "phoenix",
+                  "the strokes"
+                ]
+              }
+            },
+            {
+              "id": "pop-girl",
+              "name": {
+                "value": "pop girl radio",
+                "synonyms": [
+                  "pop girl",
+                  "pop",
+                  "pop music",
+                  "pop hits",
+                  "top 40",
+                  "top40",
+                  "hits",
+                  "chart",
+                  "charts",
+                  "girl pop",
+                  "taylor swift",
+                  "taylor",
+                  "swift",
+                  "swiftie",
+                  "swifties",
+                  "eras",
+                  "ariana grande",
+                  "dua lipa",
+                  "olivia rodrigo",
+                  "sabrina carpenter",
+                  "billie eilish",
+                  "chappell roan",
+                  "lady gaga"
+                ]
+              }
+            },
+            {
+              "id": "working-for-the-weekend",
+              "name": {
+                "value": "working for the weekend",
+                "synonyms": [
+                  "working",
+                  "work music",
+                  "concentration",
+                  "productivity",
+                  "office",
+                  "desk",
+                  "flow",
+                  "groove",
+                  "grooves",
+                  "relaxed",
+                  "laid back",
+                  "afternoon",
+                  "friday",
+                  "monday",
+                  "no distractions",
+                  "zen",
+                  "groove salad"
+                ]
+              }
+            },
+            {
+              "id": "lofi-beats",
+              "name": {
+                "value": "lo fi beats to work to",
+                "synonyms": [
+                  "lofi beats to work to",
+                  "lo fi",
+                  "lofi beats",
+                  "lofi hip hop",
+                  "hip hop",
+                  "instrumental hip hop",
+                  "boom bap",
+                  "liquid",
+                  "liquid beats",
+                  "chillhop",
+                  "jazzhop",
+                  "jazz hop",
+                  "study beats",
+                  "homework",
+                  "relax",
+                  "rainy day",
+                  "vinyl crackle",
+                  "nujabes",
+                  "j dilla",
+                  "lofi girl",
+                  "beat blender"
+                ]
+              }
+            },
+            {
+              "id": "code-all-night",
+              "name": {
+                "value": "code all night",
+                "synonyms": [
+                  "code",
+                  "programming",
+                  "programmer",
+                  "developer",
+                  "dev",
+                  "hacker",
+                  "hacking",
+                  "hackathon",
+                  "software",
+                  "engineering",
+                  "computer",
+                  "terminal",
+                  "keyboard",
+                  "electronica",
+                  "dark",
+                  "dark electronic",
+                  "steady",
+                  "techno",
+                  "idm",
+                  "glitch",
+                  "industrial",
+                  "cyberpunk",
+                  "matrix"
+                ]
+              }
+            },
+            {
+              "id": "y2k-chill-out",
+              "name": {
+                "value": "y2k chill out",
+                "synonyms": [
+                  "y two k chill out",
+                  "two thousand chill out",
+                  "y2k chill",
+                  "y2k",
+                  "2000",
+                  "2000s",
+                  "early 2000s",
+                  "00s",
+                  "millennium",
+                  "classic chillout",
+                  "throwback",
+                  "ibiza",
+                  "cafe del mar",
+                  "buddha bar",
+                  "hotel costes",
+                  "thievery corporation",
+                  "zero 7",
+                  "air",
+                  "morcheeba",
+                  "massive attack",
+                  "groove armada",
+                  "royksopp",
+                  "kruder dorfmeister"
+                ]
+              }
+            },
+            {
+              "id": "soulful-christmas",
+              "name": {
+                "value": "soulful christmas",
+                "synonyms": [
+                  "soul",
+                  "soulful",
+                  "r b",
+                  "rnb",
+                  "rhythm and blues",
+                  "motown",
+                  "stax",
+                  "gospel",
+                  "sixties",
+                  "seventies",
+                  "70s",
+                  "classic christmas",
+                  "otis redding",
+                  "james brown",
+                  "jackson 5",
+                  "stevie wonder",
+                  "donny hathaway",
+                  "temptations",
+                  "supremes",
+                  "marvin gaye",
+                  "al green",
+                  "groovy",
+                  "warm"
+                ]
+              }
+            },
+            {
+              "id": "christmas-at-the-mall",
+              "name": {
+                "value": "christmas at the mall",
+                "synonyms": [
+                  "strings",
+                  "orchestra",
+                  "orchestral",
+                  "symphonic",
+                  "no singing",
+                  "harp",
+                  "bells",
+                  "easy listening",
+                  "elevator music",
+                  "muzak",
+                  "department store",
+                  "mall",
+                  "shopping",
+                  "background",
+                  "dinner party",
+                  "office party",
+                  "50s",
+                  "mantovani",
+                  "percy faith",
+                  "ray conniff",
+                  "classy",
+                  "department store christmas"
+                ]
+              }
+            },
+            {
+              "id": "fireside-christmas",
+              "name": {
+                "value": "fireside christmas",
+                "synonyms": [
+                  "fireside",
+                  "fireplace",
+                  "fire",
+                  "cocoa",
+                  "hot chocolate",
+                  "eggnog",
+                  "cocktail",
+                  "cocktail hour",
+                  "swing",
+                  "jazzy",
+                  "standards",
+                  "crooners",
+                  "bossa nova",
+                  "exotica",
+                  "tiki",
+                  "romantic",
+                  "snow",
+                  "cabin",
+                  "christmas lounge",
+                  "cocoa lounge"
+                ]
+              }
+            },
+            {
+              "id": "rockin-around-the-tree",
+              "name": {
+                "value": "rockin around the tree",
+                "synonyms": [
+                  "tree",
+                  "christmas tree",
+                  "rockin",
+                  "rocking",
+                  "punk",
+                  "pop punk",
+                  "guitars",
+                  "loud",
+                  "ugly sweater",
+                  "the ramones",
+                  "the killers",
+                  "weezer",
+                  "she him",
+                  "low",
+                  "julian casablancas",
+                  "christmas rocks"
+                ]
+              }
+            },
+            {
+              "id": "dial-up",
+              "name": {
+                "value": "dial up",
+                "synonyms": [
+                  "soft breaks",
+                  "breaks",
+                  "breakbeat",
+                  "nineties",
+                  "internet",
+                  "modem",
+                  "dialup",
+                  "56k",
+                  "aol",
+                  "geocities",
+                  "netscape",
+                  "web 1 0",
+                  "bedroom",
+                  "browsing",
+                  "generative"
+                ]
+              }
+            },
+            {
+              "id": "shareware-summer",
+              "name": {
+                "value": "shareware summer",
+                "synonyms": [
+                  "synth funk",
+                  "funky",
+                  "synthwave",
+                  "retrowave",
+                  "outrun",
+                  "electro",
+                  "boogie",
+                  "disco",
+                  "sunshine",
+                  "sunny",
+                  "summer",
+                  "summertime",
+                  "pool",
+                  "happy",
+                  "feel good",
+                  "bright",
+                  "80s",
+                  "eighties",
+                  "shareware",
+                  "floppy disk",
+                  "trial version",
+                  "demo"
+                ]
+              }
+            },
+            {
+              "id": "night-build",
+              "name": {
+                "value": "night build",
+                "synonyms": [
+                  "dark ambient",
+                  "drone",
+                  "after hours",
+                  "nighttime",
+                  "midnight",
+                  "3am",
+                  "sleep",
+                  "sleeping",
+                  "insomnia",
+                  "quiet",
+                  "slow",
+                  "meditation",
+                  "build",
+                  "compile",
+                  "ci",
+                  "overnight",
+                  "city",
+                  "rain",
+                  "moody",
+                  "cinematic",
+                  "blade runner"
+                ]
+              }
+            },
+            {
+              "id": "pixel-drift",
+              "name": {
+                "value": "pixel drift",
+                "synonyms": [
+                  "chiptune",
+                  "chip",
+                  "chip music",
+                  "8 bit",
+                  "8bit",
+                  "eight bit",
+                  "16 bit",
+                  "arcade",
+                  "video game",
+                  "video games",
+                  "game music",
+                  "vgm",
+                  "retro games",
+                  "retro gaming",
+                  "nintendo",
+                  "nes",
+                  "snes",
+                  "gameboy",
+                  "game boy",
+                  "sega",
+                  "commodore",
+                  "amiga",
+                  "bleeps"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

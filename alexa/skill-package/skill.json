@@ -1,0 +1,40 @@
+{
+  "manifest": {
+    "manifestVersion": "1.0",
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "HIFI radio",
+          "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, lo-fi, Christmas and more.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer.\n\nSay \"Alexa, open HIFI radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays: \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\". Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear the whole dial.\n\nHIFI is also an iPhone and Mac app, and lives at hifi.nates-software.com.",
+          "examplePhrases": ["Alexa, open HIFI radio", "Alexa, ask HIFI radio to play lo-fi beats", "Alexa, ask HIFI radio what's playing"],
+          "keywords": ["radio", "internet radio", "music", "lo-fi", "lofi", "somafm", "radio paradise", "christmas music", "chill", "work music", "focus", "ambient", "pop"],
+          "smallIconUri": "https://hifi.nates-software.com/alexa/icon-108.png",
+          "largeIconUri": "https://hifi.nates-software.com/alexa/icon-512.png"
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Say \"open HIFI radio\" to start playing. Try \"play pop girl\", \"play something for work\", \"next\", \"what's playing\", \"list stations\", \"pause\" and \"resume\". The synth stations (dial-up, shareware summer, night build, pixel drift) play original tracks back to back; the rest are live streams. No account linking, no purchases.",
+      "category": "STREAMING_SERVICE",
+      "distributionCountries": []
+    },
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://hifi.nates-software.com/privacy",
+          "termsOfUseUrl": ""
+        }
+      }
+    },
+    "apis": {
+      "custom": {
+        "interfaces": [{ "type": "AUDIO_PLAYER" }]
+      }
+    }
+  }
+}

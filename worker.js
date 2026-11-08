@@ -218,7 +218,7 @@ export default {
     // (scripts/build-site.mjs) so they keep for a year; media and the catalog keep a while.
     if (headers.get('Content-Type')?.includes('text/html')) headers.set('Cache-Control','no-cache');
     else if (response.ok && url.searchParams.has('v') && /\.(js|css)$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=31536000, immutable');
-    else if (response.ok && /^\/(shots|tracks|tv|playlists)\/|\.svg$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=86400, stale-while-revalidate=604800');
+    else if (response.ok && /^\/(shots|tracks|tv|playlists|alexa)\/|\.svg$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=86400, stale-while-revalidate=604800');
     else if (response.ok && url.pathname === '/stations.json') headers.set('Cache-Control','public, max-age=300, stale-while-revalidate=86400');
     if (url.pathname.endsWith('.dmg') && response.ok) {
       headers.set('Content-Disposition', 'attachment; filename="HIFI.dmg"');
