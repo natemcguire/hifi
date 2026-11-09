@@ -6,11 +6,11 @@
         "en-US": {
           "name": "HIFI radio",
           "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, lo-fi, Christmas and more.",
-          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer.\n\nSay \"Alexa, open hi-fi radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays: \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\". Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear the whole dial.\n\nHIFI is also an iPhone and Mac app, and lives at hifi.nates-software.com.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays: \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\". Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear the whole dial.\n\nHIFI is also an iPhone and Mac app, and lives at hifi.nates-software.com.",
           "examplePhrases": [
-            "Alexa, open hi fi radio",
-            "Alexa, ask hi fi radio to play lo-fi beats",
-            "Alexa, ask hi fi radio what's playing"
+            "Alexa, open hifi live radio",
+            "Alexa, ask hifi live radio to play lo-fi beats",
+            "Alexa, ask hifi live radio what's playing"
           ],
           "keywords": [
             "radio",
@@ -32,7 +32,7 @@
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Say \"open hi fi radio\" to start playing. Try \"play pop girl\", \"play something for work\", \"next\", \"what's playing\", \"list stations\", \"pause\" and \"resume\". The synth stations (dial-up, shareware summer, night build, pixel drift) play original tracks back to back; the rest are live streams. No account linking, no purchases.",
+      "testingInstructions": "Say \"open hifi live radio\" to start playing. Try \"play pop girl\", \"play something for work\", \"next\", \"what's playing\", \"list stations\", \"pause\" and \"resume\". The synth stations (dial-up, shareware summer, night build, pixel drift) play original tracks back to back; the rest are live streams. No account linking, no purchases.",
       "category": "STREAMING_SERVICE",
       "distributionCountries": []
     },

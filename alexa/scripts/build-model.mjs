@@ -32,7 +32,7 @@ const values = stations.map(s => {
 const model = {
   interactionModel: {
     languageModel: {
-      invocationName: 'hi fi radio',
+      invocationName: 'hifi live radio',
       modelConfiguration: { fallbackIntentSensitivity: { level: 'LOW' } },
       intents: [
         { name: 'PlayStationIntent', slots: [{ name: 'station', type: 'HIFI_STATION' }], samples: [
