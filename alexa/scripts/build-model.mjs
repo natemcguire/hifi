@@ -49,8 +49,10 @@ const model = {
         { name: 'ListStationsIntent', slots: [], samples: [
           'list stations', 'list the stations', 'what stations are there', 'what stations do you have', 'which stations are there', 'what can i listen to', 'what are my options', 'stations',
         ] },
-        { name: 'AMAZON.NextIntent', samples: ['next station', 'another station', 'something else', 'skip station', 'change the station', 'change station'] },
-        { name: 'AMAZON.PreviousIntent', samples: ['previous station', 'last station', 'go back a station', 'back a station'] },
+        // Amazon's next and previous can't take extra phrases, so the station-flavoured ones get their own intents.
+        { name: 'NextStationIntent', slots: [], samples: ['next station', 'another station', 'something else', 'skip station', 'skip this station', 'change the station', 'change station', 'move along the dial'] },
+        { name: 'PreviousStationIntent', slots: [], samples: ['previous station', 'last station', 'go back a station', 'back a station', 'the station before'] },
+        { name: 'AMAZON.NextIntent', samples: [] }, { name: 'AMAZON.PreviousIntent', samples: [] },
         { name: 'AMAZON.ResumeIntent', samples: [] }, { name: 'AMAZON.PauseIntent', samples: [] }, { name: 'AMAZON.StopIntent', samples: [] },
         { name: 'AMAZON.CancelIntent', samples: [] }, { name: 'AMAZON.HelpIntent', samples: [] }, { name: 'AMAZON.FallbackIntent', samples: [] },
         { name: 'AMAZON.NavigateHomeIntent', samples: [] }, { name: 'AMAZON.StartOverIntent', samples: [] }, { name: 'AMAZON.RepeatIntent', samples: [] },

@@ -141,8 +141,8 @@ const PlayAnythingIntentHandler = {
   handle: handlerInput => resume(handlerInput, true),
 };
 
-const NextIntentHandler = { canHandle: intent('AMAZON.NextIntent'), handle: h => neighbour(h, 1, true) };
-const PreviousIntentHandler = { canHandle: intent('AMAZON.PreviousIntent'), handle: h => neighbour(h, -1, true) };
+const NextIntentHandler = { canHandle: intent('AMAZON.NextIntent', 'NextStationIntent'), handle: h => neighbour(h, 1, true) };
+const PreviousIntentHandler = { canHandle: intent('AMAZON.PreviousIntent', 'PreviousStationIntent'), handle: h => neighbour(h, -1, true) };
 
 const StopIntentHandler = {
   canHandle: intent('AMAZON.PauseIntent', 'AMAZON.StopIntent', 'AMAZON.CancelIntent'),
@@ -202,9 +202,13 @@ const StartOverIntentHandler = {
 
 const FallbackIntentHandler = {
   canHandle: intent('AMAZON.FallbackIntent', 'AMAZON.NavigateHomeIntent'),
-  handle: handlerInput => handlerInput.responseBuilder
-    .speak("I didn't catch that. Say play and a station name, like play lo fi beats, or say next.")
-    .reprompt('Which station would you like?').getResponse(),
+  handle(handlerInput) {
+    // An unrecognised first utterance ("open hifi radio" heard oddly) still means: play.
+    if (handlerInput.requestEnvelope.session?.new) return LaunchRequestHandler.handle(handlerInput);
+    return handlerInput.responseBuilder
+      .speak("I didn't catch that. Say play and a station name, like play lo fi beats, or say next.")
+      .reprompt('Which station would you like?').getResponse();
+  },
 };
 
 // Buttons on the device or a remote: no speech allowed in these responses.
@@ -277,12 +281,14 @@ const ErrorHandler = {
   },
 };
 
-exports.handler = Alexa.SkillBuilders.custom()
+const builder = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler, PlayStationIntentHandler, PlayAnythingIntentHandler, NextIntentHandler, PreviousIntentHandler,
     StopIntentHandler, WhatsPlayingIntentHandler, ListStationsIntentHandler, NotForRadioIntentHandler, StartOverIntentHandler,
     FallbackIntentHandler, PlaybackControllerHandler, AudioPlayerEventHandler, SessionEndedRequestHandler, ExceptionEncounteredHandler,
   )
   .addErrorHandlers(ErrorHandler)
-  .withCustomUserAgent('hifi-radio/1.0')
-  .lambda();
+  .withCustomUserAgent('hifi-radio/1.0');
+
+exports.skill = builder.create();   // for server.js (Railway)
+exports.handler = builder.lambda(); // for AWS Lambda / Alexa-hosted

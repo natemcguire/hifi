@@ -87,24 +87,37 @@
           ]
         },
         {
-          "name": "AMAZON.NextIntent",
+          "name": "NextStationIntent",
+          "slots": [],
           "samples": [
             "next station",
             "another station",
             "something else",
             "skip station",
+            "skip this station",
             "change the station",
-            "change station"
+            "change station",
+            "move along the dial"
           ]
         },
         {
-          "name": "AMAZON.PreviousIntent",
+          "name": "PreviousStationIntent",
+          "slots": [],
           "samples": [
             "previous station",
             "last station",
             "go back a station",
-            "back a station"
+            "back a station",
+            "the station before"
           ]
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
         },
         {
           "name": "AMAZON.ResumeIntent",
