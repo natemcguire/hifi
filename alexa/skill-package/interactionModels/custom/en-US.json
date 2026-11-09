@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "hifi radio",
+      "invocationName": "hi fi radio",
       "modelConfiguration": {
         "fallbackIntentSensitivity": {
           "level": "LOW"
@@ -60,16 +60,26 @@
           "slots": [],
           "samples": [
             "what is playing",
+            "what's playing",
             "what is this",
+            "what's this",
             "what song is this",
             "who is this",
+            "who's this",
             "who sings this",
             "what is this song",
+            "what's this song",
             "what am i listening to",
             "what station is this",
             "which station is this",
             "what is on",
-            "what is the song"
+            "what's on",
+            "what is the song",
+            "what's the song",
+            "song name",
+            "what song is playing",
+            "tell me the song",
+            "now playing"
           ]
         },
         {

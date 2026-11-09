@@ -1,7 +1,7 @@
 # HIFI radio for Alexa
 
-The HIFI dial on Echo speakers. "Alexa, open HIFI radio" picks up where you left off;
-"Alexa, ask HIFI radio to play pop girl" tunes a station; "next" and "previous" move along
+The HIFI dial on Echo speakers. "Alexa, open hi-fi radio" picks up where you left off;
+"Alexa, ask hi-fi radio to play pop girl" tunes a station; "next" and "previous" move along
 the dial like the click wheel; "what's playing" names the song.
 
 - `lambda/` — the skill code (Node, ASK SDK v2). `index.js` handles the requests,
@@ -45,7 +45,7 @@ of Amazon's certification.
 
 | You say | It does |
 |---|---|
-| open HIFI radio | resumes the last station (Radio Paradise the first time) |
+| open hi-fi radio | resumes the last station (Radio Paradise the first time) |
 | play lo-fi beats / play Taylor Swift / play something for work | ranks names, tags, genre and lines; plays the best fit |
 | next, previous | the next or previous station on the dial |
 | what's playing | the song, from the same now-playing feed the app uses |

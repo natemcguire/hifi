@@ -32,7 +32,7 @@ const values = stations.map(s => {
 const model = {
   interactionModel: {
     languageModel: {
-      invocationName: 'hifi radio',
+      invocationName: 'hi fi radio',
       modelConfiguration: { fallbackIntentSensitivity: { level: 'LOW' } },
       intents: [
         { name: 'PlayStationIntent', slots: [{ name: 'station', type: 'HIFI_STATION' }], samples: [
@@ -44,7 +44,8 @@ const model = {
           'play', 'play radio', 'play something', 'play anything', 'start', 'start playing', 'turn on', 'turn on the radio', 'resume radio', 'keep playing', 'play my station', 'play where i left off',
         ] },
         { name: 'WhatsPlayingIntent', slots: [], samples: [
-          'what is playing', 'what is this', 'what song is this', 'who is this', 'who sings this', 'what is this song', 'what am i listening to', 'what station is this', 'which station is this', 'what is on', 'what is the song',
+          'what is playing', "what's playing", 'what is this', "what's this", 'what song is this', 'who is this', "who's this", 'who sings this', 'what is this song', "what's this song",
+          'what am i listening to', 'what station is this', 'which station is this', 'what is on', "what's on", 'what is the song', "what's the song", 'song name', 'what song is playing', 'tell me the song', 'now playing',
         ] },
         { name: 'ListStationsIntent', slots: [], samples: [
           'list stations', 'list the stations', 'what stations are there', 'what stations do you have', 'which stations are there', 'what can i listen to', 'what are my options', 'stations',
