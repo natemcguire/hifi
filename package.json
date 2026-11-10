@@ -6,7 +6,9 @@
   "scripts": {
     "build": "node scripts/build-site.mjs",
     "dev": "npm run build && wrangler dev",
-    "release": "node scripts/release-site.mjs"
+    "release": "node scripts/release-site.mjs",
+    "mockup:live": "node scripts/build-youtube-mockup.mjs",
+    "mockup:live:deploy": "node scripts/build-youtube-mockup.mjs && wrangler pages deploy dist-youtube-mockup --project-name hifi-mockups --branch youtube-live --commit-dirty=true"
   },
   "devDependencies": {
     "wrangler": "4.99.0"

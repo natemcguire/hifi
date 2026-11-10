@@ -1,0 +1,78 @@
+{
+  "note": "The HIFI Live lineup for the YouTube mockup. Names, colors, genres, taglines, tracks and TV clips come from stations.json at build time; this file only adds what a stream needs on top.",
+  "streams": [
+    {
+      "id": "night-build",
+      "title": "Night Build · dark ambient for after-hours coding",
+      "mood": "Dark ambient · after hours",
+      "sky": "night",
+      "thumbClip": 2,
+      "watching": "1.8K"
+    },
+    {
+      "id": "dial-up",
+      "title": "Dial-Up · lo-fi soft breaks to work and study to",
+      "mood": "Lo-fi · soft breaks · rain",
+      "sky": "rain",
+      "thumbClip": 1,
+      "watching": "2.4K"
+    },
+    {
+      "id": "shareware-summer",
+      "title": "Shareware Summer · sunny synth funk for long afternoons",
+      "mood": "Synth funk · sunshine",
+      "sky": "day",
+      "thumbClip": 1,
+      "watching": "640"
+    },
+    {
+      "id": "pixel-drift",
+      "title": "Pixel Drift · chiptune to focus to, no quarters required",
+      "mood": "Chiptune · arcade dusk",
+      "sky": "dusk",
+      "thumbClip": 1,
+      "watching": "910"
+    },
+    {
+      "id": "lofi-beats",
+      "title": "Lo-Fi Beats to Work To · instrumental hip-hop, rain on the glass",
+      "mood": "Lo-fi beats · rainy evening",
+      "sky": "rain",
+      "thumbClip": 2,
+      "watching": "3.1K",
+      "needsCatalog": true,
+      "tagline": "Instrumental hip-hop for heads-down work.",
+      "tracks": [
+        {"title": "Rain Check", "artist": "HIFI Studio (to be made)"},
+        {"title": "Desk Plant, Tuesday", "artist": "HIFI Studio (to be made)"},
+        {"title": "Second Coffee", "artist": "HIFI Studio (to be made)"},
+        {"title": "Inbox Zero, Almost", "artist": "HIFI Studio (to be made)"}
+      ]
+    },
+    {
+      "id": "fireside-christmas",
+      "title": "Fireside Christmas · acoustic carols by the fire, all December",
+      "mood": "Acoustic Christmas · public-domain carols",
+      "genre": "Acoustic carols",
+      "sky": "snow",
+      "christmas": true,
+      "thumbClip": 2,
+      "watching": "4.6K",
+      "tagline": "Our own acoustic takes on the old carols. Snow on the sill, the fire on TV.",
+      "tracks": [
+        {"title": "Silent Night", "artist": "HIFI Studio · acoustic", "year": "1818"},
+        {"title": "O Holy Night", "artist": "HIFI Studio · acoustic", "year": "1847"},
+        {"title": "Jingle Bells", "artist": "HIFI Studio · acoustic", "year": "1857"},
+        {"title": "Deck the Halls", "artist": "HIFI Studio · acoustic", "year": "trad., 1862 lyrics"},
+        {"title": "The First Noel", "artist": "HIFI Studio · acoustic", "year": "trad., 1823"},
+        {"title": "God Rest Ye Merry, Gentlemen", "artist": "HIFI Studio · acoustic", "year": "trad., 1760"},
+        {"title": "What Child Is This?", "artist": "HIFI Studio · acoustic", "year": "1865"},
+        {"title": "Hark! The Herald Angels Sing", "artist": "HIFI Studio · acoustic", "year": "1739 / 1840"},
+        {"title": "Joy to the World", "artist": "HIFI Studio · acoustic", "year": "1719 / 1839"},
+        {"title": "O Come, All Ye Faithful", "artist": "HIFI Studio · acoustic", "year": "1751 / 1841"},
+        {"title": "Good King Wenceslas", "artist": "HIFI Studio · acoustic", "year": "1853"},
+        {"title": "We Wish You a Merry Christmas", "artist": "HIFI Studio · acoustic", "year": "trad."}
+      ]
+    }
+  ]
+}

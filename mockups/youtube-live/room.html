@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex"><meta name="theme-color" content="#ffffff">
+<title>HIFI Live: the room (mockup)</title>
+<link rel="icon" href="favicon.svg"><link rel="stylesheet" href="mockup.css">
+</head>
+<body>
+<header class="nav"><a class="brand" href="./"><i></i>HIFI</a><span class="tag">Live · mockup</span>
+<nav><a class="keep" href="./">Lineup</a><a href="./#notes">Notes</a></nav></header>
+
+<main class="watch">
+  <div class="player"><div class="room" id="room"></div></div>
+  <div class="info">
+    <h1 id="title"></h1>
+    <div class="row"><span class="live">LIVE</span><span id="watching"></span></div>
+    <div class="chips" id="chips" role="tablist" aria-label="Streams"></div>
+    <div class="desc" id="desc"></div>
+  </div>
+</main>
+
+<script src="data.js"></script>
+<script type="module">
+import {renderRoom} from './scene.js';
+const {streams}=window.HIFI_LIVE;
+const room=document.getElementById('room'),chips=document.getElementById('chips'),desc=document.getElementById('desc');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+for(const s of streams){
+  const b=document.createElement('a');
+  b.className='chip';b.href=`?s=${s.id}`;b.style.setProperty('--c',s.color);b.dataset.id=s.id;
+  b.textContent=s.name.replace(/\b\w+/g,w=>w[0]+w.slice(1).toLowerCase()).replace(' To Work To',' to Work To');
+  b.addEventListener('click',e=>{e.preventDefault();history.replaceState(null,'',`?s=${s.id}`);show(s.id);});
+  chips.append(b);
+}
+function show(id){
+  const s=streams.find(x=>x.id===id)||streams[0];
+  renderRoom(room,s,{mode:'hero'});
+  document.title=`${s.name}: HIFI Live (mockup)`;
+  document.getElementById('title').textContent=`${s.title} (24/7)`;
+  document.getElementById('watching').textContent=`${s.watching} watching · streaming 24/7`;
+  for(const c of chips.children) c.setAttribute('aria-current',c.dataset.id===s.id);
+  let html=`<p><b>${esc(s.tagline)}</b></p><p>${esc(s.mood)}. A mid-90s room on all day: the station’s HIFI TV clips on the CRT, a new clip with every song, a record turning in front.</p>`;
+  if(s.christmas){
+    html+=`<p>Setlist: our own acoustic arrangements of public-domain carols (to be generated).</p><ol>${s.tracks.map(t=>`<li>${esc(t.title)} <small>${esc(t.year)}</small></li>`).join('')}</ol>
+      <p><small>Public-domain compositions only. Modern songs such as All I Want for Christmas Is You or Last Christmas need licensing even as covers.</small></p>`;
+  }else if(s.needsCatalog){
+    html+=`<p><small>Song titles are placeholders: this stream needs its own generated lo-fi catalog before it can go live (the app’s station relays SomaFM).</small></p>`;
+  }else{
+    html+=`<p>Up next: ${s.tracks.slice(0,4).map(t=>esc(t.title)).join(' · ')}</p><p><small>Original HIFI Studio music only.</small></p>`;
+  }
+  desc.innerHTML=html;
+}
+show(new URLSearchParams(location.search).get('s')||'night-build');
+</script>
+</body>
+</html>

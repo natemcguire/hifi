@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 /video/tv/raw/
 /.playwright-mcp/
+/dist-youtube-mockup/

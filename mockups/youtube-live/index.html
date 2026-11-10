@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex"><meta name="theme-color" content="#ffffff">
+<title>HIFI Live: the 24/7 lineup (mockup)</title>
+<link rel="icon" href="favicon.svg"><link rel="stylesheet" href="mockup.css">
+</head>
+<body>
+<header class="nav"><a class="brand" href="./"><i></i>HIFI</a><span class="tag">Live · mockup</span>
+<nav><a class="keep" href="room.html">The room</a><a href="room.html?s=fireside-christmas">Christmas room</a><a href="#notes">Notes</a></nav></header>
+
+<section class="head">
+  <div>
+    <p class="eyebrow">Design mockup. No stream is live yet; viewer counts are placeholders.</p>
+    <h1>HIFI Live.</h1>
+    <p class="lead">Six rooms, on all day and all night.</p>
+    <p class="sub">Each stream is the same mid-90s den: wood paneling, a lava lamp, the station’s HIFI TV clips on a CRT and a record turning in front. The names, colors and clips are the stations you already have in HIFI, and every song is ours.</p>
+  </div>
+  <div class="actions"><a class="pill" href="room.html">Open a room</a><a class="pill ghost" href="room.html?s=fireside-christmas">The Christmas room</a></div>
+</section>
+
+<div class="channel"><span class="avatar" aria-hidden="true"></span><div><b>HIFI</b><span>6 live streams · 24/7 · original music only</span></div></div>
+<div class="cards" id="cards"></div>
+
+<section class="notes" id="notes">
+  <h2>Before any of this goes live</h2>
+  <div class="notes-grid">
+    <div class="note"><h3>Only our own music</h3>
+      <p>Dial-Up, Shareware Summer, Night Build and Pixel Drift already play HIFI Studio tracks (procedural compositions plus Nate’s AI-generated seeds), so they are ready for a stream.</p>
+      <p>In the app, Lo-Fi Beats to Work To and Fireside Christmas relay SomaFM. Their YouTube streams can’t use that audio: each needs its own generated catalog first. No licensed or third-party tracks anywhere.</p></div>
+    <div class="note"><h3>Christmas: public-domain carols only</h3>
+      <p>Fireside Christmas plays our own AI-generated acoustic versions of compositions in the public domain: Silent Night, O Holy Night, Jingle Bells, Deck the Halls, The First Noel, God Rest Ye Merry Gentlemen, What Child Is This?, Hark! The Herald Angels Sing, Joy to the World, O Come All Ye Faithful, Good King Wenceslas, We Wish You a Merry Christmas.</p>
+      <p class="warn">Modern songs are still under copyright, and a cover needs a license even when we generate it ourselves: All I Want for Christmas Is You, Last Christmas, White Christmas, Rockin’ Around the Christmas Tree, Have Yourself a Merry Little Christmas, Let It Snow!, Winter Wonderland (until 2030). On YouTube that means a sync license too, and Content ID would claim them.</p>
+      <p>Use the old lyrics and our own arrangements: many modern arrangements and some English translations are copyrighted even when the tune isn’t.</p></div>
+    <div class="note"><h3>The room</h3>
+      <p>The CRT plays each station’s four HIFI TV clips (the same files the app uses), one per song, under scanlines, noise, a VHS tracking band and a little wobble. The lava lamp and the record label take the station’s color.</p>
+      <p>The turntable here is drawn in CSS. For the real stream, Guillermo Rauch’s groove-level record player sim (<a href="https://github.com/rauchg/vinyl">rauchg/vinyl</a>, MIT, keep its notice) could render the deck.</p></div>
+    <div class="note"><h3>Not built yet</h3>
+      <ul><li>Streaming: a 24/7 renderer and encoder per stream, YouTube channel and stream keys.</li>
+      <li>The lo-fi and acoustic Christmas catalogs.</li>
+      <li>Which channel name and handle to claim.</li></ul></div>
+  </div>
+</section>
+<footer>HIFI Live mockup · built from <code>stations.json</code> and <code>mockups/youtube-live/lineup.json</code></footer>
+
+<script src="data.js"></script>
+<script type="module">
+import {renderRoom,playWhenVisible} from './scene.js';
+const cards=document.getElementById('cards');
+const rooms=[];
+for(const s of window.HIFI_LIVE.streams){
+  const a=document.createElement('a');
+  a.className='card';a.href=`room.html?s=${s.id}`;a.style.setProperty('--c',s.color);
+  a.innerHTML=`<div class="thumb"><div class="room"></div><span class="live">LIVE</span><span class="ch">CH ${s.frequency}</span></div>
+    <div class="meta"><span class="avatar" aria-hidden="true"></span><div>
+      <b class="title"></b><span class="by"></span><span class="mood"></span><p class="tagline"></p>
+      ${s.needsCatalog?'<span class="flag">Needs our own lo-fi catalog first</span>':''}
+      ${s.christmas?'<span class="flag">Our acoustic carols still to be made</span>':''}
+    </div></div>`;
+  a.querySelector('.title').textContent=`${s.title} (24/7)`;
+  a.querySelector('.by').textContent=`HIFI · ${s.watching} watching`;
+  a.querySelector('.mood').textContent=s.mood;
+  a.querySelector('.tagline').textContent=s.tagline;
+  cards.append(a);
+  rooms.push(renderRoom(a.querySelector('.room'),s,{mode:'thumb'}));
+}
+playWhenVisible(rooms);
+</script>
+</body>
+</html>
