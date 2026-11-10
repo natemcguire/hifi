@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HIFI Live: broadcast frame</title>
+<link rel="stylesheet" href="stream.css">
+</head>
+<body>
+<!--
+  The frame tools/render.mjs records, one image per 1/30 s of side time: ?s=<stream id>&render=1.
+  Without render=1 it is a preview that plays the side on the wall clock (click for the side's audio).
+-->
+<div class="room" id="room">
+  <div class="tape"><canvas id="tape" width="960" height="720"></canvas></div>
+  <div class="bug"><span class="mark" aria-hidden="true"></span><b>HIFI</b><em>LIVE</em></div>
+  <div class="station"><b id="sname"></b><span id="sgenre"></span></div>
+  <div class="lower"><div class="np"><b class="t" id="t"></b><span class="a" id="a"></span>
+    <span class="s" id="s"></span><span class="bar"><i id="bar"></i></span>
+    <span class="times"><span id="e"></span><span id="r"></span></span></div></div>
+</div>
+<div class="offstage"><canvas id="deck" style="width:960px;height:720px"></canvas></div>
+<script type="module" src="stream.js"></script>
+</body>
+</html>

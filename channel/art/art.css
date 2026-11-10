@@ -1,0 +1,33 @@
+/* Channel art: thumbnails 1280x720, banner 2560x1440, avatar 800x800, watermark 150x150 (tools/art.mjs). */
+html,body{margin:0;background:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#fff}
+.mark{position:relative;display:inline-block;width:var(--w);height:calc(var(--w)*1.5);border-radius:calc(var(--w)*.25);background:linear-gradient(#fff,#dcdde0);box-shadow:0 calc(var(--w)*.06) calc(var(--w)*.2) rgba(0,0,0,.35)}
+.mark::before{content:"";position:absolute;left:18%;right:18%;top:17%;height:30%;border-radius:calc(var(--w)*.06);background:#1d1f21}
+.mark::after{content:"";position:absolute;left:25%;bottom:16%;width:50%;height:33%;border-radius:50%;background:#e4e5e7;box-shadow:inset 0 0 0 calc(var(--w)*.15) #f8f8f8}
+
+/* Thumbnail: the room off tape, the station big, LIVE 24/7. */
+.thumb{position:relative;width:1280px;height:720px;overflow:hidden;background:#000}
+.thumb img{position:absolute;left:-160px;top:-90px;width:1600px;height:900px;object-fit:cover}
+.thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.25) 55%,rgba(0,0,0,0) 75%)}
+.thumb .copy{position:absolute;left:64px;top:56px;right:420px;z-index:2}
+.thumb .brand{display:flex;align-items:center;gap:14px;font-size:34px;font-weight:800;letter-spacing:.06em;--w:26px}
+.thumb .live{margin-left:6px;font-size:22px;font-weight:800;letter-spacing:.08em;background:#e62117;border-radius:6px;padding:5px 11px}
+.thumb h1{margin:34px 0 0;font-size:118px;line-height:.92;font-weight:800;letter-spacing:-.025em;text-shadow:0 6px 30px rgba(0,0,0,.6)}
+.thumb p{margin:22px 0 0;font-size:40px;font-weight:700;color:var(--c);text-shadow:0 3px 16px rgba(0,0,0,.8)}
+.thumb .clock{position:absolute;left:64px;bottom:52px;z-index:2;font-size:30px;font-weight:700;letter-spacing:.04em;opacity:.92}
+.christmas.thumb p{color:#ffc2b8}
+
+/* Banner: six rooms like six TVs on a shelf, the wordmark in the middle of the safe area (1546x423). */
+.banner{position:relative;width:2560px;height:1440px;overflow:hidden;background:radial-gradient(120% 70% at 50% 50%,#2a211a,#0d0a08 70%)}
+.banner .strip{position:absolute;left:0;right:0;top:50%;height:423px;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:28px}
+.banner .tv{width:288px;height:216px;border-radius:26px;overflow:hidden;box-shadow:0 0 0 10px #262422,0 0 0 13px #3a3632,0 24px 60px rgba(0,0,0,.6);flex:none}
+.banner .tv img{width:100%;height:100%;object-fit:cover;filter:saturate(1.05)}
+.banner .word{flex:none;width:640px;text-align:center}
+.banner .word b{display:flex;align-items:center;justify-content:center;gap:24px;font-size:120px;font-weight:800;letter-spacing:.06em;--w:58px}
+.banner .word span{display:block;margin-top:8px;font-size:40px;font-weight:600;color:#e9dccb}
+
+/* Avatar and watermark: the click-wheel mark. */
+.avatar{width:800px;height:800px;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#46525a,#262c30);--w:300px}
+.avatar .mark{box-shadow:0 26px 70px rgba(0,0,0,.45)}
+.watermark{width:150px;height:150px;display:grid;place-items:center;--w:78px}
+.watermark .mark{box-shadow:0 2px 8px rgba(0,0,0,.5)}

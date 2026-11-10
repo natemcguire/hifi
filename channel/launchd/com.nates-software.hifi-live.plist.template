@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  HIFI Live: one 24/7 YouTube stream from the MacBook Pro. Owner project: hifi (channel/README.md).
+  NOT INSTALLED. Install only after Nate signs off on going live (see the README's go-live checklist):
+    sed "s/STREAM_ID/night-build/g" com.nates-software.hifi-live.plist.template > ~/Library/LaunchAgents/com.nates-software.hifi-live.night-build.plist
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.nates-software.hifi-live.night-build.plist
+  Stop: launchctl bootout gui/$(id -u)/com.nates-software.hifi-live.night-build
+  push.mjs restarts ffmpeg itself and, after 12 failures in a row, exits 0; KeepAlive only
+  restarts it after a crash (SuccessfulExit=false), so a stream that can't connect stops instead of looping.
+  push.mjs reads the stream key from the Pro's Keychain (service hifi-live, account STREAM_ID); never put it in this file.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.nates-software.hifi-live.STREAM_ID</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string><string>-lc</string>
+    <string>cd ~/hifi-channel/bundle &amp;&amp; HIFI_CHANNEL_OUT=~/hifi-channel/out exec node tools/push.mjs STREAM_ID</string>
+  </array>
+  <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
+  <key>ThrottleInterval</key><integer>60</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>StandardOutPath</key><string>/tmp/hifi-live.STREAM_ID.log</string>
+  <key>StandardErrorPath</key><string>/tmp/hifi-live.STREAM_ID.log</string>
+</dict>
+</plist>

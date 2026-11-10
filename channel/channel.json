@@ -1,0 +1,88 @@
+{
+  "note": "The HIFI YouTube channel plan. tools/build.mjs reads this with stations.json and, for streams with a catalog, live/music/catalog.json; tools/art.mjs renders the images named here; publish/<id>.txt are the texts to paste into YouTube Studio. Nothing here publishes anything.",
+  "channel": {
+    "name": "HIFI",
+    "handles": ["@hifi.live", "@hifiradio.tv", "@hifi247"],
+    "handleNote": "Check availability when the channel is created; take the first that is free.",
+    "tagline": "Home-video radio, on all day.",
+    "description": "HIFI is radio on a tape that never ends: a mid-90s den shot on a camcorder, a record turning on the deck and the station's own clips on the TV. Six stations stream around the clock: four synth stations, Lo-Fi Beats to Work To and, in December, Fireside Christmas.\n\nEvery note is our own. The synth stations and the lo-fi beats are composed in the HIFI studio; the Christmas carols are public-domain melodies in our own acoustic arrangements. No samples, no licensed music.\n\nListen in the HIFI app, a click-wheel iPod radio for iPhone, Mac and the web: https://hifi.nates-software.com/",
+    "keywords": ["lofi", "lo-fi hip hop", "study music", "work music", "ambient", "synthwave", "chiptune", "vaporwave", "vhs", "90s", "camcorder", "24/7 radio", "focus music", "christmas carols", "acoustic christmas"],
+    "country": "US",
+    "defaultLanguage": "en",
+    "category": "Music (10)",
+    "madeForKids": false,
+    "syntheticContent": "Disclose: yes. The rooms are AI-generated photographs and the TV clips are AI-generated video, realistic enough that YouTube's altered or synthetic content label applies.",
+    "links": [
+      {"title": "HIFI radio", "url": "https://hifi.nates-software.com/"},
+      {"title": "HIFI for iPhone and Mac", "url": "https://hifi.nates-software.com/download"}
+    ],
+    "art": {
+      "avatar": "art/avatar.png",
+      "banner": "art/banner.png",
+      "watermark": "art/watermark.png"
+    }
+  },
+  "encoding": {
+    "note": "YouTube Live ingest for 1080p30: H.264 high profile, 2 s keyframes, CBR-like rate, AAC 48 kHz stereo. Six streams at once need about 6 x 6.5 = 39 Mbps of steady upload; drop videoBitrate to 4500k or run fewer streams if the line can't hold it.",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "videoBitrate": "6000k",
+    "audioBitrate": "160k",
+    "keyframeSeconds": 2,
+    "ingest": "rtmps://a.rtmps.youtube.com/live2"
+  },
+  "streams": [
+    {
+      "id": "night-build",
+      "title": "Night Build · dark ambient for after-hours coding · HIFI 24/7",
+      "about": "Dark ambient for the hours after everyone logs off. The den at 11:38 PM, the city out the window, a blue lava lamp and Night Build on the deck.",
+      "tags": ["dark ambient", "coding music", "late night", "programming music", "synth"],
+      "thumbClip": 2
+    },
+    {
+      "id": "dial-up",
+      "title": "Dial-Up · lo-fi soft breaks for rainy afternoons · HIFI 24/7",
+      "about": "Soft breaks and rain on the window, the way the internet sounded when it took a while. A grey afternoon in April 1997.",
+      "tags": ["lofi", "soft breaks", "rain", "study music", "chill"],
+      "thumbClip": 1
+    },
+    {
+      "id": "shareware-summer",
+      "title": "Shareware Summer · sunny synth funk for long afternoons · HIFI 24/7",
+      "about": "Synth funk for a long afternoon with nothing due. Sun through the blinds, the trial never expires.",
+      "tags": ["synth funk", "summer", "city pop", "feel good", "synth"],
+      "thumbClip": 1
+    },
+    {
+      "id": "pixel-drift",
+      "title": "Pixel Drift · chiptune to focus to · HIFI 24/7",
+      "about": "Chiptune at dusk: save points, friendly bosses, no quarters needed.",
+      "tags": ["chiptune", "8-bit", "video game music", "focus music", "retro"],
+      "thumbClip": 1
+    },
+    {
+      "id": "lofi-beats",
+      "title": "Lo-Fi Beats to Work To · instrumental hip-hop, rain on the glass · HIFI 24/7",
+      "about": "Instrumental hip-hop for heads-down work: dusty drums, warm keys, rain on the glass. Composed in the HIFI studio. (In the HIFI app this station relays SomaFM; this stream plays our own catalog instead.)",
+      "tags": ["lofi hip hop", "lofi beats", "beats to work to", "study beats", "chillhop"],
+      "thumbClip": 2,
+      "catalog": "live/music/catalog.json",
+      "genre": "Lo-fi beats / Instrumental hip-hop",
+      "tagline": "Instrumental hip-hop for heads-down work."
+    },
+    {
+      "id": "fireside-christmas",
+      "title": "Fireside Christmas · acoustic carols by the fire · HIFI 24/7",
+      "about": "Our own acoustic takes on the old carols, by the fire on TV, with snow on the sill. Christmas Eve, 1996.",
+      "tags": ["christmas music", "acoustic christmas", "christmas carols", "fireplace", "christmas guitar"],
+      "thumbClip": 2,
+      "catalog": "live/music/catalog.json",
+      "genre": "Acoustic carols",
+      "tagline": "Our own acoustic takes on the old carols.",
+      "christmas": true,
+      "season": {"from": "12-01", "to": "01-06", "note": "Live from December 1 to January 6; off the rest of the year."},
+      "rights": "Public-domain compositions only, in HIFI Studio arrangements. Modern songs (White Christmas, Last Christmas, All I Want for Christmas Is You and the like) need licensing even as covers, so they are not on this stream."
+    }
+  ]
+}

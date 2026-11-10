@@ -7,3 +7,7 @@ __pycache__/
 /video/tv/raw/
 /.playwright-mcp/
 /dist-youtube-mockup/
+/dist-channel/
+/channel/build/
+/channel/out/
+/.scratch/

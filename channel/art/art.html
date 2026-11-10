@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>HIFI channel art</title><link rel="stylesheet" href="art.css"></head>
+<body><div id="art"></div>
+<script type="module">
+// ?kind=thumb&s=<id> | banner | avatar | watermark. Room stills come from /stills/ (tools/art.mjs makes them).
+const q = new URLSearchParams(location.search), kind = q.get('kind'), art = document.getElementById('art');
+const { streams } = await (await fetch('/streams.json')).json();
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const still = (id) => `/stills/${id}-clean-thumb.jpg`;
+const nice = (n) => n.replace(/\b\w+/g, (w) => w[0] + w.slice(1).toLowerCase()).replace(' To Work To', ' to Work To').replace('Dial-up', 'Dial-Up');
+if (kind === 'thumb') {
+  const s = streams.find((x) => x.id === q.get('s'));
+  art.className = `thumb${s.christmas ? ' christmas' : ''}`; art.style.setProperty('--c', s.color);
+  art.innerHTML = `<img src="${still(s.id)}" alt=""><div class="copy"><div class="brand"><span class="mark"></span>HIFI<span class="live">LIVE 24/7</span></div>
+    <h1>${esc(nice(s.name))}</h1><p>${esc(s.genre.replace(' / ', ' · '))}</p></div>`;
+} else if (kind === 'banner') {
+  art.className = 'banner';
+  const tv = (s) => `<div class="tv"><img src="${still(s.id)}" alt=""></div>`, half = Math.ceil(streams.length / 2);
+  art.innerHTML = `<div class="strip">${streams.slice(0, half).map(tv).join('')}<div class="word"><b><span class="mark"></span>HIFI</b><span>Home-video radio, on all day.</span></div>${streams.slice(half).map(tv).join('')}</div>`;
+} else {
+  art.className = kind; art.innerHTML = '<span class="mark"></span>';
+}
+await Promise.all([...document.images].map((i) => i.decode().catch(() => {})));
+await document.fonts.ready;
+document.title = 'ready';
+</script></body></html>
