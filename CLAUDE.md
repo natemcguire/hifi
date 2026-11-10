@@ -12,3 +12,11 @@ MacBook Pro (never the mini), then add the paths to the station.
 
 **Why:** four work stations went live on 2026-11-05 with no clips, so their Now Playing
 screens fell back to plain covers while every other station had video.
+
+## Commands
+
+- `npm run dev` builds `dist/` and serves it with `wrangler dev`; the player is at `/player`.
+- `npm run release` needs a clean commit. It builds, deploys the `nsw-hifi` Worker and checks the
+  live bytes. If that check fails, look at what's live before deploying again.
+- The Alexa skill has its own deploy: `alexa/scripts/deploy.sh` (see `alexa/README.md`).
+- Everything else (URL parameters, the iOS and Mac app, synth tracks) is in `README.md`.
