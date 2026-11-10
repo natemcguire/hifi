@@ -5,7 +5,6 @@
       "id": "night-build",
       "title": "Night Build · dark ambient for after-hours coding",
       "mood": "Dark ambient · after hours",
-      "sky": "night",
       "thumbClip": 2,
       "watching": "1.8K"
     },
@@ -13,7 +12,6 @@
       "id": "dial-up",
       "title": "Dial-Up · lo-fi soft breaks to work and study to",
       "mood": "Lo-fi · soft breaks · rain",
-      "sky": "rain",
       "thumbClip": 1,
       "watching": "2.4K"
     },
@@ -21,7 +19,6 @@
       "id": "shareware-summer",
       "title": "Shareware Summer · sunny synth funk for long afternoons",
       "mood": "Synth funk · sunshine",
-      "sky": "day",
       "thumbClip": 1,
       "watching": "640"
     },
@@ -29,7 +26,6 @@
       "id": "pixel-drift",
       "title": "Pixel Drift · chiptune to focus to, no quarters required",
       "mood": "Chiptune · arcade dusk",
-      "sky": "dusk",
       "thumbClip": 1,
       "watching": "910"
     },
@@ -37,7 +33,6 @@
       "id": "lofi-beats",
       "title": "Lo-Fi Beats to Work To · instrumental hip-hop, rain on the glass",
       "mood": "Lo-fi beats · rainy evening",
-      "sky": "rain",
       "thumbClip": 2,
       "watching": "3.1K",
       "needsCatalog": true,
@@ -54,7 +49,6 @@
       "title": "Fireside Christmas · acoustic carols by the fire, all December",
       "mood": "Acoustic Christmas · public-domain carols",
       "genre": "Acoustic carols",
-      "sky": "snow",
       "christmas": true,
       "thumbClip": 2,
       "watching": "4.6K",

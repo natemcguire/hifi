@@ -40,7 +40,7 @@ function show(id){
   document.getElementById('title').textContent=`${s.title} (24/7)`;
   document.getElementById('watching').textContent=`${s.watching} watching · streaming 24/7`;
   for(const c of chips.children) c.setAttribute('aria-current',c.dataset.id===s.id);
-  let html=`<p><b>${esc(s.tagline)}</b></p><p>${esc(s.mood)}. A mid-90s room on all day: the station’s HIFI TV clips on the CRT, a new clip with every song, a record turning in front.</p>`;
+  let html=`<p><b>${esc(s.tagline)}</b></p><p>${esc(s.mood)}. Home video of a mid-90s den, on all day: the station’s HIFI TV clips on the CRT, a new clip with every song, a record turning on the deck.</p>`;
   if(s.christmas){
     html+=`<p>Setlist: our own acoustic arrangements of public-domain carols (to be generated).</p><ol>${s.tracks.map(t=>`<li>${esc(t.title)} <small>${esc(t.year)}</small></li>`).join('')}</ol>
       <p><small>Public-domain compositions only. Modern songs such as All I Want for Christmas Is You or Last Christmas need licensing even as covers.</small></p>`;

@@ -15,7 +15,7 @@
     <p class="eyebrow">Design mockup. No stream is live yet; viewer counts are placeholders.</p>
     <h1>HIFI Live.</h1>
     <p class="lead">Six rooms, on all day and all night.</p>
-    <p class="sub">Each stream is the same mid-90s den: wood paneling, a lava lamp, the station’s HIFI TV clips on a CRT and a record turning in front. The names, colors and clips are the stations you already have in HIFI, and every song is ours.</p>
+    <p class="sub">Each stream is a real-looking mid-90s den, played back like a tape somebody shot on a camcorder in 1996: wood paneling, a lava lamp, the station’s HIFI TV clips on the CRT and a record turning on the deck, with tape noise, tracking wobble and the date stamp in the corner. The names, colors and clips are the stations you already have in HIFI, and every song is ours.</p>
   </div>
   <div class="actions"><a class="pill" href="room.html">Open a room</a><a class="pill ghost" href="room.html?s=fireside-christmas">The Christmas room</a></div>
 </section>
@@ -33,9 +33,10 @@
       <p>Fireside Christmas plays our own AI-generated acoustic versions of compositions in the public domain: Silent Night, O Holy Night, Jingle Bells, Deck the Halls, The First Noel, God Rest Ye Merry Gentlemen, What Child Is This?, Hark! The Herald Angels Sing, Joy to the World, O Come All Ye Faithful, Good King Wenceslas, We Wish You a Merry Christmas.</p>
       <p class="warn">Modern songs are still under copyright, and a cover needs a license even when we generate it ourselves: All I Want for Christmas Is You, Last Christmas, White Christmas, Rockin’ Around the Christmas Tree, Have Yourself a Merry Little Christmas, Let It Snow!, Winter Wonderland (until 2030). On YouTube that means a sync license too, and Content ID would claim them.</p>
       <p>Use the old lyrics and our own arrangements: many modern arrangements and some English translations are copyrighted even when the tune isn’t.</p></div>
-    <div class="note"><h3>The room</h3>
-      <p>The CRT plays each station’s four HIFI TV clips (the same files the app uses), one per song, under scanlines, noise, a VHS tracking band and a little wobble. The lava lamp and the record label take the station’s color.</p>
-      <p>The turntable here is drawn in CSS. For the real stream, Guillermo Rauch’s groove-level record player sim (<a href="https://github.com/rauchg/vinyl">rauchg/vinyl</a>, MIT, keep its notice) could render the deck.</p></div>
+    <div class="note"><h3>The room: home video, 1996</h3>
+      <p>Each room is a photoreal still we generated (Grok Imagine), one per stream: same den, its own time of day, weather, lava lamp and label color. The CRT was generated green, and the page keys the station’s four HIFI TV clips into it (the same files the app uses), one per song, with the TV’s glow on the room.</p>
+      <p>Then it plays back off tape, in 4:3: a hand-held camcorder drift, tracking wobble and head-switching noise at the bottom, chroma that bleeds to the right, soft focus with edge ringing, grain and dropouts, and a date stamp that keeps time. The record label turns at 33⅓. The stream graphics stay sharp on top, the way a broadcaster adds them.</p>
+      <p>Not animated yet: the lava lamp and the weather outside are part of the still.</p></div>
     <div class="note"><h3>Not built yet</h3>
       <ul><li>Streaming: a 24/7 renderer and encoder per stream, YouTube channel and stream keys.</li>
       <li>The lo-fi and acoustic Christmas catalogs.</li>

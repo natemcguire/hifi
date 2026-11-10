@@ -1,0 +1,108 @@
+{
+  "note": "Prompts for the photoreal room stills (gen_rooms.py). Same camera and furniture in every room; the time of day, weather, lamp and label colour change per station. labelSeed is a pixel on the record label for calibrate.mjs; stamp is the camcorder date and the time the tape starts (it runs on the broadcast clock and loops each hour).",
+  "base": "Photograph of a real lived-in mid-1990s American wood-paneled den, {light}. Shot straight on at eye level from across the room, the camera square to the back wall. In the center of the frame stands a large 27-inch 1990s CRT television with a dark grey plastic cabinet and a curved glass screen, on a low wooden TV stand with a VCR on the shelf below. The television screen is filled edge to edge with flat, solid, pure chroma-key green (#00FF00), evenly lit, no reflections, no picture. In the lower right foreground, on a wooden record cabinet, a belt-drive turntable seen from slightly above, with a black vinyl record on the platter and a {label} paper center label; the tonearm rests on the outer edge of the record, the dust cover is off. On the left, a glowing {lamp} lava lamp on a side table next to a stack of cassette tapes. {window} A framed abstract print on the paneling, a houseplant, beige carpet. {extra} Natural, photorealistic, real objects, correct perspective, 35mm lens. No people, no text, no logos, no brand names.",
+  "rooms": [
+    {
+      "id": "night-build",
+      "light": "late at night, lit only by a desk lamp and the glow of the television",
+      "label": "deep blue",
+      "lamp": "blue",
+      "window": "Behind, a window with half-open blinds shows a dark night sky and distant city lights.",
+      "extra": "",
+      "labelSeed": [
+        968,
+        543
+      ],
+      "stamp": {
+        "date": "NOV.14 1996",
+        "hour": 23,
+        "minute": 38
+      }
+    },
+    {
+      "id": "dial-up",
+      "light": "on a grey rainy afternoon, soft window light and one warm table lamp",
+      "label": "teal",
+      "lamp": "teal",
+      "window": "Behind, a window streaked with rain shows a grey overcast suburban street.",
+      "extra": "",
+      "labelSeed": [
+        922,
+        622
+      ],
+      "stamp": {
+        "date": "APR.22 1997",
+        "hour": 15,
+        "minute": 6
+      }
+    },
+    {
+      "id": "shareware-summer",
+      "light": "on a bright summer afternoon, warm sunlight streaming in",
+      "label": "orange",
+      "lamp": "orange",
+      "window": "Behind, an open window with sheer curtains shows green trees and a blue summer sky.",
+      "extra": "",
+      "labelSeed": [
+        932,
+        657
+      ],
+      "stamp": {
+        "date": "JUL.19 1995",
+        "hour": 14,
+        "minute": 21
+      }
+    },
+    {
+      "id": "pixel-drift",
+      "light": "at dusk, purple and pink light from the window and one warm lamp",
+      "label": "magenta",
+      "lamp": "magenta",
+      "window": "Behind, a window shows a purple and orange sunset sky over suburban rooftops.",
+      "extra": "",
+      "labelSeed": [
+        995,
+        585
+      ],
+      "stamp": {
+        "date": "SEP.07 1996",
+        "hour": 19,
+        "minute": 44
+      }
+    },
+    {
+      "id": "lofi-beats",
+      "light": "on a rainy evening, warm lamp light and the cool glow from the window",
+      "label": "mustard yellow",
+      "lamp": "amber",
+      "window": "Behind, a window streaked with raindrops shows a blue evening street with blurred street lights.",
+      "extra": "",
+      "labelSeed": [
+        955,
+        572
+      ],
+      "stamp": {
+        "date": "OCT.30 1997",
+        "hour": 20,
+        "minute": 12
+      }
+    },
+    {
+      "id": "fireside-christmas",
+      "light": "on a snowy Christmas Eve night, lit by warm string lights and a lamp",
+      "label": "red",
+      "lamp": "red",
+      "window": "Behind, a frosted window shows snow falling at night.",
+      "extra": "A small decorated Christmas tree with colored lights and wrapped presents stands to the right of the television, colored Christmas string lights hang along the top of the paneling, a garland on the TV stand.",
+      "labelSeed": [
+        980,
+        655
+      ],
+      "stamp": {
+        "date": "DEC.24 1996",
+        "hour": 21,
+        "minute": 9
+      }
+    }
+  ]
+}
