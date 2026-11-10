@@ -339,8 +339,19 @@ final class Radio: ObservableObject {
             info[MPMediaItemPropertyPlaybackDuration] = track.duration
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = max(0, player.currentTime().seconds.isFinite ? player.currentTime().seconds : 0)
         }
-        let position = "\((stations.firstIndex(of: station) ?? 0) + 1) of \(stations.count)"
-        let art = Artwork.screen(station: station, title: displayTitle, artist: displayArtist, position: position)
+        // A still from the station's HIFI TV clip; the iPod screen where there is none, or until it arrives.
+        let clip = tvClip(station, at: Date())
+        let art: Artwork.PlatformImage
+        if let clip, let still = Artwork.still(clip) {
+            art = still
+        } else {
+            let position = "\((stations.firstIndex(of: station) ?? 0) + 1) of \(stations.count)"
+            art = Artwork.screen(station: station, title: displayTitle, artist: displayArtist, position: position)
+            if let clip {
+                let tuned = station.id
+                Task { if await Artwork.loadStill(clip), self.station.id == tuned { self.updateNowPlaying() } }
+            }
+        }
         info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: art.size) { _ in art }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
         MPNowPlayingInfoCenter.default().playbackState = isPlaying ? .playing : .stopped

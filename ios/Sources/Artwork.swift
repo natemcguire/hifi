@@ -1,7 +1,9 @@
+import AVFoundation
 import SwiftUI
 
 // Station art for the lock screen and the Now Playing screen: the HIFI bars on
 // a dark tile in the station's color, with its name. Rendered once per station.
+// A station with HIFI TV clips shows a still from its clip on the lock screen instead.
 enum Artwork {
     #if os(macOS)
     typealias PlatformImage = NSImage
@@ -25,9 +27,48 @@ enum Artwork {
         return image
     }
 
+    @MainActor private static var stills: [URL: PlatformImage] = [:]
+    @MainActor private static var loading: Set<URL> = []
+
+    // Lock-screen art for a station with HIFI TV clips: a still from the clip,
+    // square, scaled up with hard pixels like the clip on screen.
+    @MainActor
+    static func still(_ clip: URL) -> PlatformImage? { stills[clip] }
+
+    // Fetches a clip's still once. True when it has just arrived.
+    @MainActor
+    static func loadStill(_ clip: URL) async -> Bool {
+        guard stills[clip] == nil, !loading.contains(clip) else { return false }
+        loading.insert(clip)
+        defer { loading.remove(clip) }
+        let generator = AVAssetImageGenerator(asset: AVURLAsset(url: clip))
+        generator.appliesPreferredTrackTransform = true
+        guard let frame = try? await generator.image(at: CMTime(seconds: 1, preferredTimescale: 600)).image,
+              let square = squared(frame, side: 544) else { return false }
+        if stills.count > 12 { stills.removeAll() }
+        #if os(macOS)
+        stills[clip] = NSImage(cgImage: square, size: NSSize(width: square.width, height: square.height))
+        #else
+        stills[clip] = UIImage(cgImage: square)
+        #endif
+        return true
+    }
+
+    // The middle of the frame, filling a square, with no smoothing.
+    private static func squared(_ frame: CGImage, side: Int) -> CGImage? {
+        guard let context = CGContext(data: nil, width: side, height: side, bitsPerComponent: 8, bytesPerRow: 0,
+                                      space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue) else { return nil }
+        context.interpolationQuality = .none
+        let scale = Double(side) / Double(min(frame.width, frame.height))
+        let width = Double(frame.width) * scale, height = Double(frame.height) * scale
+        context.draw(frame, in: CGRect(x: (Double(side) - width) / 2, y: (Double(side) - height) / 2, width: width, height: height))
+        return context.makeImage()
+    }
+
     @MainActor private static var screens: [String: PlatformImage] = [:]
 
-    // Lock-screen art: a classic iPod Now Playing screen showing this song.
+    // Lock-screen art for a station without clips, or until a still arrives:
+    // a classic iPod Now Playing screen showing this song.
     // Re-rendered whenever the song changes.
     @MainActor
     static func screen(station: Station, title: String, artist: String, position: String) -> PlatformImage {
