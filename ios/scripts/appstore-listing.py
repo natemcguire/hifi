@@ -38,9 +38,8 @@ LISTING = {
     "promotionalText": "Non-stop unlimited Christmas music, 24/7 with no commercials, on four holiday stations. "
                        "Plus live radio from Radio Paradise and SomaFM, and our own synth stations.",
     "keywords": "somafm,paradise,jazz,chill,indie,holiday,xmas,carols,retro,click wheel,player,fm,ambient,synth",
-    "whatsNew": "Search: tap the small magnifier under the screen and type. Find a station by name, mood or anything about it, "
-                "like christmas, lofi, jazz, work or taylor swift, typos and all. "
-                "The Mini Shuffle is now a white iPod shuffle that shows the song. HIFI TV's full-screen button moved to the corner.",
+    "whatsNew": "The lock screen now shows a picture from the station's HIFI TV clip while it plays. "
+                "Stations without clips keep the classic Now Playing screen.",
     "description": f"""This season: non-stop unlimited Christmas music, 24/7 with no commercials. Four holiday stations, all free. Soulful Christmas plays vintage soul and R&B, Christmas at the Mall the orchestras and strings with almost no singing, Fireside Christmas the cocktail-hour standards, and Rockin' Around the Tree the indie bands. They come from SomaFM, listener-supported and ad-free.
 
 HIFI is an internet radio player drawn as a classic click-wheel music player. Drag around the wheel to move through the menu, press the center to tune in, press MENU to back out. It costs nothing and never asks you to sign up.
