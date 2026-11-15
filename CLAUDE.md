@@ -13,11 +13,12 @@ MacBook Pro (never the mini), then add the paths to the station.
 **Why:** four work stations went live on 2026-11-05 with no clips, so their Now Playing
 screens fell back to plain covers while every other station had video.
 
-## RDS is web only until its permission is on file (Nate, 2026-11-15)
+## A station without permission is web only (Nate, 2026-11-15)
 
-RDS sits under `webStations` in `stations.json`, which only the web player reads. Do not move it
-to `stations` (the list the App Store build and Alexa read) until written permission from the
-station is on file. A new station without permission goes in `webStations` too.
+`webStations` in `stations.json` is read only by the web player. A new station whose permission
+is still open goes there, and moves to `stations` (the list the apps and Alexa read) only when
+Nate says its permission is fine. RDS started there; Nate cleared it on 2026-11-15 and it is
+now in `stations`. Radio Deejay has not been cleared.
 
 ## Commands
 

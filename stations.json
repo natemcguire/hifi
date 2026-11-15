@@ -332,6 +332,31 @@
       ]
     },
     {
+      "id": "rds",
+      "name": "RDS",
+      "label": "RDS",
+      "band": "radio",
+      "frequency": "14",
+      "tagline": "Italy's big hits, in Italian and English. Live from RDS (Radio Dimensione Suono) in Rome.",
+      "genre": "Live / Italian hits",
+      "tags": ["rds", "radio dimensione suono", "dimensione suono", "100% grandi successi", "grandi successi", "italy", "italia", "italian", "italiano", "italiana", "rome", "roma", "italian radio", "radio italiana", "italian pop", "pop italiano", "musica italiana", "italian hits", "hits", "pop", "top 40", "chart", "europe", "european", "euro pop", "sanremo", "dj", "talk", "news", "commercial radio", "fm", "summer", "estate", "holiday", "vacation", "aperitivo", "dolce vita", "espresso"],
+      "color": "#ff9a8a",
+      "stream": "https://icstream.rds.radio/rds",
+      "website": "https://www.rds.it/",
+      "provider": "RDS",
+      "providerLabel": "Live on RDS.it ↗",
+      "nowPlaying": "/api/now-playing?station=rds",
+      "bitrate": 256,
+      "sampleRate": 48000,
+      "channels": 2,
+      "tv": [
+        "tv/rds-1.mp4",
+        "tv/rds-2.mp4",
+        "tv/rds-3.mp4",
+        "tv/rds-4.mp4"
+      ]
+    },
+    {
       "id": "dial-up",
       "name": "DIAL-UP",
       "band": "synth",
@@ -716,33 +741,7 @@
       ]
     }
   ],
-  "webStations": [
-    {
-      "id": "rds",
-      "name": "RDS",
-      "label": "RDS",
-      "band": "radio",
-      "frequency": "14",
-      "tagline": "Italy's big hits, in Italian and English. Live from RDS (Radio Dimensione Suono) in Rome.",
-      "genre": "Live / Italian hits",
-      "tags": ["rds", "radio dimensione suono", "dimensione suono", "100% grandi successi", "grandi successi", "italy", "italia", "italian", "italiano", "italiana", "rome", "roma", "italian radio", "radio italiana", "italian pop", "pop italiano", "musica italiana", "italian hits", "hits", "pop", "top 40", "chart", "europe", "european", "euro pop", "sanremo", "dj", "talk", "news", "commercial radio", "fm", "summer", "estate", "holiday", "vacation", "aperitivo", "dolce vita", "espresso"],
-      "color": "#ff9a8a",
-      "stream": "https://icstream.rds.radio/rds",
-      "website": "https://www.rds.it/",
-      "provider": "RDS",
-      "providerLabel": "Live on RDS.it ↗",
-      "nowPlaying": "/api/now-playing?station=rds",
-      "bitrate": 256,
-      "sampleRate": 48000,
-      "channels": 2,
-      "tv": [
-        "tv/rds-1.mp4",
-        "tv/rds-2.mp4",
-        "tv/rds-3.mp4",
-        "tv/rds-4.mp4"
-      ]
-    }
-  ],
+  "webStations": [],
   "videoStations": [
     {
       "id": "101x-chillville",

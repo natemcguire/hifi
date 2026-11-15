@@ -71,7 +71,7 @@ EXTERNAL SERVICES: hifi.nates-software.com (station list, now-playing relay, our
 
 REGIONAL DIFFERENCES: none in the app. It is available worldwide in English. A broadcaster or YouTube may geo-restrict a stream or a video; Chillville skips to the next song if a video cannot play. Spotify features need Spotify in the listener's country.
 
-RIGHTS: Synth Sounds are original recordings owned by Nate McGuire (Nate's Software), composed by our own scripts plus four owner-supplied AI-generated seed tracks; provenance is in the open-source repository (github.com/natemcguire/hifi, MIT). HIFI TV clips are original AI-generated video made for HIFI. Live stations are the public streams Radio Paradise, SomaFM and Exclusive Radio publish for any player; HIFI links to them, plays them unaltered, carries no ads, and names the stations with links to support them. Chillville plays only official uploads through the YouTube IFrame Player API under the YouTube API Services Terms; nothing is downloaded or rehosted. Spotify features use the Spotify Web API under the Spotify Developer Terms. Documentation for any of these is available on request.
+RIGHTS: Synth Sounds are original recordings owned by Nate McGuire (Nate's Software), composed by our own scripts plus four owner-supplied AI-generated seed tracks; provenance is in the open-source repository (github.com/natemcguire/hifi, MIT). HIFI TV clips are original AI-generated video made for HIFI. Live stations are the public streams Radio Paradise, SomaFM, Exclusive Radio and RDS publish for any player; HIFI links to them, plays them unaltered, carries no ads, and names the stations with links to support them. Chillville plays only official uploads through the YouTube IFrame Player API under the YouTube API Services Terms; nothing is downloaded or rehosted. Spotify features use the Spotify Web API under the Spotify Developer Terms. Documentation for any of these is available on request.
 
 ## Longer answers, for Nate's reply if Apple asks more
 
@@ -160,7 +160,7 @@ Chillville video. Spotify features depend on Spotify being available to the list
 - HIFI TV clips (`tv/*.mp4`): original AI-generated video made for HIFI.
 - Live stations: the stations' public stream URLs, played unaltered, with their names
   and support links shown. No rehosting, no ads inserted. Nothing in the repo is a
-  written permission from Radio Paradise, SomaFM or Exclusive Radio. If Apple asks for
+  written permission from Radio Paradise, SomaFM, Exclusive Radio or RDS. If Apple asks for
   a licence letter, Nate must get one from each station (SomaFM asks apps to request
   permission at somafm.com/contact; Radio Paradise lists third-party player terms on
   radioparadise.com).

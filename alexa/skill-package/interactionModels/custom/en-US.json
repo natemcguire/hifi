@@ -202,7 +202,6 @@
                   "deep cuts",
                   "curated",
                   "hand picked",
-                  "dj",
                   "human dj",
                   "commercial free",
                   "no ads",
@@ -213,7 +212,8 @@
                   "best of everything",
                   "discovery",
                   "old favorites",
-                  "grown up"
+                  "grown up",
+                  "thoughtful"
                 ]
               }
             },
@@ -316,13 +316,9 @@
                 "value": "pop girl radio",
                 "synonyms": [
                   "pop girl",
-                  "pop",
                   "pop music",
                   "pop hits",
-                  "top 40",
                   "top40",
-                  "hits",
-                  "chart",
                   "charts",
                   "girl pop",
                   "taylor swift",
@@ -337,7 +333,11 @@
                   "sabrina carpenter",
                   "billie eilish",
                   "chappell roan",
-                  "lady gaga"
+                  "lady gaga",
+                  "katy perry",
+                  "beyonce",
+                  "rihanna",
+                  "miley cyrus"
                 ]
               }
             },
@@ -571,6 +571,37 @@
               }
             },
             {
+              "id": "rds",
+              "name": {
+                "value": "rds",
+                "synonyms": [
+                  "radio dimensione suono",
+                  "dimensione suono",
+                  "100 grandi successi",
+                  "grandi successi",
+                  "italy",
+                  "italia",
+                  "italian",
+                  "italiano",
+                  "italiana",
+                  "rome",
+                  "roma",
+                  "italian radio",
+                  "radio italiana",
+                  "italian pop",
+                  "pop italiano",
+                  "musica italiana",
+                  "italian hits",
+                  "europe",
+                  "european",
+                  "euro pop",
+                  "sanremo",
+                  "talk",
+                  "news"
+                ]
+              }
+            },
+            {
               "id": "dial-up",
               "name": {
                 "value": "dial up",
@@ -608,7 +639,6 @@
                   "disco",
                   "sunshine",
                   "sunny",
-                  "summer",
                   "summertime",
                   "pool",
                   "happy",
