@@ -178,7 +178,12 @@ struct IPodView: View {
             }
         }
         #if os(iOS)
-        .onChange(of: scenePhase) { if scenePhase == .background, radio.station.isVideo { radio.stop() } }
+        .onChange(of: scenePhase) {
+            if scenePhase == .background, radio.station.isVideo { radio.stop() }
+            // The app can stay in memory for days, so launch alone is too rare: a station added
+            // since then shows up the next time the app comes to the front.
+            if scenePhase == .active { Task { await radio.refreshCatalog() } }
+        }
         #endif
         .onKeyPress(.upArrow) { key(nil) { rotate(-1) } }
         .onKeyPress(.downArrow) { key(nil) { rotate(1) } }
