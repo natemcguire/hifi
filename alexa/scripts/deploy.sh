@@ -19,13 +19,13 @@ endpoint=https://alexa-production-80ec.up.railway.app/alexa
 node alexa/scripts/build-model.mjs
 
 wait_for() {  # resource name → polls until the build settles, fails on FAILED
-  local n=0 status
+  local n=0 state  # not "status": zsh keeps that name read-only
   while (( n < 90 )); do
-    status=$(ask smapi get-skill-status --skill-id "$skill" --resource "$1" | python3 -c "
+    state=$(ask smapi get-skill-status --skill-id "$skill" --resource "$1" | python3 -c "
 import json,sys; d=json.load(sys.stdin)['$1']; d=d.get('en-US',d)['lastUpdateRequest']; print(d['status']); 
 [print(e['message'],file=sys.stderr) for e in d.get('errors',[])]")
-    [[ $status == SUCCEEDED ]] && return 0
-    [[ $status == FAILED ]] && { echo "$1 build failed" >&2; return 1; }
+    [[ $state == SUCCEEDED ]] && return 0
+    [[ $state == FAILED ]] && { echo "$1 build failed" >&2; return 1; }
     sleep 5; n=$((n+1))
   done
   echo "$1 build still running" >&2; return 1
