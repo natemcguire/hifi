@@ -33,6 +33,29 @@ async function somaFmNowPlaying(channel) {
   somaCache.set(channel, now);
   return now;
 }
+// RDS (Radio Dimensione Suono, web player only) publishes what is on air in its Icecast
+// status, as "Kind*Title*Artist*Year*id" in capitals. Kind is Song, Link (a programme or
+// jingle) or Spot (an advert); only a Song is shown as a song.
+const RDS_STATUS = 'https://icstream.rds.radio/status-json.xsl';
+const RDS_SLOGAN = { artist: 'RDS', title: '100% Grandi Successi', song: false };
+const titleCase = text => text === text.toUpperCase() ? text.toLowerCase().replace(/(^|[^\p{L}\p{N}'’])(\p{L})/gu, (_, gap, letter) => gap + letter.toUpperCase()) : text;
+function rdsSong(raw) {
+  const [kind, title, artist] = String(raw ?? '').split('*').map(clean);
+  if (kind === 'Song' && title) return { artist: titleCase(artist || ''), title: titleCase(title), song: true };
+  if (kind === 'Link' && title) return { artist: 'RDS', title: titleCase(title), song: false };
+  return RDS_SLOGAN;
+}
+let rdsCache = null;
+async function rdsNowPlaying() {
+  if (rdsCache && Date.now() - rdsCache.at < 15000) return rdsCache;
+  const response = await fetch(RDS_STATUS, { headers: { Accept: 'application/json', 'User-Agent': 'NatesSoftware-HIFI/1.0 (+https://hifi.nates-software.com)' }, signal: AbortSignal.timeout(5000) });
+  if (!response.ok) throw Error(`RDS metadata: ${response.status}`);
+  const sources = [(await response.json())?.icestats?.source].flat();
+  const mount = sources.find(source => typeof source?.listenurl === 'string' && source.listenurl.endsWith('/rds'));
+  if (!mount) throw Error('RDS metadata had no /rds mount');
+  rdsCache = { at: Date.now(), ...rdsSong(mount.title), remaining: null };
+  return rdsCache;
+}
 // "Listen on Spotify": a search link always works without keys. When the
 // Worker has SPOTIFY_CLIENT_ID/SPOTIFY_CLIENT_SECRET it resolves the exact
 // track with an app-only token, falling back to the search link on any failure.
@@ -138,13 +161,14 @@ async function nowPlaying(url, env) {
   const headers = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
   const station = url.searchParams.get('station');
   const soma = Object.hasOwn(SOMAFM, station) ? SOMAFM[station] : null;
-  if (station !== 'radio-paradise' && !soma) return new Response(JSON.stringify({ error: 'Unknown station' }), { status: 404, headers });
+  if (station !== 'radio-paradise' && station !== 'rds' && !soma) return new Response(JSON.stringify({ error: 'Unknown station' }), { status: 404, headers });
   try {
-    const now = soma ? await somaFmNowPlaying(soma) : await radioParadiseNowPlaying();
+    const now = soma ? await somaFmNowPlaying(soma) : station === 'rds' ? await rdsNowPlaying() : await radioParadiseNowPlaying();
     const elapsed = (Date.now() - now.at) / 1000;
     const remaining = now.remaining === null ? null : Math.max(0, Math.round(now.remaining - elapsed));
-    const [spotify, playlist] = await Promise.all([spotifyLink(env, now.artist, now.title), natePlaylist()]);
-    return new Response(JSON.stringify({ station, source: soma ? 'somafm.com' : 'radioparadise.com', artist: now.artist, title: now.title, remaining, poll: soma ? 20 : undefined,
+    // A programme name or the station slogan is not a song: no Spotify link for it.
+    const [spotify, playlist] = await Promise.all([now.song === false ? { url: null, id: null } : spotifyLink(env, now.artist, now.title), natePlaylist()]);
+    return new Response(JSON.stringify({ station, source: soma ? 'somafm.com' : station === 'rds' ? 'rds.it' : 'radioparadise.com', artist: now.artist, title: now.title, remaining, poll: soma ? 20 : station === 'rds' ? 15 : undefined,
       spotify: spotify.url, trackId: spotify.id, share: spotify.id ? `https://nates-software.com/hifi/song/${spotify.id}` : null, playlist }), { headers });
   } catch {
     return new Response(JSON.stringify({ error: 'Now-playing metadata unavailable' }), { status: 502, headers });
@@ -212,8 +236,9 @@ export default {
     if (response.status === 404 && (request.headers.get('Accept') || '').includes('text/html')) response = new Response(request.method === 'HEAD' ? null : notFoundPage, { status: 404, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
     const headers = new Headers(response.headers);
     headers.set('X-Content-Type-Options','nosniff');
+    if (env.HIFI_TEST) headers.set('X-Robots-Tag','noindex');  // the test copy (wrangler.test.toml) stays out of search
     headers.set('Referrer-Policy','strict-origin-when-cross-origin');
-    headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' https://*.radioparadise.com https://*.somafm.com https://streaming.exclusive.radio; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self' https://www.youtube-nocookie.com; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'");
+    headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' https://*.radioparadise.com https://*.somafm.com https://streaming.exclusive.radio https://icstream.rds.radio; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self' https://www.youtube-nocookie.com; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'");
     // HTML is checked every visit; scripts and styles are linked by content hash
     // (scripts/build-site.mjs) so they keep for a year; media and the catalog keep a while.
     if (headers.get('Content-Type')?.includes('text/html')) headers.set('Cache-Control','no-cache');

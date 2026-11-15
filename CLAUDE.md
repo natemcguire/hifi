@@ -13,9 +13,16 @@ MacBook Pro (never the mini), then add the paths to the station.
 **Why:** four work stations went live on 2026-11-05 with no clips, so their Now Playing
 screens fell back to plain covers while every other station had video.
 
+## RDS is web only until its permission is on file (Nate, 2026-11-15)
+
+RDS sits under `webStations` in `stations.json`, which only the web player reads. Do not move it
+to `stations` (the list the App Store build and Alexa read) until written permission from the
+station is on file. A new station without permission goes in `webStations` too.
+
 ## Commands
 
 - `npm run dev` builds `dist/` and serves it with `wrangler dev`; the player is at `/player`.
+- `npm run deploy:test` builds and deploys the working tree to the test Worker `nsw-hifi-test`.
 - `npm run release` needs a clean commit. It builds, deploys the `nsw-hifi` Worker and checks the
   live bytes. If that check fails, look at what's live before deploying again.
 - The Alexa skill has its own deploy: `alexa/scripts/deploy.sh` (see `alexa/README.md`).

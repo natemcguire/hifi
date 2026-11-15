@@ -1,0 +1,26 @@
+# The test copy of the site (npm run deploy:test): https://nsw-hifi-test.<account>.workers.dev.
+# It has its own download counter and none of production's routes, database or Tastemakers binding.
+name = "nsw-hifi-test"
+account_id = "4219a576830c72b0e6e4ca358e61473a"
+main = "worker.js"
+compatibility_date = "2026-06-16"
+workers_dev = true
+preview_urls = false
+
+[vars]
+HIFI_TEST = "1"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+run_worker_first = true
+html_handling = "none"
+not_found_handling = "none"
+
+[[durable_objects.bindings]]
+name = "DOWNLOADS"
+class_name = "Downloads"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Downloads"]
