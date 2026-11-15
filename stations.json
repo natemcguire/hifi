@@ -334,9 +334,10 @@
     {
       "id": "rds",
       "name": "RDS",
-      "label": "RDS",
+      "label": "RDS 100% Grandi Successi",
       "band": "radio",
       "frequency": "14",
+      "subtitle": "Italian hits, live from Rome",
       "tagline": "Italy's big hits, in Italian and English. Live from RDS (Radio Dimensione Suono) in Rome.",
       "genre": "Live / Italian hits",
       "tags": ["rds", "radio dimensione suono", "dimensione suono", "100% grandi successi", "grandi successi", "italy", "italia", "italian", "italiano", "italiana", "rome", "roma", "italian radio", "radio italiana", "italian pop", "pop italiano", "musica italiana", "italian hits", "hits", "pop", "top 40", "chart", "europe", "european", "euro pop", "sanremo", "dj", "talk", "news", "commercial radio", "fm", "summer", "estate", "holiday", "vacation", "aperitivo", "dolce vita", "espresso"],
