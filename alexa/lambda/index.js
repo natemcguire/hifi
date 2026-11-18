@@ -100,10 +100,11 @@ function requestedStation(handlerInput, stations) {
   const resolved = (slot.resolutions?.resolutionsPerAuthority || [])
     .flatMap(r => r.status?.code === 'ER_SUCCESS_MATCH' ? r.values.map(v => v.value.id) : []);
   const ranked = rank(stations, said);
-  // The voice model's own match wins when the ranker agrees it fits, and the ranker picks between
-  // several ("kiss FM" is five stations); otherwise the ranker.
+  // The voice model offers up to five loose matches. One of them wins when it is among the
+  // ranker's best three, and the ranker picks between several ("kiss FM" is five stations);
+  // otherwise the ranker's best, and the model's only when the ranker found nothing.
   const byModel = resolved.map(id => stations.find(s => s.id === id)).filter(Boolean);
-  const station = ranked.find(s => byModel.includes(s)) || ranked[0] || byModel[0] || null;
+  const station = ranked.slice(0, 3).find(s => byModel.includes(s)) || ranked[0] || byModel[0] || null;
   return { said, station };
 }
 

@@ -16,10 +16,10 @@ const ALIASES = [
 // Words that carry no station: "play something for work" is a question about work.
 const FILLER = new Set(['play', 'put', 'on', 'tune', 'to', 'the', 'a', 'an', 'some', 'something', 'anything', 'for', 'me', 'my', 'music', 'radio', 'station', 'channel', 'please', 'of', 'and', 'with', 'that', 'this', 'like', 'i', 'want', 'hear', 'listen', 'go', 'switch', 'change']);
 
-// Numbers come spoken ("one oh three point five", "z one hundred") or as digits ("103.5",
-// "z100"), and letters come spelled ("k. e. x. p."). Both sides fold to one form: a run of
-// number words or digit groups becomes one string of digits ("1035"), spelled letters join
-// up ("kexp"), and digits after spelled letters join them ("z100", "hr3").
+// Numbers come spoken ("one oh three point five", "z one hundred"), as digits ("103.5", "z100")
+// or half and half ("Z1 hundred"), and letters come spelled ("k. e. x. p."). Both sides fold to
+// one form: letters and digits apart, a run of number words or digit groups as one string of
+// digits ("z 100", "1035 kiss fm", "jazz 24"), and spelled letters joined up ("kexp", "hr 3").
 const UNITS = { zero: 0, oh: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9 };
 const TEENS = { ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19 };
 const TENS = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
@@ -48,7 +48,7 @@ function spelled(words) {
   let letters = false;  // the last word out is letters that were said one by one
   for (const w of words) {
     const letter = /^[a-z]$/.test(w);
-    if (letters && (letter || digits(w))) out[out.length - 1] += w;
+    if (letters && letter) out[out.length - 1] += w;
     else out.push(w);
     letters = letter && (letters || (w !== 'a' && w !== 'i'));  // "a" and "i" are words unless they follow a letter
   }
@@ -58,7 +58,8 @@ function spelled(words) {
 function fold(text) {
   let out = String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/['’]/g, '');
   for (const [from, to] of ALIASES) out = out.replace(from, to);
-  return spelled(numerals(out.replace(/[^a-z0-9]+/g, ' ').trim().split(' '))).join(' ');
+  out = out.replace(/[^a-z0-9]+/g, ' ').replace(/([a-z])(?=\d)/g, '$1 ').replace(/(\d)(?=[a-z])/g, '$1 ').trim();
+  return spelled(numerals(out.split(' '))).join(' ');
 }
 const tokens = text => fold(text).split(' ').filter(Boolean);
 const bare = folded => folded.split(' ').filter(w => !FILLER.has(w)).join(' ');

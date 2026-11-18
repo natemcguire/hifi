@@ -18,7 +18,7 @@ test('a station by its name', () => {
 
 test('numbers and letters the way Alexa hears them', () => {
   for (const [said, id] of [
-    ['z one hundred', 'z100'], ['z100', 'z100'], ['z. 100', 'z100'], ['jazz twenty four', 'jazz24'], ['one live', '1live'],
+    ['z one hundred', 'z100'], ['z100', 'z100'], ['z. 100', 'z100'], ['Z1 hundred', 'z100'], ['Q1 oh two', 'q102'], ['jazz twenty four', 'jazz24'], ['one live', '1live'],
     ['one oh three point five kiss fm', 'kiss-fm-chicago'], ['103.5 kiss fm', 'kiss-fm-chicago'], ['wild ninety four nine', 'wild-949'],
     ['hot ninety nine five', 'hot-995'], ['power ninety six one', 'power-961'], ['q one oh two', 'q102'], ['kiss one oh eight', 'kiss-108'],
     ['kiss ten sixty five', 'kiis-1065'], ['radio five three eight', 'radio-538'], ['cadena one hundred', 'cadena-100'],
