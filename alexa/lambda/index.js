@@ -19,8 +19,12 @@ function parseToken(token) {
 }
 
 // ----- speech -----
-// Station names are set in capitals; Alexa reads them better as plain words.
-const spoken = station => station.name.toLowerCase().replace(/!+$/, '').replace(/\blo-fi\b/g, 'lo fi').replace(/\by2k\b/g, 'Y 2 K');
+// The house stations' names are set in capitals; Alexa reads them better as plain words. A world
+// station is said the way its label is written ("Z100", "KEXP"), or the way the catalog's `say`
+// spells it out when the label reads badly ("kiss FM" for KIIS FM).
+const spoken = station => station.say
+  || (station.country && station.label ? station.label.replace(/&/g, 'and').replace(/!+$/, '')
+    : station.name.toLowerCase().replace(/!+$/, '').replace(/\blo-fi\b/g, 'lo fi').replace(/\by2k\b/g, 'Y 2 K'));
 const and = names => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
 
 // ----- playback -----
@@ -96,9 +100,10 @@ function requestedStation(handlerInput, stations) {
   const resolved = (slot.resolutions?.resolutionsPerAuthority || [])
     .flatMap(r => r.status?.code === 'ER_SUCCESS_MATCH' ? r.values.map(v => v.value.id) : []);
   const ranked = rank(stations, said);
-  // The voice model's own match wins when the ranker agrees it's plausible; otherwise the ranker.
+  // The voice model's own match wins when the ranker agrees it fits, and the ranker picks between
+  // several ("kiss FM" is five stations); otherwise the ranker.
   const byModel = resolved.map(id => stations.find(s => s.id === id)).filter(Boolean);
-  const station = byModel.find(s => ranked.slice(0, 3).includes(s)) || ranked[0] || byModel[0] || null;
+  const station = ranked.find(s => byModel.includes(s)) || ranked[0] || byModel[0] || null;
   return { said, station };
 }
 
@@ -177,8 +182,16 @@ const ListStationsIntentHandler = {
   canHandle: intent('ListStationsIntent', 'AMAZON.HelpIntent'),
   async handle(handlerInput) {
     const stations = await catalog.stations();
-    const names = stations.map(spoken);
-    const speech = `HIFI radio has ${stations.length} stations: ${and(names)}. Say play and a station name, or say next to move along the dial.`;
+    // The house stations are read out; the world stations are too many to read, so they are
+    // counted and a few are named.
+    const house = stations.filter(s => !s.country), world = stations.filter(s => s.country);
+    const countries = [...new Set(world.map(s => s.country))];
+    const examples = countries.slice(0, 3).map(code => world.find(s => s.country === code));  // one each from the first countries
+    const speech = world.length
+      ? `HIFI radio has ${stations.length} stations. The house stations are ${and(house.map(spoken))}. `
+        + `Then there are ${world.length} stations from ${countries.length} countries, like ${and(examples.map(spoken))}. `
+        + 'Say play and a station name, a city or a country, or say next to move along the dial.'
+      : `HIFI radio has ${stations.length} stations: ${and(house.map(spoken))}. Say play and a station name, or say next to move along the dial.`;
     return handlerInput.responseBuilder.speak(speech).reprompt('Which station would you like?')
       .withSimpleCard('HIFI radio', stations.map(s => `${s.name} — ${s.genre}`).join('\n')).getResponse();
   },

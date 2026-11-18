@@ -11,16 +11,57 @@ const ALIASES = [
   [/\blow?[ -]?fi\b/g, 'lofi'], [/\bhip[ -]?hop\b/g, 'hiphop'], [/\bchill[ -]?out\b/g, 'chillout'], [/\btrip[ -]?hop\b/g, 'triphop'],
   [/\b(y ?2 ?k|y two k|why two k|two thousand)\b/g, 'y2k'], [/\br ?(and|n) ?b\b/g, 'rnb'], [/\b(8|eight)[ -]?bit\b/g, '8bit'], [/\b(16|sixteen)[ -]?bit\b/g, '16bit'],
   [/\bx-?mas\b/g, 'christmas'], [/\bdial[ -]?up\b/g, 'dialup'], [/\b(nineties|90's)\b/g, '90s'], [/\b(eighties|80's)\b/g, '80s'],
+  [/\br ?& ?b\b/g, 'rnb'], [/\bkiis\b/g, 'kiss'],  // KIIS FM is said "kiss FM"
 ];
 // Words that carry no station: "play something for work" is a question about work.
 const FILLER = new Set(['play', 'put', 'on', 'tune', 'to', 'the', 'a', 'an', 'some', 'something', 'anything', 'for', 'me', 'my', 'music', 'radio', 'station', 'channel', 'please', 'of', 'and', 'with', 'that', 'this', 'like', 'i', 'want', 'hear', 'listen', 'go', 'switch', 'change']);
 
+// Numbers come spoken ("one oh three point five", "z one hundred") or as digits ("103.5",
+// "z100"), and letters come spelled ("k. e. x. p."). Both sides fold to one form: a run of
+// number words or digit groups becomes one string of digits ("1035"), spelled letters join
+// up ("kexp"), and digits after spelled letters join them ("z100", "hr3").
+const UNITS = { zero: 0, oh: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9 };
+const TEENS = { ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19 };
+const TENS = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+const digits = w => /^\d+$/.test(w);
+const numeric = w => w !== undefined && (digits(w) || (w in UNITS && w !== 'oh') || w in TEENS || w in TENS);
+
+function numerals(words) {
+  const out = [];
+  let run = null;  // the digits said so far
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i], next = words[i + 1];
+    if (digits(w)) run = (run ?? '') + w;
+    else if (run !== null && w === 'point' && numeric(next)) continue;
+    else if (run !== null && w === 'hundred') run += '00';
+    else if (w in TENS && next in UNITS && next !== 'oh' && next !== 'zero') { run = (run ?? '') + (TENS[w] + UNITS[next]); i++; }
+    else if (w in TENS || w in TEENS) run = (run ?? '') + (TENS[w] ?? TEENS[w]);
+    else if (w in UNITS && (w !== 'oh' || run !== null)) run = (run ?? '') + UNITS[w];
+    else { if (run !== null) { out.push(run); run = null; } out.push(w); }
+  }
+  if (run !== null) out.push(run);
+  return out;
+}
+
+function spelled(words) {
+  const out = [];
+  let letters = false;  // the last word out is letters that were said one by one
+  for (const w of words) {
+    const letter = /^[a-z]$/.test(w);
+    if (letters && (letter || digits(w))) out[out.length - 1] += w;
+    else out.push(w);
+    letters = letter && (letters || (w !== 'a' && w !== 'i'));  // "a" and "i" are words unless they follow a letter
+  }
+  return out;
+}
+
 function fold(text) {
-  let out = String(text || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/['’]/g, '');
+  let out = String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/['’]/g, '');
   for (const [from, to] of ALIASES) out = out.replace(from, to);
-  return out.replace(/[^a-z0-9]+/g, ' ').trim();
+  return spelled(numerals(out.replace(/[^a-z0-9]+/g, ' ').trim().split(' '))).join(' ');
 }
 const tokens = text => fold(text).split(' ').filter(Boolean);
+const bare = folded => folded.split(' ').filter(w => !FILLER.has(w)).join(' ');
 // "coding" should find "code", "beats" should find "beat": the plain stem, when it differs.
 const stem = w => w.length > 4 ? w.replace(/(ing|ers|er|ies|es|s)$/, '') : w;
 
@@ -86,7 +127,7 @@ function fields(station) {
   return f;
 }
 
-function score(station, words, query) {
+function score(station, words, query, whole) {
   let total = 0;
   for (const word of words) {
     let best = 0;
@@ -97,8 +138,11 @@ function score(station, words, query) {
     if (best === 0) return 0;
     total += best;
   }
-  const name = fold(station.name);
-  if (name.startsWith(query)) total += 4;
+  // The whole name said: "the edge", "radio x" (filler words dropped), "one live" for 1LIVE.
+  // `whole` keeps the filler words, for names made of them ("q music" for Qmusic).
+  const name = fold(station.name), run = name.replace(/ /g, '');
+  if (bare(name) === query || run === query.replace(/ /g, '') || run === whole.replace(/ /g, '')) total += 5;
+  else if (name.startsWith(query)) total += 4;
   else if (name.includes(query)) total += 2;
   else if ((station.tags || []).some(t => fold(t) === query)) total += 1.5;
   return total;
@@ -114,7 +158,7 @@ function rank(stations, query) {
   const q = fold(query);
   const words = tokens(q).filter(w => !FILLER.has(w));
   if (!words.length) return [];
-  return stations.map(s => ({ s, v: score(s, words, words.join(' ')) })).filter(x => x.v >= MIN_PER_WORD * words.length)
+  return stations.map(s => ({ s, v: score(s, words, words.join(' '), q) })).filter(x => x.v >= MIN_PER_WORD * words.length)
     .sort((a, b) => b.v - a.v).map(x => x.s);
 }
 const meaningful = query => tokens(query).some(w => !FILLER.has(w));

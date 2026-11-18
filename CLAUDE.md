@@ -21,8 +21,17 @@ Nate says its permission is fine. RDS started there; Nate cleared it on 2026-11-
 now in `stations`. Radio Deejay has not been cleared.
 
 The 97 stations added on 2026-11-18 (Late Night Jazz, Jazz24 and the world's big free stations, one
-Radio row per `country`) are in `webStations` and none has been cleared. Their stream hosts are in `MEDIA_HOSTS` in `worker.js`; the list and what
-was left out are in `README.md` under Web-only stations.
+Radio row per `country`) started there too. Nate cleared them the same day and they are now in
+`stations`; `webStations` is empty. Their stream hosts are in `MEDIA_HOSTS` in `worker.js`; the
+list and what was left out are in `README.md` under World stations.
+
+## A station change reaches Alexa by its own deploy
+
+The apps and the skill read the live `stations.json`, so a station in `stations` plays on Alexa as
+soon as the site is released. Asking for it by name needs the voice model: run
+`alexa/scripts/deploy.sh --model` after the release (the full deploy when `alexa/lambda` changed).
+A name Alexa would read badly gets a `say` in the catalog ("kiss FM" for KIIS FM); see
+`alexa/README.md`.
 
 ## Commands
 

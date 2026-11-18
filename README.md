@@ -1,6 +1,6 @@
 # HIFI
 
-A click-wheel iPod internet radio for the browser, iPhone and Mac: nine live stations (plus four for Christmas) and four synth stations made here.
+A click-wheel iPod internet radio for the browser, iPhone, Mac and Alexa: sixteen live house stations (four of them for Christmas), 95 big stations from 35 countries and four synth stations made here.
 
 ```sh
 npm install && npm run dev    # builds dist/ and serves the site with wrangler dev
@@ -19,7 +19,7 @@ No build tools needed just to hack on the player: `python3 -m http.server 8080`,
 
 ## What it does
 
-- **Radio** menu, one list with a search field above it (type anywhere on the list and it narrows by name, line or genre): Radio Paradise, eleven SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!; four for working, Working for the Weekend, Lo-Fi Beats to Work To, Code All Night and Y2K Chill-Out: SomaFM's Groove Salad, Fluid, DEF CON Radio and Groove Salad Classic; and for the season Soulful Christmas, Christmas at the Mall, Fireside Christmas and Rockin' Around the Tree: SomaFM's Jolly Ol' Soul, Department Store Christmas, Christmas Lounge and Christmas Rocks!), Pop Girl Radio from Exclusive Radio, RDS (Radio Dimensione Suono, from Rome) and 101X Chillville, streamed straight from their servers; on the web player the list goes on with Late Night Jazz, Jazz24 and 95 of the world's big free stations, one row per country that opens that country's list (see Web-only stations). Nothing is proxied or rehosted. Then the **Synth Sounds**: Dial-Up, Shareware Summer, Night Build and Pixel Drift, procedurally composed MP3s in `tracks/`. Each one plays like a broadcast: the current track is picked from wall-clock time, so everyone hears the same thing.
+- **Radio** menu, one list with a search field above it (type anywhere on the list and it narrows by name, line or genre): Radio Paradise, eleven SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!; four for working, Working for the Weekend, Lo-Fi Beats to Work To, Code All Night and Y2K Chill-Out: SomaFM's Groove Salad, Fluid, DEF CON Radio and Groove Salad Classic; and for the season Soulful Christmas, Christmas at the Mall, Fireside Christmas and Rockin' Around the Tree: SomaFM's Jolly Ol' Soul, Department Store Christmas, Christmas Lounge and Christmas Rocks!), Pop Girl Radio from Exclusive Radio, RDS (Radio Dimensione Suono, from Rome) and 101X Chillville, streamed straight from their servers; the list goes on with Late Night Jazz, Jazz24 and 95 of the world's big free stations, one row per country that opens that country's list (see World stations). Nothing is proxied or rehosted. Then the **Synth Sounds**: Dial-Up, Shareware Summer, Night Build and Pixel Drift, procedurally composed MP3s in `tracks/`. Each one plays like a broadcast: the current track is picked from wall-clock time, so everyone hears the same thing.
 - `stations.json` also carries `features` (today `christmas`): flags the web player and the apps read live, so a look can be switched on for everyone by editing the file and releasing. In the apps a long press on the title bar (the strip with the battery) turns the Christmas look on or off for that device ahead of the flag, so testers can see it any time.
 - `/player` (`index.html`, `app.js`, `styles.css`) is the same white click-wheel iPod as the native apps in `ios/Sources/IPod.swift`: drag the ring to scroll, center to choose, MENU to go back; on Now Playing the wheel is the volume. Arrow keys, Return, Escape and Space work too. It uses the Media Session API for lock-screen and media-key controls.
 - Spotify: listeners sign in with PKCE through `https://nates-software.com/hifi/spotify/callback` (state `web.…`), which hands the code to `/spotify` (`spotify.js`) to finish in the browser. The ♥ saves live songs to their Liked Songs; their playlists show under Playlists.
@@ -56,11 +56,15 @@ npm run release    # clean commit required; builds, deploys the nsw-hifi Worker,
 ### Web-only stations
 
 A station under `webStations` in `stations.json` is on the web player only. The iPhone and Mac
-app and the Alexa skill read `stations`, so they never show it, whatever build they are. RDS
-started there and moved to `stations` on 2026-11-15, when Nate cleared it. A new station whose
-permission is still open goes in `webStations` first.
+app and the Alexa skill read `stations`, so they never show it, whatever build they are. A new
+station whose permission is still open goes in `webStations` first and moves to `stations` when
+Nate clears it. RDS did on 2026-11-15, and the 97 world stations on 2026-11-18, the day they
+were added. The list is empty now.
 
-It holds 97 stations, added on 2026-11-18 and not cleared yet:
+### World stations
+
+97 stations added on 2026-11-18, in `stations` since Nate cleared them that day, so the web
+player, the iPhone and Mac app and the Alexa skill all play them:
 
 - **Late Night Jazz** (Ella Radio): slow instrumental ballads, piano trios and tenor sax. The
   closest free stream to the Spotify playlist Dark Academia Jazz; Jazz24 is the broader one.
@@ -98,7 +102,8 @@ sends; test those streams that way.
 
 A world station carries a `country` code, named in `countries` at the top of `stations.json`.
 The Radio list shows one row per country after the house stations; the row opens that
-country's list, and a search looks through every station at once. The nine iHeart stations
+country's list, and a search looks through every station at once. The apps do the same from
+1.0.4 on; an older build shows every station in one long list. The nine iHeart stations
 have a song feed (`/api/now-playing`, from iHeart's public track endpoint). The other metro
 stations carry a `line` ("Houston · Top 40"), shown under the name when there is no song.
 Also left out: Bauer's UK stations (KISS, Hits Radio, Absolute Radio), which answer only with

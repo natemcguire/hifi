@@ -127,7 +127,7 @@ final class Radio: ObservableObject {
         track = nil
         if let url = station.streamURL {
             player.insert(AVPlayerItem(url: url), after: nil)
-            pollLiveSong()
+            if station.hasSongFeed { pollLiveSong() } else { pollTask?.cancel() }
         } else if let tracks = station.tracks, !tracks.isEmpty {
             pollTask?.cancel()
             let first = enqueue(tracks[index])
@@ -208,7 +208,7 @@ final class Radio: ObservableObject {
     @Published private(set) var songs: [String: LiveSong] = [:]
 
     func refreshSongs() async {
-        let live = stations.filter(\.isLive).map(\.id)
+        let live = stations.filter(\.hasSongFeed).map(\.id)
         await withTaskGroup(of: (String, LiveSong?).self) { group in
             for id in live { group.addTask { (id, await Self.fetchSong(id)) } }
             for await (id, song) in group { if let song { songs[id] = song } }

@@ -17,6 +17,11 @@ enum WheelRegion: Equatable {
     case menu, next, play, previous, center
 }
 
+// One row of the Radio list: a station, or a country that opens its own list of stations.
+private enum Dial {
+    case station(Station), country(String)
+}
+
 private struct Row {
     let title: String
     var chevron = true
@@ -391,7 +396,7 @@ struct IPodView: View {
     private var title: String {
         switch page {
         case .main: "HIFI"
-        case .band: "Radio"
+        case .band(let band): Self.country(band).map(radio.catalog.countryName) ?? "Radio"
         case .playlists: "Playlists"
         case .nowPlaying: "Now Playing"
         case .settings: "Settings"
@@ -518,7 +523,7 @@ struct IPodView: View {
         // lands, then the keyboard. One motion at a time, so none of them stutters the others.
         searchArrivedWithPage = true
         query = ""
-        if let index = stations("radio").firstIndex(of: radio.station) { selection[.band("radio")] = index }
+        if let index = playingRow("radio") { selection[.band("radio")] = index }
         forward = true
         withAnimation(.easeInOut(duration: 0.3)) { stack.append(.band("radio")) }
         Task {
@@ -607,9 +612,16 @@ struct IPodView: View {
             return [Row(title: "Now Playing", playing: radio.isPlaying), Row(title: "Radio"),
                     Row(title: "Playlists"), Row(title: "Settings"), Row(title: "About")]
         case .band(let band):
-            return stations(band).map { Row(title: $0.displayName, chevron: false,
-                                            playing: radio.isPlaying && $0.id == radio.station.id,
-                                            subtitle: songLine($0)) }
+            return dial(band).map { item -> Row in
+                switch item {
+                case .station(let station):
+                    Row(title: station.displayName, chevron: false, playing: radio.isPlaying && station.id == radio.station.id,
+                        subtitle: songLine(station))
+                case .country(let code):
+                    Row(title: radio.catalog.countryName(code), playing: radio.isPlaying && radio.station.country == code,
+                        subtitle: radio.stations.filter { $0.country == code }.map(\.displayName).joined(separator: ", "))
+                }
+            }
         case .playlists:
             // Nate's Software's playlist first, then the listener's own.
             var list = playlistRows.map { Row(title: $0.name, chevron: false, subtitle: $0.detail) }
@@ -634,10 +646,36 @@ struct IPodView: View {
 
     private var playlistRows: [SpotifyPlaylist] { [spotify.natePlaylist].compactMap { $0 } + spotify.playlists }
 
-    // Radio is the one list: every station, in catalog order (the band only matters to older builds).
-    // With a search typed, the stations that fit it, best first (StationSearch).
-    private func stations(_ band: String) -> [Station] {
-        StationSearch.rank(radio.stations, query: query)
+    // Radio is the one list, in catalog order (a station's own `band` only matters to older builds).
+    // World stations carry a `country`: the list shows one row per country after the live house
+    // stations, and that row opens the country's own list, the page `.band("country:DE")`.
+    // With a search typed, the stations that fit it, best first (StationSearch), from every
+    // country at once; inside a country, from that country.
+    private static func country(_ band: String) -> String? {
+        band.hasPrefix("country:") ? String(band.dropFirst(8)) : nil
+    }
+
+    private func dial(_ band: String) -> [Dial] {
+        if let code = Self.country(band) {
+            return StationSearch.rank(radio.stations.filter { $0.country == code }, query: query).map(Dial.station)
+        }
+        if !StationSearch.tokens(query).isEmpty { return StationSearch.rank(radio.stations, query: query).map(Dial.station) }
+        let house = radio.stations.filter { $0.country == nil }
+        let names = radio.catalog
+        let codes = Set(radio.stations.compactMap(\.country)).sorted { names.countryName($0).localizedCompare(names.countryName($1)) == .orderedAscending }
+        var list = house.map(Dial.station)
+        list.insert(contentsOf: codes.map(Dial.country), at: (house.lastIndex { $0.band == "radio" } ?? house.count - 1) + 1)  // before Synth Sounds
+        return list
+    }
+
+    // Where a list should open: on the station that is playing, or on its country's row.
+    private func playingRow(_ band: String) -> Int? {
+        dial(band).firstIndex { item in
+            switch item {
+            case .station(let station): station.id == radio.station.id
+            case .country(let code): code == radio.station.country
+            }
+        }
     }
 
     // The station's own line if it has one; else "Artist – Song" under a live station,
@@ -646,7 +684,7 @@ struct IPodView: View {
         _ = songTick
         if let subtitle = station.subtitle { return subtitle }
         if station.isLive {
-            guard let song = radio.songs[station.id], let title = song.title, !title.isEmpty else { return nil }
+            guard let song = radio.songs[station.id], let title = song.title, !title.isEmpty else { return station.line }
             return [song.artist, title].compactMap { $0?.isEmpty == false ? $0 : nil }.joined(separator: " – ")
         }
         guard let tracks = station.tracks, !tracks.isEmpty else { return nil }
@@ -692,7 +730,7 @@ struct IPodView: View {
     private func push(_ next: Page) {
         if case .band(let band) = next {
             query = ""  // the list opens whole
-            if let index = stations(band).firstIndex(of: radio.station) { selection[next] = index }
+            if let index = playingRow(band) { selection[next] = index }
         }
         searchFocused = false
         forward = true
@@ -706,11 +744,16 @@ struct IPodView: View {
         case .main:
             if Self.mainPages.indices.contains(index) { push(Self.mainPages[index]) }
         case .band(let band):
-            let list = stations(band)
+            let list = dial(band)
             guard list.indices.contains(index) else { return }
-            closeSearch()
-            radio.tune(list[index])
-            if page != .nowPlaying { push(.nowPlaying) }
+            switch list[index] {
+            case .country(let code):
+                push(.band("country:\(code)"))
+            case .station(let station):
+                closeSearch()
+                radio.tune(station)
+                if page != .nowPlaying { push(.nowPlaying) }
+            }
         case .playlists:
             // Spotify plays its own music: a playlist opens in the Spotify app.
             if let playlist = playlistRows[safe: index] { openURL(playlist.url) } else { spotify.showConnect = true }
@@ -748,6 +791,7 @@ struct IPodView: View {
         // Leaving a video stops it, the way MENU stops a movie on an iPod.
         if page == .nowPlaying, radio.station.isVideo, radio.isPlaying { radio.stop() }
         if case .band = page, searchOpen { closeSearch() }
+        if case .band(let band) = page, Self.country(band) != nil { query = "" }  // a search inside a country stays there
         forward = false
         withAnimation(.easeInOut(duration: 0.25)) { _ = stack.removeLast() }
     }
@@ -810,21 +854,22 @@ extension IPodView {
 
         await pause(2.5)
         // Radio: the live stations and the song on each; tune one in.
-        let live = stations("radio")
+        // The rows of the Radio list that are stations; a country row keeps its place as nil.
+        let live: [Station?] = dial("radio").map { if case .station(let station) = $0 { station } else { nil } }
         await open(1, settle: 3)
-        if let i = live.firstIndex(where: { $0.id == "sonic-universe" }) { await open(i, settle: 9) }
+        if let i = live.firstIndex(where: { $0?.id == "sonic-universe" }) { await open(i, settle: 9) }
         for _ in 0..<3 { rotate(1); await pause(0.25) }  // on Now Playing the wheel is the volume
         await pause(1)
         for _ in 0..<3 { rotate(-1); await pause(0.25) }
         await pause(2.5)
         press(.next); await pause(6)  // the next station, from the wheel
         await back(1.5)
-        if let i = live.firstIndex(where: \.isVideo) { await open(i, settle: 12) }  // 101X Chillville: official videos
+        if let i = live.firstIndex(where: { $0?.isVideo == true }) { await open(i, settle: 12) }  // 101X Chillville: official videos
         await back()  // MENU stops the video
         await back()
         // Synth Sounds: our own music on a shared clock, with pause and play.
         await open(1, settle: 2)
-        if let i = live.firstIndex(where: { $0.id == "shareware-summer" }) { await open(i, settle: 7) }
+        if let i = live.firstIndex(where: { $0?.id == "shareware-summer" }) { await open(i, settle: 7) }
         press(.play); await pause(2)
         press(.play); await pause(4)
         await back(0.8); await back()

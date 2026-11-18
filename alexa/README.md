@@ -10,7 +10,13 @@ the dial like the click wheel; "what's playing" names the song.
   listener's station and offset on the volume. `server.js` is the Railway entry point.
 - `skill-package/` — the manifest and the voice model. The model is **generated**: run
   `node alexa/scripts/build-model.mjs` after any catalog change. It also bundles a copy of
-  `stations.json` with the Lambda for when the site is unreachable.
+  `stations.json` with the Lambda for when the site is unreachable. Each station goes in with
+  the ways its name is said: "z one hundred" for Z100, "one oh three point five kiss fm" and
+  "kiss fm chicago" for 103.5 KISS FM, "k. e. x. p." for KEXP. `search.js` folds what Alexa
+  heard the same way, so the spoken and the written name meet.
+- A station's `say` in `stations.json` is how Alexa says its name when the label reads badly
+  aloud: "kiss FM" for KIIS FM, "one live" for 1LIVE. Without it a world station is said as its
+  label is written and a house station as its name in small letters.
 - `assets/` — cover art for the Echo Show and the store icons, drawn by
   `python3 alexa/scripts/make-covers.py` (same cover as the app) and served from the site at
   `https://hifi.nates-software.com/alexa/`.
@@ -37,7 +43,8 @@ after a cover change. `index.js` also exports a Lambda handler, so the same code
 to AWS Lambda or an Alexa-hosted skill later without changes.
 
 Testing: any Echo on the developer account hears the development skill. The ASK CLI's
-`simulate-skill` runs text turns end to end. Publishing is
+`simulate-skill` runs text turns end to end, and `node --test alexa/lambda` checks what is said
+against the station that should play. Publishing is
 `ask smapi submit-skill-for-certification --skill-id $(cat alexa/skill.id)` and a few days
 of Amazon's certification.
 
@@ -47,7 +54,10 @@ of Amazon's certification.
 |---|---|
 | open HIFI live radio | resumes the last station (Radio Paradise the first time) |
 | play lo-fi beats / play Taylor Swift / play something for work | ranks names, tags, genre and lines; plays the best fit |
+| play jazz / play late night jazz / play jazz twenty four | Jazz24 for plain "jazz"; the other two by name |
+| play Z100 / play kiss FM / play KEXP / play one live | a world station by name; "kiss FM" is KIIS FM in Los Angeles |
+| play kiss FM Chicago / play Houston / play Germany | by city or country; the first station there when several fit |
 | next, previous | the next or previous station on the dial |
 | what's playing | the song, from the same now-playing feed the app uses |
-| list stations | reads the dial |
+| list stations | reads the house stations, counts the world stations and names a few |
 | pause, resume, stop | as expected; track stations resume mid-track |

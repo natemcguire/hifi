@@ -38,13 +38,17 @@ LISTING = {
     "promotionalText": "Non-stop unlimited Christmas music, 24/7 with no commercials, on four holiday stations. "
                        "Plus live radio from Radio Paradise and SomaFM, and our own synth stations.",
     "keywords": "somafm,paradise,jazz,chill,indie,holiday,xmas,carols,retro,click wheel,player,fm,ambient,synth",
-    "whatsNew": "The lock screen now shows a picture from the station's HIFI TV clip while it plays. "
-                "Stations without clips keep the classic Now Playing screen.",
+    "whatsNew": "Radio has 97 more stations: Late Night Jazz, Jazz24 and 95 big stations from 35 countries, "
+                "Z100, KIIS FM, Heart, 1LIVE and triple j among them. Each country has its own row in the Radio list, "
+                "and search finds a station by name, city or country. "
+                "The station list now refreshes every time you come back to the app.",
     "description": f"""This season: non-stop unlimited Christmas music, 24/7 with no commercials. Four holiday stations, all free. Soulful Christmas plays vintage soul and R&B, Christmas at the Mall the orchestras and strings with almost no singing, Fireside Christmas the cocktail-hour standards, and Rockin' Around the Tree the indie bands. They come from SomaFM, listener-supported and ad-free.
 
 HIFI is an internet radio player drawn as a classic click-wheel music player. Drag around the wheel to move through the menu, press the center to tune in, press MENU to back out. It costs nothing and never asks you to sign up.
 
 The live stations come straight from Radio Paradise and SomaFM, independent broadcasters paid for by their listeners, with Pop Girl Radio from Exclusive Radio alongside. Four of them are for working, mostly without vocals: Working for the Weekend (downtempo), Lo-Fi Beats to Work To, Code All Night (dark electronica) and Y2K Chill-Out (early-2000s downtempo). You see the song that is on right now and who made it.
+
+Late Night Jazz and Jazz24 play jazz around the clock. Then come 95 big stations from 35 countries, each country on its own row: Z100 in New York, KIIS FM in Los Angeles, Heart and Capital in London, 1LIVE in Cologne, triple j in Sydney. Each one plays the broadcaster's own public stream.
 
 The Synth Sounds stations are instrumental music we made for HIFI. They run on a shared clock, so tuning in drops you wherever the rotation is, the way a real radio does.
 • Dial-Up: lo-fi beats, soft breaks, rain on the window

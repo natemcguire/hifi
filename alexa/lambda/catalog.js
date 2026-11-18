@@ -14,7 +14,8 @@ const playable = s => Boolean(s.stream) || (Array.isArray(s.tracks) && s.tracks.
 
 function shape(raw) {
   return raw.stations.filter(playable).map(s => ({
-    id: s.id, name: s.name, band: s.band, genre: s.genre || '', subtitle: s.subtitle || '', tagline: s.tagline || '',
+    id: s.id, name: s.name, label: s.label || '', say: s.say || '', country: s.country || '', band: s.band,
+    genre: s.genre || '', subtitle: s.subtitle || s.line || '', tagline: s.tagline || '',
     tags: s.tags || [], color: s.color || '#ffffff', stream: s.stream || null, nowPlaying: s.nowPlaying ? SITE + s.nowPlaying : null,
     tracks: (s.tracks || []).map(t => ({ src: `${SITE}/${t.src}`, title: t.title, artist: t.artist, duration: t.duration })),
     cover: `${SITE}/alexa/covers/${s.id}.png`,
@@ -56,4 +57,4 @@ async function nowPlaying(station) {
   finally { clearTimeout(timer); }
 }
 
-module.exports = { stations, nowPlaying, SITE };
+module.exports = { stations, nowPlaying, bundled, SITE };

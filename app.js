@@ -66,6 +66,7 @@ async function loadCatalog() {
 const catalog = await loadCatalog();
 // Web-only stations (catalog.webStations) join the live stations here. The native apps and
 // the Alexa skill read only catalog.stations, so a station listed there stays off them.
+// The list is empty once every station's permission is cleared.
 for (const station of Array.isArray(catalog.webStations) ? catalog.webStations : []) {
   if (!station?.id || catalog.stations.some(s => s.id === station.id)) continue;
   catalog.stations.splice(catalog.stations.findLastIndex(s => s.band === 'radio') + 1, 0, station);

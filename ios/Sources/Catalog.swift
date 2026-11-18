@@ -5,6 +5,8 @@ import SwiftUI
 struct Catalog: Decodable {
     let epoch: Double  // ms since 1970; synth rotations are measured from here
     let stations: [Station]
+    // Names for the `country` codes the world stations carry ("DE": "Germany").
+    let countries: [String: String]?
     // Stations that play official videos (101X Chillville). Older builds don't read
     // this list, so they never see a station they can't play.
     let videoStations: [Station]?
@@ -19,6 +21,8 @@ struct Catalog: Decodable {
     // The Christmas look as the server has it. The app ORs this with the listener's own
     // "christmas" default (a long press on the title bar, or `-christmas 1` at launch).
     var christmas: Bool { features?.christmas ?? false }
+
+    func countryName(_ code: String) -> String { countries?[code] ?? code }
 
     static let base = URL(string: "https://hifi.nates-software.com/")!
 
@@ -49,6 +53,9 @@ struct Station: Decodable, Identifiable, Equatable {
     let band: String
     let frequency: String
     let subtitle: String?  // a fixed line under the name in the list, instead of the song
+    let line: String?      // shown under the name when no song is known ("Houston · Top 40")
+    let country: String?   // a world station: the Radio list files it under its country's row
+    let nowPlaying: String?  // the station's song feed; without one it is never asked what is on
     let tagline: String
     let genre: String
     let tags: [String]?    // what the station is about, for search (christmas, lofi, work…)
@@ -63,6 +70,7 @@ struct Station: Decodable, Identifiable, Equatable {
     let label: String?     // a name with its own capitals, like "101X Chillville"
 
     var isLive: Bool { stream != nil }
+    var hasSongFeed: Bool { isLive && nowPlaying != nil }
     var isVideo: Bool { video != nil }
     var displayName: String { label ?? name.capitalized }
     var clips: [URL] { (tv ?? []).map { Catalog.base.appending(path: $0) } }

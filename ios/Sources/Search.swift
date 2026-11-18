@@ -30,7 +30,7 @@ enum StationSearch {
         func field(_ text: String, _ weight: Double) -> Field { Field(text: fold(text), words: tokens(text), weight: weight) }
         let made = [field(station.displayName, 3), field(station.name, 3),
                     field((station.tags ?? []).joined(separator: " "), 2.2),
-                    field(station.genre, 1.8), field(station.subtitle ?? "", 1.4),
+                    field(station.genre, 1.8), field(station.subtitle ?? station.line ?? "", 1.4),
                     field(station.tagline, 1), field(station.providerLabel ?? "", 0.8)]
         cache[station.id] = made
         return made
