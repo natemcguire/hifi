@@ -6,10 +6,10 @@
         "en-US": {
           "name": "HIFI radio",
           "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, jazz, lo-fi, Christmas and big stations like Z100.",
-          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays: \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and Mac app, and lives at hifi.nates-software.com.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live radio for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and Mac app, and lives at hifi.nates-software.com.",
           "examplePhrases": [
             "Alexa, open hifi live radio",
-            "Alexa, ask hifi live radio to play lo-fi beats",
+            "Alexa, ask hifi live radio for lo-fi beats",
             "Alexa, ask hifi live radio what's playing"
           ],
           "keywords": [
