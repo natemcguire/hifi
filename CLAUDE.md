@@ -20,8 +20,8 @@ is still open goes there, and moves to `stations` (the list the apps and Alexa r
 Nate says its permission is fine. RDS started there; Nate cleared it on 2026-11-15 and it is
 now in `stations`. Radio Deejay has not been cleared.
 
-The 38 stations added on 2026-11-18 (Jazz24 and the world's big free stations) are in `webStations`
-and none has been cleared. Their stream hosts are in `MEDIA_HOSTS` in `worker.js`; the list and what
+The 97 stations added on 2026-11-18 (Late Night Jazz, Jazz24 and the world's big free stations, one
+Radio row per `country`) are in `webStations` and none has been cleared. Their stream hosts are in `MEDIA_HOSTS` in `worker.js`; the list and what
 was left out are in `README.md` under Web-only stations.
 
 ## Commands

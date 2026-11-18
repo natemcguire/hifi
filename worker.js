@@ -56,6 +56,23 @@ async function rdsNowPlaying() {
   rdsCache = { at: Date.now(), ...rdsSong(mount.title), remaining: null };
   return rdsCache;
 }
+// iHeart's stations publish the song on air, with the time it ends, at a public, keyless
+// endpoint keyed by the station's stream number. It answers 204 while adverts or talk are on.
+const IHEART = { 'z100': 1469, 'kiis-fm': 185, 'kiss-fm-chicago': 849, 'kiss-fm-dallas': 2245, 'wild-949': 305, 'hot-995': 2509, 'power-961': 741, 'q102': 1997, 'kiss-108': 1097 };
+const iheartCache = new Map();
+async function iheartNowPlaying(stream) {
+  const cached = iheartCache.get(stream);
+  if (cached && Date.now() - cached.at < 15000) return cached;
+  const response = await fetch(`https://us.api.iheart.com/api/v3/live-meta/stream/${stream}/currentTrackMeta`, { headers: { Accept: 'application/json', 'User-Agent': 'NatesSoftware-HIFI/1.0 (+https://hifi.nates-software.com)' }, signal: AbortSignal.timeout(5000) });
+  if (response.status !== 200) throw Error(`iHeart metadata: ${response.status}`);
+  const data = await response.json();
+  const artist = clean(data?.artist), title = clean(data?.title);
+  if (!title) throw Error('iHeart metadata had no title');
+  const left = (Number(data?.endTime) - Date.now()) / 1000;
+  const now = { at: Date.now(), artist, title, remaining: Number.isFinite(left) && left > 0 ? Math.min(left, 3600) : null };
+  iheartCache.set(stream, now);
+  return now;
+}
 // "Listen on Spotify": a search link always works without keys. When the
 // Worker has SPOTIFY_CLIENT_ID/SPOTIFY_CLIENT_SECRET it resolves the exact
 // track with an app-only token, falling back to the search link on any failure.
@@ -161,14 +178,15 @@ async function nowPlaying(url, env) {
   const headers = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
   const station = url.searchParams.get('station');
   const soma = Object.hasOwn(SOMAFM, station) ? SOMAFM[station] : null;
-  if (station !== 'radio-paradise' && station !== 'rds' && !soma) return new Response(JSON.stringify({ error: 'Unknown station' }), { status: 404, headers });
+  const iheart = Object.hasOwn(IHEART, station) ? IHEART[station] : null;
+  if (station !== 'radio-paradise' && station !== 'rds' && !soma && !iheart) return new Response(JSON.stringify({ error: 'Unknown station' }), { status: 404, headers });
   try {
-    const now = soma ? await somaFmNowPlaying(soma) : station === 'rds' ? await rdsNowPlaying() : await radioParadiseNowPlaying();
+    const now = soma ? await somaFmNowPlaying(soma) : iheart ? await iheartNowPlaying(iheart) : station === 'rds' ? await rdsNowPlaying() : await radioParadiseNowPlaying();
     const elapsed = (Date.now() - now.at) / 1000;
     const remaining = now.remaining === null ? null : Math.max(0, Math.round(now.remaining - elapsed));
     // A programme name or the station slogan is not a song: no Spotify link for it.
     const [spotify, playlist] = await Promise.all([now.song === false ? { url: null, id: null } : spotifyLink(env, now.artist, now.title), natePlaylist()]);
-    return new Response(JSON.stringify({ station, source: soma ? 'somafm.com' : station === 'rds' ? 'rds.it' : 'radioparadise.com', artist: now.artist, title: now.title, remaining, poll: soma ? 20 : station === 'rds' ? 15 : undefined,
+    return new Response(JSON.stringify({ station, source: soma ? 'somafm.com' : iheart ? 'iheart.com' : station === 'rds' ? 'rds.it' : 'radioparadise.com', artist: now.artist, title: now.title, remaining, poll: soma ? 20 : station === 'rds' ? 15 : undefined,
       spotify: spotify.url, trackId: spotify.id, share: spotify.id ? `https://nates-software.com/hifi/song/${spotify.id}` : null, playlist }), { headers });
   } catch {
     return new Response(JSON.stringify({ error: 'Now-playing metadata unavailable' }), { status: 502, headers });
@@ -192,6 +210,17 @@ const MEDIA_HOSTS = [
   // KCRW, Antena 1, The Edge, Prambors and Hitz, Cool Fahrenheit, Love Radio, Galgalatz, Hit Radio
   'https://streams.kcrw.com', 'https://antenaone.crossradio.com.br', 'https://digitalstreams.mediaworks.nz', 'https://*.rcs.revma.com',
   'https://coolism-web3rd.cdn.byteark.com', 'https://azura.loveradio.com.ph', 'https://*.bynetcdn.com', 'https://hitradio-maroc.ice.infomaniak.ch',
+  // The metro stations, 2026-11-18 (StreamTheWorld, Global and the ARD hosts above carry many of them).
+  // Late Night Jazz (Ella Radio) and 98.8 KISS FM answer from radiohost.de; the nine iHeart stations from ihrhls.com:
+  'https://stream.ella-radio.de', 'https://*.radiohost.de', 'https://*.ihrhls.com',
+  // Germany: Antenne Bayern, NDR 2, 104.6 RTL, 98.8 KISS FM, Hit Radio FFH, bigFM
+  'https://*.antenne.de', 'https://icecast.ndr.de', 'https://stream.104.6rtl.com', 'https://stream.kissfm.de', 'https://mp3.ffh.de', 'https://stream.bigfm.de',
+  // France: Skyrock, Fun Radio and RTL2 (M6, through audiomeans), Europe 2 and RFM (lmn.fm)
+  'https://icecast.skyrock.net', 'https://icecast.funradio.fr', 'https://icecast.rtl2.fr', 'https://*.audiomeans.fr', 'https://*.lmn.fm', 'https://stream.rfm.fr',
+  // Spain: Cadena 100, Kiss FM (its advert hop uses port 8443), Flaix FM and D99 in Monterrey (both through mdstrm)
+  'https://*.flumotion.com', 'https://*.kissfmradio.cires21.com:*', 'https://stream.flaixfm.cat', 'https://mdstrm.com', 'https://*.mdstrm.com',
+  // Italy: Radio 105, R101 and Virgin Radio (unitedradio.it), Radio Kiss Kiss; SLAM!; KiSS 92.5 Toronto
+  'https://*.unitedradio.it', 'https://*.fluidstream.net', 'https://stream.slam.nl', 'https://rogers-hls.leanstream.co',
 ].join(' ');
 // Self-contained Windows 95 dialog (inline CSS, no script) shared with Nate's Software error pages.
 const notFoundPage = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Page not found — HIFI</title><style>*{box-sizing:border-box}html{background:#008080}body{margin:0;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:16px;background:#008080;color:#000;font:14px/1.5 "MS Sans Serif","Microsoft Sans Serif",Tahoma,Geneva,Verdana,sans-serif}.window{width:100%;max-width:460px;background:#c0c0c0;border:2px solid;border-color:#dfdfdf #000 #000 #dfdfdf;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080,4px 4px 0 rgba(0,0,0,.35);padding:3px}.titlebar{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;font-size:13px;padding:3px 3px 3px 6px;min-height:22px}.titlebar i{width:16px;height:14px;background:#c0c0c0;border:1px solid;border-color:#fff #000 #000 #fff;color:#000;font:bold 11px/12px Tahoma,sans-serif;font-style:normal;text-align:center}.content{display:flex;gap:14px;padding:18px 16px 14px}.icon{flex:none;width:34px;height:34px;border-radius:50%;background:#000080;color:#fff;font:bold 22px/34px Georgia,serif;text-align:center;box-shadow:1px 1px 0 #808080}h1{margin:0 0 8px;font-size:17px;line-height:1.3}p{margin:0 0 8px}.actions{display:flex;justify-content:flex-end;padding:4px 16px 16px}.button{display:inline-block;min-width:96px;padding:5px 16px;background:#c0c0c0;color:#000;text-align:center;text-decoration:none;font-weight:bold;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset -1px -1px #808080,inset 1px 1px #dfdfdf,0 0 0 1px #000}.button:focus-visible{outline:1px dotted #000;outline-offset:-5px}.status{margin:0 3px;padding:2px 6px;font-size:12px;border:1px solid;border-color:#808080 #fff #fff #808080}@media(max-width:420px){.actions .button{flex:1}}</style></head><body><main class="window" aria-labelledby="heading"><div class="titlebar"><span>HIFI</span><i aria-hidden="true">×</i></div><div class="content"><div class="icon" aria-hidden="true">i</div><div><h1 id="heading">This page isn’t on the air</h1><p>There’s nothing at this address on HIFI. The link may be old or mistyped.</p><p>The radio itself is one click away.</p></div></div><div class="actions"><a class="button" href="/">Open HIFI</a></div><div class="status">HIFI · a little radio from Nate’s Software</div></main></body></html>`;

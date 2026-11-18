@@ -19,7 +19,7 @@ No build tools needed just to hack on the player: `python3 -m http.server 8080`,
 
 ## What it does
 
-- **Radio** menu, one list with a search field above it (type anywhere on the list and it narrows by name, line or genre): Radio Paradise, eleven SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!; four for working, Working for the Weekend, Lo-Fi Beats to Work To, Code All Night and Y2K Chill-Out: SomaFM's Groove Salad, Fluid, DEF CON Radio and Groove Salad Classic; and for the season Soulful Christmas, Christmas at the Mall, Fireside Christmas and Rockin' Around the Tree: SomaFM's Jolly Ol' Soul, Department Store Christmas, Christmas Lounge and Christmas Rocks!), Pop Girl Radio from Exclusive Radio, RDS (Radio Dimensione Suono, from Rome) and 101X Chillville, streamed straight from their servers; on the web player the list goes on with Jazz24 and 37 of the world's big free stations (see Web-only stations). Nothing is proxied or rehosted. Then the **Synth Sounds**: Dial-Up, Shareware Summer, Night Build and Pixel Drift, procedurally composed MP3s in `tracks/`. Each one plays like a broadcast: the current track is picked from wall-clock time, so everyone hears the same thing.
+- **Radio** menu, one list with a search field above it (type anywhere on the list and it narrows by name, line or genre): Radio Paradise, eleven SomaFM channels (Boot Liquor, Sonic Universe, Indie Pop Rocks!; four for working, Working for the Weekend, Lo-Fi Beats to Work To, Code All Night and Y2K Chill-Out: SomaFM's Groove Salad, Fluid, DEF CON Radio and Groove Salad Classic; and for the season Soulful Christmas, Christmas at the Mall, Fireside Christmas and Rockin' Around the Tree: SomaFM's Jolly Ol' Soul, Department Store Christmas, Christmas Lounge and Christmas Rocks!), Pop Girl Radio from Exclusive Radio, RDS (Radio Dimensione Suono, from Rome) and 101X Chillville, streamed straight from their servers; on the web player the list goes on with Late Night Jazz, Jazz24 and 95 of the world's big free stations, one row per country that opens that country's list (see Web-only stations). Nothing is proxied or rehosted. Then the **Synth Sounds**: Dial-Up, Shareware Summer, Night Build and Pixel Drift, procedurally composed MP3s in `tracks/`. Each one plays like a broadcast: the current track is picked from wall-clock time, so everyone hears the same thing.
 - `stations.json` also carries `features` (today `christmas`): flags the web player and the apps read live, so a look can be switched on for everyone by editing the file and releasing. In the apps a long press on the title bar (the strip with the battery) turns the Christmas look on or off for that device ahead of the flag, so testers can see it any time.
 - `/player` (`index.html`, `app.js`, `styles.css`) is the same white click-wheel iPod as the native apps in `ios/Sources/IPod.swift`: drag the ring to scroll, center to choose, MENU to go back; on Now Playing the wheel is the volume. Arrow keys, Return, Escape and Space work too. It uses the Media Session API for lock-screen and media-key controls.
 - Spotify: listeners sign in with PKCE through `https://nates-software.com/hifi/spotify/callback` (state `web.…`), which hands the code to `/spotify` (`spotify.js`) to finish in the browser. The ♥ saves live songs to their Liked Songs; their playlists show under Playlists.
@@ -60,8 +60,21 @@ app and the Alexa skill read `stations`, so they never show it, whatever build t
 started there and moved to `stations` on 2026-11-15, when Nate cleared it. A new station whose
 permission is still open goes in `webStations` first.
 
-It holds 38 stations, added on 2026-11-18 and not cleared yet:
+It holds 97 stations, added on 2026-11-18 and not cleared yet:
 
+- **Late Night Jazz** (Ella Radio): slow instrumental ballads, piano trios and tenor sax. The
+  closest free stream to the Spotify playlist Dark Academia Jazz; Jazz24 is the broader one.
+- **The hit stations of the biggest metros**, 58 of them. United States, one for each of the
+  ten largest metros: Z100 (New York), KIIS FM (Los Angeles), 103.5 KISS FM (Chicago), 106.1
+  KISS FM (Dallas), WiLD 94.9 (San Francisco), 104.1 KRBE (Houston), HOT 99.5 (Washington),
+  Power 96.1 (Atlanta), Q102 (Philadelphia), KISS 108 (Boston). United Kingdom: Radio X,
+  Capital XTRA, Smooth Radio. Germany: Bayern 3, Antenne Bayern, NDR 2, Radio Hamburg, 104.6
+  RTL, 98.8 KISS FM, hr3, Hit Radio FFH, bigFM. France: Skyrock, Fun Radio, RTL2, Europe 2,
+  RFM. Spain: Cadena 100, Cadena Dial, Kiss FM, Flaix FM, RAC105. Italy: Radio 105, Radio Kiss
+  Kiss, R101, Virgin Radio. Netherlands: Radio 538, Sky Radio, SLAM!. Canada: KiSS 92.5.
+  Australia: KIIS 1065, Nova 96.9, KIIS 101.1, Nova 100, Nova 106.9, Nova 93.7, Nova 919.
+  Brazil: Mix FM, 89 FM, Band FM, Nativa FM, JB FM. Mexico: LOS40, Alfa 91.3, La Z, Stereo
+  Joya, Beat 100.9, D99.
 - **Jazz24** (KNKX, Seattle): classic jazz, ballads and standards, picked to match the Spotify
   playlist Dark Academia Jazz.
 - **The big free stations of the main markets.** Europe: Heart and Capital (UK), 1LIVE and SWR3
@@ -82,6 +95,15 @@ Egypt, Mediacorp in Singapore (it answers US listeners with a "not available" cl
 Ö3, DR P3 and RTL 102.5. StreamTheWorld closes a connection after 32 KB unless it is a media
 request (`Range` and `Accept-Encoding: identity`), which is what a browser's audio element
 sends; test those streams that way.
+
+A world station carries a `country` code, named in `countries` at the top of `stations.json`.
+The Radio list shows one row per country after the house stations; the row opens that
+country's list, and a search looks through every station at once. The nine iHeart stations
+have a song feed (`/api/now-playing`, from iHeart's public track endpoint). The other metro
+stations carry a `line` ("Houston · Top 40"), shown under the name when there is no song.
+Also left out: Bauer's UK stations (KISS, Hits Radio, Absolute Radio), which answer only with
+a listener token, Bell's and Stingray's Canadian stations, which play only in Canada, and
+Cogeco's in Montreal, which are HLS only.
 
 A new stream host goes in `MEDIA_HOSTS` in `worker.js` (the page's `media-src`), together with
 any host the stream redirects to.

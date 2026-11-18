@@ -189,16 +189,30 @@ async function loadVideoStations() {
 }
 // One list under Radio: the live stations, 101X Chillville, then Synth Sounds. (`band` stays in the
 // catalog for older native builds, which still show two menus.)
-const stationsIn = () => catalog.stations;
+// World stations carry a `country`: the Radio list shows one row per country after the house
+// stations, and each country opens its own list. A search looks through every station at once.
+const countryName = code => catalog.countries?.[code] || code;
+const isCountryRow = item => !item.id;
+const stationsIn = band => band?.startsWith('country:') ? catalog.stations.filter(station => station.country === band.slice(8)) : catalog.stations;
+function radioMenu() {
+  const list = catalog.stations.filter(station => !station.country);
+  const countries = [...new Set(catalog.stations.map(station => station.country).filter(Boolean))]
+    .sort((a, b) => countryName(a).localeCompare(countryName(b))).map(country => ({ country }));
+  list.splice(list.findLastIndex(station => station.band === 'radio') + 1, 0, ...countries);  // before Synth Sounds
+  return list;
+}
 // The Radio list's search: every word typed has to appear in the station's name, line, genre or tags.
 const stationMatches = (station, words) => {
-  const text = [stationName(station), station.name, station.subtitle, station.genre, ...(station.tags || [])].filter(Boolean).join(' ').toLowerCase();
+  const text = [stationName(station), station.name, station.subtitle, station.line, station.genre, ...(station.tags || [])].filter(Boolean).join(' ').toLowerCase();
   return words.every(word => text.includes(word));
 };
 const stationsShown = band => {
   const words = ui.query.toLowerCase().split(/\s+/).filter(Boolean);
-  return words.length ? stationsIn(band).filter(station => stationMatches(station, words)) : stationsIn(band);
+  if (words.length) return stationsIn(band).filter(station => stationMatches(station, words));
+  return band.startsWith('country:') ? stationsIn(band) : radioMenu();
 };
+// Where the list should open: on the station that is playing, or on its country's row.
+const playingRow = band => stationsShown(band).findIndex(item => item === radio.station || (isCountryRow(item) && item.country === radio.station.country));
 
 // MARK: Radio (ios/Sources/Radio.swift)
 
@@ -906,6 +920,7 @@ layout();
 // MARK: Menus
 
 const TITLES = { main: 'HIFI', 'band:radio': 'Radio', 'band:synth': 'Synth Sounds', playlists: 'Playlists', nowPlaying: 'Now Playing', settings: 'Settings', about: 'About' };
+const titleOf = p => p.startsWith('band:country:') ? countryName(p.slice(13)) : TITLES[p];
 const MAIN_PAGES = ['nowPlaying', 'band:radio', 'playlists', 'settings', 'about'];
 const ui = { stack: ['main'], selection: {}, showVolume: false, view: null, query: '' };  // query: the Radio list's search
 const page = () => ui.stack.at(-1);
@@ -916,7 +931,8 @@ function songLine(station) {
   if (station.subtitle) return station.subtitle;
   if (isLive(station)) {
     const song = radio.songs[station.id];
-    return song?.title ? [song.artist, song.title].filter(Boolean).join(' – ') : null;
+    // A station with no song yet (or no song feed) says where it is: "Los Angeles · Top 40".
+    return song?.title ? [song.artist, song.title].filter(Boolean).join(' – ') : station.line || null;
   }
   if (!station.tracks?.length) return null;
   const track = station.id === radio.station.id && radio.playing && radio.track ? radio.track : rotationAt(station.tracks, catalog.epoch).track;
@@ -926,7 +942,9 @@ function songLine(station) {
 function rows(p) {
   if (p === 'main') return [{ title: 'Now Playing', playing: radio.playing }, { title: 'Radio' }, { title: 'Playlists' }, { title: 'Settings' }, { title: 'About' }]
     .map(row => ({ chevron: true, ...row }));
-  if (p.startsWith('band:')) return stationsShown(p.slice(5)).map(station => ({ title: stationName(station), playing: radio.playing && station.id === radio.station.id, subtitle: songLine(station) }));
+  if (p.startsWith('band:')) return stationsShown(p.slice(5)).map(station => isCountryRow(station)
+    ? { title: countryName(station.country), subtitle: stationsIn(`country:${station.country}`).map(stationName).join(', '), chevron: true, playing: radio.playing && radio.station.country === station.country }
+    : { title: stationName(station), playing: radio.playing && station.id === radio.station.id, subtitle: songLine(station) });
   if (p === 'playlists') {
     // Nate's Software's playlist first, then the listener's own.
     const list = playlistRows().map(playlist => ({ title: playlist.name, subtitle: playlist.detail }));
@@ -955,7 +973,7 @@ function listView(p) {
   const search = searchable ? `<div class="search"><span class="mag" aria-hidden="true">${ICON.search}</span>`
     + '<input class="q" type="search" placeholder="Search stations" aria-label="Search stations" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">'
     + `<button class="clear" type="button" aria-label="Clear search" hidden>${ICON.clear}</button></div>` : '';
-  el.innerHTML = `${search}<div class="list" role="listbox" aria-label="${escape(TITLES[p])}"><div class="rows"></div><div class="hl" aria-hidden="true"></div>`
+  el.innerHTML = `${search}<div class="list" role="listbox" aria-label="${escape(titleOf(p))}"><div class="rows"></div><div class="hl" aria-hidden="true"></div>`
     + `${searchable ? '<div class="empty" hidden>No stations match</div>' : ''}</div>${p === 'main' ? '<div class="cover-pane"></div>' : ''}`;
   const list = el.querySelector('.list'), rowsEl = el.querySelector('.rows'), hl = el.querySelector('.hl'), pane = el.querySelector('.cover-pane');
   const field = el.querySelector('input.q'), clear = el.querySelector('.clear'), empty = el.querySelector('.empty');
@@ -1109,8 +1127,8 @@ function show(forward) {
   $('pages').append(view.el);
   view.update();
   const title = $('title');
-  if (title.textContent !== TITLES[p]) {
-    title.textContent = TITLES[p];
+  if (title.textContent !== titleOf(p)) {
+    title.textContent = titleOf(p);
     if (old && !reducedMotion.matches) title.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
   }
   if (!old) return entered(p);
@@ -1139,7 +1157,7 @@ function setQuery(value) {
 function push(next) {
   if (next.startsWith('band:')) {
     ui.query = '';  // the list opens whole
-    const index = stationsIn(next.slice(5)).indexOf(radio.station);
+    const index = playingRow(next.slice(5));
     if (index >= 0) ui.selection[next] = index;
   }
   ui.stack.push(next);
@@ -1150,7 +1168,7 @@ function menu() {
   touched();
   if (spotify.showConnect) { spotify.showConnect = false; return changed(); }
   if (ui.stack.length <= 1) return;
-  ui.stack.pop();
+  if (ui.stack.pop().startsWith('band:country:')) ui.query = '';  // a search inside a country stays there
   show(false);
 }
 
@@ -1193,6 +1211,7 @@ function select() {
   else if (p.startsWith('band:')) {
     const station = stationsShown(p.slice(5))[index];
     if (!station) return;
+    if (isCountryRow(station)) return push(`band:country:${station.country}`);
     tune(station);
     if (page() !== 'nowPlaying') push('nowPlaying');  // a video station already went there
   } else if (p === 'playlists') {
@@ -1414,7 +1433,7 @@ setInterval(() => { if (page().startsWith('band:') || page() === 'main') changed
 const opening = { radio: 'band:radio', synth: 'band:radio', nowPlaying: 'nowPlaying', playlists: 'playlists', settings: 'settings', about: 'about' }[params.get('page')];
 if (opening) {
   ui.stack.push(opening);
-  if (opening.startsWith('band:')) ui.selection[opening] = Math.max(0, stationsIn(opening.slice(5)).indexOf(radio.station));
+  if (opening.startsWith('band:')) ui.selection[opening] = Math.max(0, playingRow(opening.slice(5)));
 }
 show(true);
 touched();
