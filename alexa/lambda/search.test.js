@@ -39,7 +39,7 @@ test('KIIS FM is said "kiss FM", and a city tells the KISS stations apart', () =
 
 test('a genre, a mood, an artist, a city or a country', () => {
   for (const [said, id] of [
-    ['jazz', 'jazz24'], ['dark academia', 'late-night-jazz'], ['something for work', 'working-for-the-weekend'], ['taylor swift', 'pop-girl'],
+    ['jazz', 'jazz24'], ['top 40', 'pop-girl'], ['dark academia', 'late-night-jazz'], ['something for work', 'working-for-the-weekend'], ['taylor swift', 'pop-girl'],
     ['new york', 'z100'], ['los angeles', 'kiis-fm'], ['houston', 'krbe'], ['germany', '1live'], ['france', 'nrj'],
   ]) assert.strictEqual(first(said), id, said);
   assert.strictEqual(stations.find(s => s.id === first('something from australia')).country, 'AU');
