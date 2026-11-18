@@ -174,6 +174,25 @@ async function nowPlaying(url, env) {
     return new Response(JSON.stringify({ error: 'Now-playing metadata unavailable' }), { status: 502, headers });
   }
 }
+// Where a live station's audio may come from (the page's media-src). A stream often answers from another
+// server of the same broadcaster or its delivery network, so each entry covers the redirect as well.
+const MEDIA_HOSTS = [
+  'https://*.radioparadise.com', 'https://*.somafm.com', 'https://streaming.exclusive.radio', 'https://icstream.rds.radio',
+  // Web-only stations (stations.json webStations), 2026-11-18. Jazz24:
+  'https://*.audiocdn.com',
+  // Europe: Heart and Capital, 1LIVE and SWR3 (ARD), NRJ, Qmusic, Studio Brussel (VRT), Sveriges Radio, NRK,
+  // NOVA, YleX, RTÉ, RMF FM, SRF, Rádio Comercial, Power Türk
+  'https://media-ssl.musicradio.com', 'https://*.wdr.de', 'https://liveradio.swr.de', 'https://*.rndfnk.com', 'https://*.nrjaudio.fm',
+  'https://*.qmusic.nl', 'https://*.vrtcdn.be', 'https://*.streamabc.net', 'https://*.sr.se', 'https://lyd.nrk.no', 'https://*.contentdelivery.net',
+  'https://live-bauerdk.sharp-stream.com', 'https://icecast.live.yle.fi', 'https://icecast.rte.ie', 'https://*.rmfstream.pl', 'https://*.srg-ssr.ch',
+  'https://stream-icy.bauermedia.pt', 'https://listen.powerapp.com.tr',
+  // StreamTheWorld carries LOS40, RTÉ 2FM, CBC Music, Exa FM, La 100, Tropicana, Rock & Pop, Kiss92 and Metro FM;
+  // StreamGuys carries KEXP, triple j, The Edge, Cool FM and Capital FM Kenya
+  'https://*.streamtheworld.com', 'https://*.streamguys1.com',
+  // KCRW, Antena 1, The Edge, Prambors and Hitz, Cool Fahrenheit, Love Radio, Galgalatz, Hit Radio
+  'https://streams.kcrw.com', 'https://antenaone.crossradio.com.br', 'https://digitalstreams.mediaworks.nz', 'https://*.rcs.revma.com',
+  'https://coolism-web3rd.cdn.byteark.com', 'https://azura.loveradio.com.ph', 'https://*.bynetcdn.com', 'https://hitradio-maroc.ice.infomaniak.ch',
+].join(' ');
 // Self-contained Windows 95 dialog (inline CSS, no script) shared with Nate's Software error pages.
 const notFoundPage = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Page not found — HIFI</title><style>*{box-sizing:border-box}html{background:#008080}body{margin:0;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:16px;background:#008080;color:#000;font:14px/1.5 "MS Sans Serif","Microsoft Sans Serif",Tahoma,Geneva,Verdana,sans-serif}.window{width:100%;max-width:460px;background:#c0c0c0;border:2px solid;border-color:#dfdfdf #000 #000 #dfdfdf;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080,4px 4px 0 rgba(0,0,0,.35);padding:3px}.titlebar{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;font-size:13px;padding:3px 3px 3px 6px;min-height:22px}.titlebar i{width:16px;height:14px;background:#c0c0c0;border:1px solid;border-color:#fff #000 #000 #fff;color:#000;font:bold 11px/12px Tahoma,sans-serif;font-style:normal;text-align:center}.content{display:flex;gap:14px;padding:18px 16px 14px}.icon{flex:none;width:34px;height:34px;border-radius:50%;background:#000080;color:#fff;font:bold 22px/34px Georgia,serif;text-align:center;box-shadow:1px 1px 0 #808080}h1{margin:0 0 8px;font-size:17px;line-height:1.3}p{margin:0 0 8px}.actions{display:flex;justify-content:flex-end;padding:4px 16px 16px}.button{display:inline-block;min-width:96px;padding:5px 16px;background:#c0c0c0;color:#000;text-align:center;text-decoration:none;font-weight:bold;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset -1px -1px #808080,inset 1px 1px #dfdfdf,0 0 0 1px #000}.button:focus-visible{outline:1px dotted #000;outline-offset:-5px}.status{margin:0 3px;padding:2px 6px;font-size:12px;border:1px solid;border-color:#808080 #fff #fff #808080}@media(max-width:420px){.actions .button{flex:1}}</style></head><body><main class="window" aria-labelledby="heading"><div class="titlebar"><span>HIFI</span><i aria-hidden="true">×</i></div><div class="content"><div class="icon" aria-hidden="true">i</div><div><h1 id="heading">This page isn’t on the air</h1><p>There’s nothing at this address on HIFI. The link may be old or mistyped.</p><p>The radio itself is one click away.</p></div></div><div class="actions"><a class="button" href="/">Open HIFI</a></div><div class="status">HIFI · a little radio from Nate’s Software</div></main></body></html>`;
 // Mac downloads, counted as one anonymous number: nothing about who downloaded is kept.
@@ -238,7 +257,7 @@ export default {
     headers.set('X-Content-Type-Options','nosniff');
     if (env.HIFI_TEST) headers.set('X-Robots-Tag','noindex');  // the test copy (wrangler.test.toml) stays out of search
     headers.set('Referrer-Policy','strict-origin-when-cross-origin');
-    headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' https://*.radioparadise.com https://*.somafm.com https://streaming.exclusive.radio https://icstream.rds.radio; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self' https://www.youtube-nocookie.com; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'");
+    headers.set('Content-Security-Policy', `default-src 'self'; script-src 'self' https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' ${MEDIA_HOSTS}; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self' https://www.youtube-nocookie.com; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'`);
     // HTML is checked every visit; scripts and styles are linked by content hash
     // (scripts/build-site.mjs) so they keep for a year; media and the catalog keep a while.
     if (headers.get('Content-Type')?.includes('text/html')) headers.set('Cache-Control','no-cache');

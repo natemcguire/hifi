@@ -1,0 +1,191 @@
+[
+  {"id": "jazz24-1", "prompt": "1960s home movie: a dim, dusty library at night, tall wooden shelves of old books, a green banker's lamp glowing on a reading table beside an open novel, dust drifting in the lamplight, nobody there"},
+  {"id": "jazz24-2", "prompt": "1960s 8mm footage: an empty basement jazz club after hours, an upright bass leaning on a stool beside a piano, a single spotlight, cigarette haze hanging in the air, chairs up on the tables"},
+  {"id": "jazz24-3", "prompt": "1960s home movie: rain running down a tall study window at night, a leather armchair, a record turning on an old turntable, a glass of red wine on a stack of books, warm lamp light"},
+  {"id": "jazz24-4", "prompt": "1950s 8mm footage: a wet city street at night seen from a doorway, a street lamp glowing in the mist, a saxophone case resting against a brick wall, slow push-in, nobody around"},
+
+  {"id": "heart-1", "prompt": "1990s camcorder footage from the top deck of a red double-decker bus crossing a bridge over the Thames on a bright morning, the river and the skyline sliding past, people only as distant shapes"},
+  {"id": "heart-2", "prompt": "1990s home video: a kitchen in an English terraced house on a sunny morning, a kettle steaming, toast on a plate, a small radio on the windowsill, a garden with a washing line through the window, nobody there"},
+  {"id": "heart-3", "prompt": "1990s camcorder footage: a row of pastel beach huts on an English seaside promenade in summer, bunting flapping, seagulls wheeling, the sea beyond, nobody close"},
+  {"id": "heart-4", "prompt": "1980s home video through a car windscreen: driving down a narrow English country lane between green hedgerows on a summer afternoon, sunlight flickering through the trees"},
+
+  {"id": "capital-1", "prompt": "1990s camcorder footage: London at night from a moving car, neon signs and theatre lights streaking past, red buses, wet road shining, people only as blurred silhouettes"},
+  {"id": "capital-2", "prompt": "1990s VHS footage: an empty dance floor in a London club before opening, a mirror ball turning, coloured light beams sweeping through haze, nobody there"},
+  {"id": "capital-3", "prompt": "1990s home video: a summer music festival field in England at dusk seen from far back, a distant lit stage, flags waving, a crowd only as tiny silhouettes, the sky turning pink"},
+  {"id": "capital-4", "prompt": "1990s camcorder footage from a rooftop in London at sunset, chimney pots and aerials in the foreground, the city skyline glowing orange, a slow pan"},
+
+  {"id": "1live-1", "prompt": "1990s camcorder footage: the Rhine at Cologne at dusk, the twin cathedral spires and an iron railway bridge in silhouette, a long barge sliding past, lights coming on"},
+  {"id": "1live-2", "prompt": "1990s VHS footage from a tram window: riding through a German city in the evening, shop lights and bicycles passing, rain on the glass, people only as blurred shapes"},
+  {"id": "1live-3", "prompt": "1990s home video: an old industrial hall in the Ruhr turned into a club, bare brick, a wall of loudspeakers, coloured lights pulsing in fog, nobody on the floor"},
+  {"id": "1live-4", "prompt": "1990s camcorder footage: a summer open-air festival beside a lake in western Germany at sunset, tents and flags in the foreground, a distant stage glowing, a crowd only as far-off silhouettes"},
+
+  {"id": "swr3-1", "prompt": "1980s home video through a car windscreen: a winding road through the Black Forest on a clear morning, dark fir trees on both sides, mist in the valley below"},
+  {"id": "swr3-2", "prompt": "1990s camcorder footage: vineyards on a steep hillside above a river in south-west Germany in early autumn, golden leaves, a small village with a church tower below, slow pan"},
+  {"id": "swr3-3", "prompt": "1990s home video: a balcony in a German town on a summer evening, geraniums in window boxes, a small radio on a table beside two glasses, half-timbered houses across the street, nobody there"},
+  {"id": "swr3-4", "prompt": "1990s camcorder footage from a ferry on Lake Constance at golden hour, the wake spreading behind, the Alps faint on the horizon, a flag flapping at the stern"},
+
+  {"id": "nrj-1", "prompt": "1990s camcorder footage from a moving car in Paris at night, the lit Eiffel Tower sliding past between buildings, street lamps along the Seine, reflections on the water"},
+  {"id": "nrj-2", "prompt": "1990s home video: a Paris café terrace early in the morning, rattan chairs and round tables, two coffee cups, pigeons on the pavement, Haussmann buildings behind, nobody seated"},
+  {"id": "nrj-3", "prompt": "1990s VHS footage: a nightclub on the French Riviera before opening, palm trees lit pink and blue, an empty dance floor beside a pool, the sea dark beyond"},
+  {"id": "nrj-4", "prompt": "1980s home video through a car windscreen: driving a tree-lined road in the south of France in summer, plane trees flickering past, bright sun and deep shade, fields of sunflowers"},
+
+  {"id": "los40-1", "prompt": "1990s camcorder footage: a grand avenue in Madrid at night seen from a moving car, lit theatre fronts and fountains passing, warm street lamps, people only as distant shapes"},
+  {"id": "los40-2", "prompt": "1990s home video: a beach bar on the Spanish coast at sunset, straw parasols, empty stools, a portable radio on the counter, the sea glowing orange"},
+  {"id": "los40-3", "prompt": "1990s camcorder footage: a whitewashed Spanish village street at midday, geraniums in blue pots, laundry overhead, a cat asleep in a doorway, hard sun and shadow"},
+  {"id": "los40-4", "prompt": "1990s VHS footage: a summer fiesta in a Spanish plaza at night, strings of coloured bulbs overhead, paper lanterns swaying, an empty bandstand, people only as far silhouettes"},
+
+  {"id": "qmusic-1", "prompt": "1990s home video from a bicycle: riding along an Amsterdam canal on a bright morning, tall narrow gabled houses, houseboats, bicycles chained to the railings, leaves on the water"},
+  {"id": "qmusic-2", "prompt": "1990s camcorder footage: a row of Dutch windmills beside a flat green polder on a breezy day, the sails turning slowly, clouds racing overhead"},
+  {"id": "qmusic-3", "prompt": "1990s home video: endless striped tulip fields in the Netherlands in spring, red and yellow rows running to the horizon, a narrow dyke road, nobody there"},
+  {"id": "qmusic-4", "prompt": "1990s camcorder footage: a wide Dutch North Sea beach at sunset, wooden beach pavilions on stilts, dune grass bending in the wind, long shadows on the sand"},
+
+  {"id": "studio-brussel-1", "prompt": "1990s camcorder footage: a cobbled square in Brussels at dusk, ornate guild houses with gilded gables, lights coming on in the windows, wet stones shining, people only as distant shapes"},
+  {"id": "studio-brussel-2", "prompt": "1990s VHS footage: a big Belgian summer rock festival field at night from far back, a distant stage flashing, flags and tents in silhouette, mud and puddles catching the light"},
+  {"id": "studio-brussel-3", "prompt": "1990s home video: a quiet canal in Ghent early in the morning, stepped-gable houses reflected in still water, a rowing boat tied up, mist lifting"},
+  {"id": "studio-brussel-4", "prompt": "1990s camcorder footage: a small record shop in Antwerp after closing, crates of vinyl, a turntable on the counter, an electric guitar on the wall, one lamp left on, nobody there"},
+
+  {"id": "sr-p3-1", "prompt": "1990s camcorder footage: the Stockholm waterfront on a summer night that never gets dark, pastel buildings glowing, white boats moored at the quay, pale sky at midnight"},
+  {"id": "sr-p3-2", "prompt": "1980s home video: a red wooden cottage with white trim beside a Swedish lake at midsummer, a small jetty, a rowing boat, birch trees, bright evening light, nobody there"},
+  {"id": "sr-p3-3", "prompt": "1990s VHS footage from a train window: crossing a snowy Swedish forest in winter at blue dusk, pines heavy with snow, a frozen lake, a single lit house far off"},
+  {"id": "sr-p3-4", "prompt": "1990s camcorder footage: a ferry threading the Stockholm archipelago in summer, small rocky islands with pines and red boathouses sliding past, gulls following the wake"},
+
+  {"id": "nrk-p3-1", "prompt": "1990s camcorder footage from a ferry deck in a Norwegian fjord, sheer green mountainsides rising from dark water, a thin waterfall, low cloud on the peaks"},
+  {"id": "nrk-p3-2", "prompt": "1990s home video: northern lights rippling green over a snow-covered wooden cabin in Norway at night, warm light in one window, stars above"},
+  {"id": "nrk-p3-3", "prompt": "1990s camcorder footage: the old wooden wharf houses of a Norwegian harbour town in the rain, bright painted fronts, fishing boats rocking, wet cobbles"},
+  {"id": "nrk-p3-4", "prompt": "1980s home video through a car windscreen: a mountain road in Norway in early summer, snow patches beside the tarmac, a turquoise lake below, sheep on the verge"},
+
+  {"id": "nova-denmark-1", "prompt": "1990s camcorder footage: the Copenhagen harbour canal on a sunny afternoon, tall narrow townhouses painted yellow, red and blue, wooden sailing boats at the quay, people only as distant shapes"},
+  {"id": "nova-denmark-2", "prompt": "1990s home video from a bicycle: riding a Copenhagen bike lane on a summer evening, other bicycles ahead only as backs, copper spires against a pink sky"},
+  {"id": "nova-denmark-3", "prompt": "1980s home video: a white thatched summer house in the Danish dunes, a flagpole with a pennant, marram grass bending, the grey-blue sea behind, nobody there"},
+  {"id": "nova-denmark-4", "prompt": "1990s camcorder footage: an old amusement garden in Denmark at dusk, thousands of small bulbs outlining pavilions and trees, a carousel turning slowly, people only as far silhouettes"},
+
+  {"id": "ylex-1", "prompt": "1990s camcorder footage: a wooden sauna hut at the edge of a Finnish lake at midnight sun, smoke rising from the chimney, a jetty, still water reflecting pink sky, nobody there"},
+  {"id": "ylex-2", "prompt": "1990s home video from a tram window in Helsinki on a snowy evening, green and yellow trams passing, lit shop windows, snow falling through street lamps"},
+  {"id": "ylex-3", "prompt": "1990s VHS footage: a rock festival beside the sea in Finland on a white summer night, a distant stage, tents among birch trees, a crowd only as far-off shapes"},
+  {"id": "ylex-4", "prompt": "1990s camcorder footage: a frozen lake in Finland on a bright winter day, a snowmobile track running to the horizon, snow-laden spruce forest, long blue shadows"},
+
+  {"id": "rte-2fm-1", "prompt": "1990s camcorder footage: a Dublin street of Georgian houses with brightly painted doors after rain, wet pavement shining, a double-decker bus passing, people only as distant shapes"},
+  {"id": "rte-2fm-2", "prompt": "1980s home video through a car windscreen: a narrow road on the west coast of Ireland, dry stone walls, green fields, the Atlantic and cliffs ahead under fast clouds"},
+  {"id": "rte-2fm-3", "prompt": "1990s home video: an empty Irish pub in the afternoon, a turf fire glowing, a fiddle and a guitar resting on a bench, sunlight through a small window, nobody there"},
+  {"id": "rte-2fm-4", "prompt": "1990s camcorder footage: a small Irish harbour at dusk, painted fishing boats, lobster pots stacked on the quay, a lighthouse blinking, gulls on the wall"},
+
+  {"id": "rmf-fm-1", "prompt": "1990s camcorder footage: the old market square in Kraków at dawn, a great brick church with two uneven towers, pigeons taking off from the cobbles, horse carriages waiting, nobody close"},
+  {"id": "rmf-fm-2", "prompt": "1990s home video: the Tatra mountains in winter, wooden highland houses with steep roofs under deep snow, smoke from chimneys, jagged peaks behind"},
+  {"id": "rmf-fm-3", "prompt": "1990s camcorder footage from a tram window in a Polish city on a summer evening, pastel tenement fronts, linden trees, golden light, people only as blurred shapes"},
+  {"id": "rmf-fm-4", "prompt": "1980s home video: a wide sandy beach on the Polish Baltic coast, wicker beach chairs, pine forest behind the dunes, gentle grey waves, a kite in the sky"},
+
+  {"id": "srf-3-1", "prompt": "1990s camcorder footage from a red mountain train in the Swiss Alps, curving across a stone viaduct, snowy peaks and a deep green valley sliding past the window"},
+  {"id": "srf-3-2", "prompt": "1990s home video: Zurich by the lake on a summer evening, swans near the quay, church towers behind, a white steamer leaving, the Alps faint in the distance"},
+  {"id": "srf-3-3", "prompt": "1980s home video: an alpine meadow in Switzerland in summer, brown cows with big bells grazing, a wooden chalet with flower boxes, a sharp snowy peak behind"},
+  {"id": "srf-3-4", "prompt": "1990s camcorder footage: an open-air music festival on a Swiss hillside at dusk seen from far back, a distant stage, a lake below, mountains turning pink"},
+
+  {"id": "radio-comercial-1", "prompt": "1990s camcorder footage from an old yellow tram climbing a steep narrow street in Lisbon, tiled house fronts, laundry on balconies, the river glinting at the bottom of the hill"},
+  {"id": "radio-comercial-2", "prompt": "1990s home video: a viewpoint over Lisbon at sunset, terracotta rooftops tumbling down to the wide river, a long red suspension bridge in the distance, a slow pan"},
+  {"id": "radio-comercial-3", "prompt": "1990s camcorder footage: a beach in the Algarve, golden cliffs and sea arches, clear green water, a small fishing boat pulled up on the sand, nobody close"},
+  {"id": "radio-comercial-4", "prompt": "1980s home video: a small Portuguese café counter in the morning, custard tarts under a glass dome, an espresso cup, blue and white tiles on the wall, sunlight through the door, nobody there"},
+
+  {"id": "power-turk-1", "prompt": "1990s camcorder footage from a ferry crossing the Bosphorus at sunset, domes and slender minarets in silhouette, gulls following the boat, a glass of tea on the rail"},
+  {"id": "power-turk-2", "prompt": "1990s home video: a steep cobbled street in Istanbul, wooden houses with bay windows, cats on the steps, a red tram bell in the distance, people only as far shapes"},
+  {"id": "power-turk-3", "prompt": "1990s camcorder footage: a Turkish Aegean bay in summer, a wooden gulet at anchor on turquoise water, pine-covered hills, white houses on the shore"},
+  {"id": "power-turk-4", "prompt": "1990s home video: hot-air balloons rising at dawn over a valley of pale rock chimneys in central Turkey, soft pink light, a slow pan"},
+
+  {"id": "kexp-1", "prompt": "1990s camcorder footage: rain on a Seattle street at dusk, a tall slender observation tower on the skyline, wet pavement shining, a ferry horn in the mist, people only as far shapes with umbrellas"},
+  {"id": "kexp-2", "prompt": "1990s home video: a small independent record shop in the Pacific Northwest, crates of vinyl, hand-drawn gig flyers without readable words on the wall, a turntable spinning, grey light through the window, nobody there"},
+  {"id": "kexp-3", "prompt": "1990s camcorder footage from a ferry on Puget Sound, evergreen islands in fog, a snow-capped volcano faint above the clouds, gulls on the rail"},
+  {"id": "kexp-4", "prompt": "1990s VHS footage: an empty small club stage in Seattle before a show, amplifiers, a drum kit, a guitar on a stand, red stage lights in haze, nobody there"},
+
+  {"id": "kcrw-1", "prompt": "1990s camcorder footage through a car windscreen: driving the Pacific Coast Highway near Los Angeles at golden hour, the ocean on one side, palm trees and dry hills on the other"},
+  {"id": "kcrw-2", "prompt": "1990s home video: a pier on the Los Angeles coast at sunset, a Ferris wheel turning slowly, surfers only as tiny shapes on the waves, the sky orange and purple"},
+  {"id": "kcrw-3", "prompt": "1990s camcorder footage: Los Angeles from the hills at night, a vast grid of lights to the horizon, a single palm tree in the foreground, warm haze"},
+  {"id": "kcrw-4", "prompt": "1980s home video: a mid-century house in the Los Angeles hills, a turquoise pool, a radio on a low table beside two empty loungers, bougainvillea, bright afternoon sun, nobody there"},
+
+  {"id": "cbc-music-1", "prompt": "1990s camcorder footage from a canoe on a still Canadian lake at dawn, the bow gliding forward, mist on the water, pine-covered rocky shores, a loon in the distance"},
+  {"id": "cbc-music-2", "prompt": "1990s home video: an outdoor skating rink in a Canadian city on a winter night, strings of lights overhead, snowbanks, skaters only as distant shapes, a tall slender tower lit on the skyline"},
+  {"id": "cbc-music-3", "prompt": "1980s home video through a car windscreen: a highway through the Canadian Rockies in autumn, golden aspens, a turquoise river, snow on the peaks ahead"},
+  {"id": "cbc-music-4", "prompt": "1990s camcorder footage: a wooden cabin porch in Canada in autumn, a guitar leaning on a chair, a red plaid blanket, maple leaves blowing across the boards, a lake behind, nobody there"},
+
+  {"id": "exa-fm-1", "prompt": "1990s camcorder footage: a wide avenue in Mexico City at dusk seen from a moving car, a golden winged statue on a tall column, jacaranda trees in purple bloom, lights coming on"},
+  {"id": "exa-fm-2", "prompt": "1990s home video: brightly painted flat-bottomed boats on a canal in the south of Mexico City, flower arches in red, yellow and blue, green water, nobody aboard"},
+  {"id": "exa-fm-3", "prompt": "1990s camcorder footage: a colonial Mexican street at midday, houses painted pink, orange and blue, strings of cut-paper flags overhead fluttering, a church dome at the end, nobody close"},
+  {"id": "exa-fm-4", "prompt": "1990s home video: a beach on the Mexican Caribbean, white sand, a thatched palapa, a hammock swaying between palms, turquoise water, nobody there"},
+
+  {"id": "antena-1-1", "prompt": "1990s camcorder footage: a long avenue of tall buildings in São Paulo at night from a moving car, antenna towers lit on the rooftops, traffic lights streaming, people only as far shapes"},
+  {"id": "antena-1-2", "prompt": "1990s home video: Rio de Janeiro at sunset from a hilltop, a rounded granite peak rising from the bay, the curve of a long beach, lights coming on, a slow pan"},
+  {"id": "antena-1-3", "prompt": "1980s home video: a beach in Brazil in the late afternoon, a wave-patterned black and white mosaic promenade, coconut palms, a green coconut with a straw on a low wall, nobody close"},
+  {"id": "antena-1-4", "prompt": "1990s camcorder footage: an apartment balcony high above São Paulo at dusk, a small radio and two glasses on a table, a hammock, the endless skyline turning gold, nobody there"},
+
+  {"id": "la-100-1", "prompt": "1990s camcorder footage: a very wide avenue in Buenos Aires at night from a moving car, a tall white obelisk lit at the centre, theatre lights, jacaranda trees"},
+  {"id": "la-100-2", "prompt": "1990s home video: a street of houses built of corrugated metal painted in bright blocks of blue, yellow and red in an old port quarter of Buenos Aires, washing on a balcony, nobody close"},
+  {"id": "la-100-3", "prompt": "1990s camcorder footage: an old café in Buenos Aires in the afternoon, dark wood, marble tables, two coffee cups, a bandoneon resting on a chair, light through tall windows, nobody there"},
+  {"id": "la-100-4", "prompt": "1980s home video through a car windscreen: a straight empty road across the Argentine pampas at sunset, flat grassland to the horizon, a windmill and a lone ombú tree"},
+
+  {"id": "tropicana-1", "prompt": "1990s camcorder footage: a walled colonial city on the Colombian Caribbean at golden hour, balconies overflowing with bougainvillea, houses painted yellow and blue, a bell tower, nobody close"},
+  {"id": "tropicana-2", "prompt": "1990s home video: an open-air dance hall in a Colombian town at night, strings of coloured bulbs, congas and timbales set up on a small stage, an empty tiled floor, nobody there"},
+  {"id": "tropicana-3", "prompt": "1990s camcorder footage: green coffee hills in Colombia in the morning, a painted wooden farmhouse with a red veranda, tall wax palms in the mist"},
+  {"id": "tropicana-4", "prompt": "1990s home video: a brightly painted old bus with an open side climbing a mountain road in Colombia, banana plants beside the road, clouds in the valley, people only as distant shapes"},
+
+  {"id": "rock-and-pop-1", "prompt": "1990s camcorder footage: Santiago de Chile at dusk from a hill, the city lights spreading out, the snow-covered Andes glowing pink behind the towers"},
+  {"id": "rock-and-pop-2", "prompt": "1990s home video: the steep hills of a Chilean port city, houses painted every colour stacked up the slope, an old funicular car climbing, the Pacific below"},
+  {"id": "rock-and-pop-3", "prompt": "1990s VHS footage: an empty rehearsal room in Santiago, electric guitars on stands, a drum kit, amplifiers, a bare bulb, egg-box foam on the walls, nobody there"},
+  {"id": "rock-and-pop-4", "prompt": "1980s home video through a car windscreen: a desert highway in northern Chile at sunset, red earth, distant volcanoes, a long straight road"},
+
+  {"id": "triple-j-1", "prompt": "1990s camcorder footage: a surf beach in Australia early in the morning, lines of waves, surfers only as tiny shapes, a kombi-style van with boards on the roof parked on the grass above"},
+  {"id": "triple-j-2", "prompt": "1990s home video: Sydney harbour from a ferry on a bright day, the white sail-shaped roofs of a concert hall and a great steel arch bridge sliding past, sparkling water"},
+  {"id": "triple-j-3", "prompt": "1990s VHS footage: an outback road in Australia at sunset through a car windscreen, red dirt, gum trees, a kangaroo crossing far ahead, a huge orange sky"},
+  {"id": "triple-j-4", "prompt": "1990s camcorder footage: a summer music festival in Australian bushland at dusk from far back, a distant stage, eucalyptus trees, tents, a crowd only as far silhouettes, dust in the light"},
+
+  {"id": "the-edge-1", "prompt": "1990s camcorder footage: Auckland harbour on a breezy summer day, dozens of white sails, a tall slender tower on the skyline, a green volcanic island across the water"},
+  {"id": "the-edge-2", "prompt": "1990s home video through a car windscreen: a road through green New Zealand hills dotted with sheep, a snowy mountain range ahead, a bright blue lake below"},
+  {"id": "the-edge-3", "prompt": "1990s camcorder footage: a black-sand surf beach on the west coast of New Zealand at sunset, big waves, sea mist, flax bushes in the foreground, nobody close"},
+  {"id": "the-edge-4", "prompt": "1990s home video: a small holiday bach by a New Zealand beach, a deck with a barbecue, a radio and jandals on the step, a pohutukawa tree in red flower, nobody there"},
+
+  {"id": "kiss92-1", "prompt": "1990s camcorder footage: the Singapore skyline at night from across the bay, towers reflected in the water, a small wooden bumboat with lanterns crossing, warm humid haze"},
+  {"id": "kiss92-2", "prompt": "1990s home video: a row of old Singapore shophouses painted pastel pink, green and yellow, wooden shutters, potted palms on the five-foot way, nobody close"},
+  {"id": "kiss92-3", "prompt": "1990s camcorder footage: an open-air hawker centre in Singapore in the evening, steam rising from stalls, ceiling fans turning, round tables with empty stools, people only as distant shapes"},
+  {"id": "kiss92-4", "prompt": "1990s VHS footage: a tropical downpour in Singapore seen from a covered walkway, rain sheeting off a tiled roof, palm fronds thrashing, a street glistening"},
+
+  {"id": "prambors-1", "prompt": "1990s camcorder footage: Jakarta at dusk from a moving car, a tall monument with a golden flame on the skyline, scooters only as streaks of light, a pink and purple sky"},
+  {"id": "prambors-2", "prompt": "1990s home video: green rice terraces in Bali in the morning, palm trees, a small thatched shrine, mist in the valley, a slow pan"},
+  {"id": "prambors-3", "prompt": "1990s camcorder footage: a beach in Indonesia at sunset, painted outrigger fishing boats pulled up on the sand, a volcano in silhouette across the water"},
+  {"id": "prambors-4", "prompt": "1990s VHS footage: a small roadside food cart in Jakarta at night lit by a single lamp, steam rising, a radio on the shelf, wet street and passing headlights behind, nobody close"},
+
+  {"id": "hitz-1", "prompt": "1990s camcorder footage: Kuala Lumpur at night, two tall silver twin towers joined by a bridge lit against the sky, traffic streaming below, warm haze"},
+  {"id": "hitz-2", "prompt": "1990s home video: a night market street in Malaysia, rows of stalls under red lanterns, steam and smoke from grills, people only as distant shapes"},
+  {"id": "hitz-3", "prompt": "1990s camcorder footage: a tea plantation in the Malaysian highlands in the morning, rolling green hills in neat rows, low cloud, a winding road"},
+  {"id": "hitz-4", "prompt": "1990s home video: a tropical island beach in Malaysia, a wooden jetty over clear turquoise water, a long-tail boat moored, palm trees, nobody there"},
+
+  {"id": "cool-fahrenheit-1", "prompt": "1990s camcorder footage from a long-tail boat on the river in Bangkok at sunset, temple spires glittering on the bank, the water gold, other boats only as far shapes"},
+  {"id": "cool-fahrenheit-2", "prompt": "1990s home video: a Bangkok street at night after rain, three-wheeled taxis only as streaks of light, tangled overhead wires, neon reflections in puddles"},
+  {"id": "cool-fahrenheit-3", "prompt": "1990s camcorder footage: a quiet beach in southern Thailand, tall limestone cliffs rising from green water, a long-tail boat with ribbons on its bow at anchor, nobody close"},
+  {"id": "cool-fahrenheit-4", "prompt": "1990s VHS footage: a small café in Bangkok on a hot afternoon, a ceiling fan turning, two iced drinks sweating on a table, a radio on a shelf, soft light through shutters, nobody there"},
+
+  {"id": "love-radio-1", "prompt": "1990s camcorder footage: Manila Bay at sunset from the seawall, coconut palms in silhouette, an enormous orange sun sinking into the water, outrigger boats far out"},
+  {"id": "love-radio-2", "prompt": "1990s home video: a brightly decorated chrome-and-paint minibus parked on a street in Manila, tassels and horse ornaments on the bonnet, a radio aerial with ribbons, nobody close"},
+  {"id": "love-radio-3", "prompt": "1990s camcorder footage: a white-sand island beach in the Philippines, an outrigger boat with a blue sail, clear water, coconut palms leaning over the shore, nobody there"},
+  {"id": "love-radio-4", "prompt": "1990s VHS footage: a small living room in the Philippines in the evening, a karaoke machine with a microphone on a table, an electric fan turning, paper star lanterns glowing in the window, nobody there"},
+
+  {"id": "galgalatz-1", "prompt": "1990s camcorder footage: the Tel Aviv seafront promenade at sunset, white modernist buildings with curved balconies, palm trees, the Mediterranean glowing, people only as distant shapes"},
+  {"id": "galgalatz-2", "prompt": "1990s home video: the old stone port of Jaffa at dusk, fishing boats in the harbour, a clock tower, warm lamps on honey-coloured walls, nobody close"},
+  {"id": "galgalatz-3", "prompt": "1980s home video through a car windscreen: a desert road in the Negev at golden hour, pale cliffs and a wide crater, a long empty road"},
+  {"id": "galgalatz-4", "prompt": "1990s camcorder footage: a rooftop in Tel Aviv on a summer night, a radio and a bowl of oranges on a low table, solar water tanks and aerials on the roofs around, the sea beyond, nobody there"},
+
+  {"id": "metro-fm-1", "prompt": "1990s camcorder footage: Johannesburg at dusk from a hill, the downtown towers and a tall concrete broadcasting tower against an orange sky, jacaranda trees in purple bloom below"},
+  {"id": "metro-fm-2", "prompt": "1990s home video: Cape Town from the harbour on a clear day, a great flat-topped mountain with a cloth of white cloud spilling over its edge, boats in the foreground"},
+  {"id": "metro-fm-3", "prompt": "1990s VHS footage: a township street in South Africa on a Saturday afternoon, brightly painted houses, a minibus only as a far shape, a big speaker on a stoep, long golden light, nobody close"},
+  {"id": "metro-fm-4", "prompt": "1990s camcorder footage: the South African bushveld at sunset, flat-topped acacia trees in silhouette, giraffes far off, a dirt road, a huge red sun"},
+
+  {"id": "cool-fm-1", "prompt": "1990s camcorder footage: the Lagos lagoon at dusk, a very long low road bridge stretching across the water, wooden canoes far out, the city skyline lit behind"},
+  {"id": "cool-fm-2", "prompt": "1990s home video: a busy Lagos street seen from a balcony, bright yellow minibuses only as shapes below, market umbrellas in every colour, afternoon sun and dust"},
+  {"id": "cool-fm-3", "prompt": "1990s camcorder footage: a beach in Lagos at sunset, tall coconut palms, wooden beach huts, Atlantic surf rolling in, horses only as distant silhouettes"},
+  {"id": "cool-fm-4", "prompt": "1990s VHS footage: an open-air bar in Lagos at night, strings of coloured bulbs, big loudspeakers stacked beside an empty dance floor, plastic chairs, nobody there"},
+
+  {"id": "capital-fm-kenya-1", "prompt": "1990s camcorder footage: Nairobi at sunrise from a hill, the city towers rising beyond a grassy plain, acacia trees in the foreground, giraffes only as far silhouettes"},
+  {"id": "capital-fm-kenya-2", "prompt": "1990s home video: a brightly painted minibus covered in murals parked on a Nairobi street, coloured lights along its roof, a row of jacaranda trees behind, nobody close"},
+  {"id": "capital-fm-kenya-3", "prompt": "1990s camcorder footage: the Kenyan savannah at golden hour through a car windscreen, a red dirt track, zebra and wildebeest far off, a lone flat-topped tree"},
+  {"id": "capital-fm-kenya-4", "prompt": "1990s home video: a white beach on the Kenyan coast, a wooden dhow with a triangular sail offshore, palm trees, turquoise shallows, nobody there"},
+
+  {"id": "hit-radio-1", "prompt": "1990s camcorder footage: a huge mosque on the Casablanca seafront at sunset, a very tall square minaret, Atlantic waves breaking against the wall below, gulls"},
+  {"id": "hit-radio-2", "prompt": "1990s home video: a rooftop terrace in Marrakech at dusk, lanterns, cushions and a brass teapot on a low table, pink walls, palm trees and the snowy Atlas mountains behind, nobody there"},
+  {"id": "hit-radio-3", "prompt": "1990s camcorder footage: a narrow lane in a Moroccan town with every wall and step painted blue, potted plants, a cat on a doorstep, a shaft of sunlight"},
+  {"id": "hit-radio-4", "prompt": "1980s home video through a car windscreen: a road along the Moroccan Atlantic coast, argan trees, a long empty beach, surfers' vans only as far shapes, low golden sun"}
+]

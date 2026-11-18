@@ -71,6 +71,8 @@ for (const station of Array.isArray(catalog.webStations) ? catalog.webStations :
   catalog.stations.splice(catalog.stations.findLastIndex(s => s.band === 'radio') + 1, 0, station);
 }
 const isLive = station => Boolean(station.stream);
+// Only a station with a song feed (nowPlaying) is asked what is on air; the others show their own line.
+const hasSongFeed = station => isLive(station) && Boolean(station.nowPlaying);
 
 // MARK: Christmas
 // stations.json carries feature flags, so the look can be switched on for everyone without a
@@ -446,6 +448,7 @@ async function fetchSong(id) {
 const sameSong = (a, b) => a?.title === b?.title && a?.artist === b?.artist;
 function pollLiveSong() {
   stopPolling();
+  if (!hasSongFeed(radio.station)) return;
   const id = radio.station.id;
   pollFor = id;
   const tick = async () => {
@@ -464,7 +467,7 @@ function pollLiveSong() {
 }
 function stopPolling() { pollFor = null; clearTimeout(pollTimer); }
 async function refreshSongs() {
-  await Promise.all(catalog.stations.filter(isLive).map(async station => {
+  await Promise.all(catalog.stations.filter(hasSongFeed).map(async station => {
     const song = await fetchSong(station.id);
     if (song) radio.songs[station.id] = song;
   }));
@@ -1035,10 +1038,10 @@ function nowPlayingView() {
     const words = [displayTitle(), displayArtist(), clip ? `${stationName(station)} · ${station.genre}` : stationName(station)];
     // A live station whose song is still on its way: the words stay as they are until it lands
     // (or 3 s pass), rather than flash the station's name and genre in between.
-    const waiting = isLive(station) && !radio.liveSong && wordsFor !== null && !holdDone;
+    const waiting = hasSongFeed(station) && !radio.liveSong && wordsFor !== null && !holdDone;
     if (waiting && !holdTimer) holdTimer = setTimeout(() => { holdTimer = 0; holdDone = true; view.update(); }, 3000);
     if (!waiting) { clearTimeout(holdTimer); holdTimer = 0; }
-    if (radio.liveSong || !isLive(station)) holdDone = false;
+    if (radio.liveSong || !hasSongFeed(station)) holdDone = false;
     if (!waiting && words.join('\n') !== wordsFor) {
       const apply = () => { text('.np-title', words[0]); text('.np-artist', words[1]); text('.np-station', words[2]); };
       const details = q('.details');
