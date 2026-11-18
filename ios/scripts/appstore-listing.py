@@ -256,7 +256,9 @@ def fill(app, version):
     detail = {**contact(app), "demoAccountRequired": False,
               "notes": "No account needed. Press the center button on the click wheel to play. "
                        "Synth Sounds stations are original music we made; the Radio stations are the public "
-                       "streams of Radio Paradise, SomaFM and Exclusive Radio. Picture in Picture: start a station, then go home. "
+                       "streams of Radio Paradise, SomaFM and Exclusive Radio. The stations listed by country under Radio "
+                       "(Z100, KIIS FM, Heart, 1LIVE and the rest) each play that broadcaster's own public stream, "
+                       "straight from its servers. Picture in Picture: start a station, then go home. "
                        "HIFI TV clips are original AI-generated video made for HIFI. 101X Chillville plays each song's official "
                        "YouTube upload in YouTube's own embedded player (youtube-nocookie.com), shown on screen and only while "
                        "the app is open; leaving Now Playing stops it. "
