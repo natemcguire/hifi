@@ -113,6 +113,13 @@ const model = {
         // Amazon's next and previous can't take extra phrases, so the station-flavoured ones get their own intents.
         { name: 'NextStationIntent', slots: [], samples: ['next station', 'another station', 'something else', 'skip station', 'skip this station', 'change the station', 'change station', 'move along the dial'] },
         { name: 'PreviousStationIntent', slots: [], samples: ['previous station', 'last station', 'go back a station', 'back a station', 'the station before'] },
+        // HIFI TV on the Echo Show: the station's clips on screen, or the plain player.
+        { name: 'VideoOffIntent', slots: [], samples: [
+          'audio only', 'just audio', 'radio only', 'just the radio', 'no video', 'turn off the video', 'turn the video off', 'stop the video', 'hide the video', 'video off', 'turn off hifi tv',
+        ] },
+        { name: 'VideoOnIntent', slots: [], samples: [
+          'show the video', 'show video', 'show the videos', 'turn on the video', 'turn the video on', 'video on', 'hifi tv', 'turn on hifi tv', 'show hifi tv', 'with video',
+        ] },
         { name: 'AMAZON.NextIntent', samples: [] }, { name: 'AMAZON.PreviousIntent', samples: [] },
         { name: 'AMAZON.ResumeIntent', samples: [] }, { name: 'AMAZON.PauseIntent', samples: [] }, { name: 'AMAZON.StopIntent', samples: [] },
         { name: 'AMAZON.CancelIntent', samples: [] }, { name: 'AMAZON.HelpIntent', samples: [] }, { name: 'AMAZON.FallbackIntent', samples: [] },

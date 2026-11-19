@@ -33,6 +33,28 @@ after a switch until the skill was restarted. Every play gets a new token (`live
 because the Echo Show reuses the art it cached for a token for days. `switch.test.js` runs
 next, previous and by-name switches back and forth, by voice and by the screen's buttons.
 
+## HIFI TV on the Echo Show
+
+On a screen that runs APL 2022.2 or later and plays video (Echo Show, Echo Hub, Fire TV), a
+station plays as HIFI TV: its four clips from `tv/` fill the screen in turn, muted and looping
+(a new one about every 30 seconds, as in the app), with the song, the artist and the station in
+the lower left. `lambda/tv.js` builds the screen.
+
+Alexa does not let a skill draw over AudioPlayer: a response can't carry an APL RenderDocument
+and AudioPlayer.Play together, and while AudioPlayer plays, the Echo Show shows only its own Now
+Playing screen with a still picture. So on these screens the station's stream (or its tracks)
+plays inside the APL document, in a second, hidden Video component on Alexa's background music
+channel. The session stays open with the microphone closed, so "Alexa, next", "previous",
+"pause", "resume", "what's playing" and "stop" reach the skill without its name. Every station
+start renders a new screen with a new token.
+
+The limit: the station plays only while the screen is up. Pressing home or asking Alexa
+something else closes it and stops the station, where AudioPlayer would keep playing. "Alexa,
+ask HIFI live radio for audio only" goes back to AudioPlayer and the plain Now Playing screen
+for that listener; "…to show the video" turns HIFI TV on again. The screen reports every 30
+seconds whether the stream plays. A stream it can't play goes to AudioPlayer by itself. A tap
+on the picture pauses and plays. Echo devices without a screen never see any of this.
+
 ## Deploying
 
 The endpoint runs on Railway (project `hifi`, service `alexa`, `lambda/server.js`), behind
@@ -81,3 +103,4 @@ resume" go to it without the name.
 | what's playing | the song, from the same now-playing feed the app uses |
 | list stations | reads the house stations, counts the world stations and names a few |
 | pause, resume, stop | as expected; track stations resume mid-track |
+| audio only / show the video | Echo Show: the plain player, or HIFI TV with the station's clips |

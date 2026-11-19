@@ -8,6 +8,7 @@ const Alexa = require('ask-sdk-core');
 const catalog = require('./catalog');
 const { rank, meaningful } = require('./search');
 const store = require('./store');
+const tv = require('./tv');
 
 const DEFAULT_STATION = 'radio-paradise';
 
@@ -38,7 +39,8 @@ const and = names => names.length < 2 ? names.join('') : `${names.slice(0, -1).j
 // ----- playback -----
 async function currentStation(envelope, state) {
   const stations = await catalog.stations();
-  const held = parseToken(envelope.context?.AudioPlayer?.token);
+  // HIFI TV on screen first (the station plays inside it), then the player, then where we left off.
+  const held = tv.showing(envelope) || parseToken(envelope.context?.AudioPlayer?.token);
   const id = held?.id || state.stationId || DEFAULT_STATION;
   return stations.find(s => s.id === id) || stations.find(s => s.id === DEFAULT_STATION) || stations[0];
 }
@@ -74,11 +76,35 @@ function answer(handlerInput, { title, text } = {}) {
   return responseBuilder.withShouldEndSession(true).getResponse();
 }
 
-async function tune(handlerInput, station, { speech, index, offset = 0 } = {}) {
+// HIFI TV: on an Echo Show that can play video, the station plays inside the skill's own screen
+// with its clips (tv.js), not through AudioPlayer, which Alexa won't show anything over. Only
+// requests that may carry a screen get one; the player's and the buttons' own requests can't.
+const MAY_RENDER = ['LaunchRequest', 'IntentRequest', 'Alexa.Presentation.APL.UserEvent'];
+const onTV = (envelope, state) => tv.on(envelope, state) && MAY_RENDER.includes(Alexa.getRequestType(envelope));
+const within = (promise, ms) => Promise.race([promise, new Promise(done => setTimeout(done, ms, null))]);
+// Questions keep the microphone open only where no HIFI TV is on screen: when a reprompt goes
+// unanswered the session ends, and with it the screen and the station playing in it.
+function ask(handlerInput, speech, reprompt) {
+  const { responseBuilder, requestEnvelope } = handlerInput;
+  responseBuilder.speak(speech);
+  if (!tv.showing(requestEnvelope)) responseBuilder.reprompt(reprompt);
+  return responseBuilder.getResponse();
+}
+
+async function tune(handlerInput, station, { speech, index, offset = 0, audioOnly = false } = {}) {
   const { requestEnvelope, responseBuilder } = handlerInput;
   const state = await store.load(requestEnvelope);
   const start = index ?? (station.tracks.length ? Math.floor(Math.random() * station.tracks.length) : 0);
   const token = tokenFor(station, start);
+  if (!audioOnly && station.tv.length && onTV(requestEnvelope, state)) {
+    // A new screen every time, built for this station, with the session left open (no
+    // shouldEndSession) so "next", "pause" and "stop" come back here without the skill's name.
+    const now = station.nowPlaying ? await within(catalog.nowPlaying(station), 1200) : null;
+    const screen = tv.render(responseBuilder, station, { index: start, now });
+    await store.save(requestEnvelope, { ...state, stationId: station.id, token, index: start, offset: 0, screen, tvTrack: 0 });
+    if (speech !== null) responseBuilder.speak(speech ?? announce(station));
+    return responseBuilder.getResponse();
+  }
   await store.save(requestEnvelope, { ...state, stationId: station.id, token, index: start, offset });
   play(responseBuilder, station, { index: start, offset, token });
   if (speech === null) return answer(handlerInput);
@@ -99,6 +125,11 @@ async function resume(handlerInput, speak) {
   const { requestEnvelope } = handlerInput;
   const state = await store.load(requestEnvelope);
   const station = await currentStation(requestEnvelope, state);
+  const screen = tv.showing(requestEnvelope);
+  if (screen && station.tracks.length && Alexa.getRequestType(requestEnvelope) === 'IntentRequest'
+    && Alexa.getIntentName(requestEnvelope) === 'AMAZON.ResumeIntent') {
+    return handlerInput.responseBuilder.addDirective(tv.resume(screen.token)).getResponse();
+  }
   const held = parseToken(state.token);
   const sameStation = held && held.id === station.id;
   const index = sameStation && held.kind === 'track' ? held.index : undefined;
@@ -109,6 +140,14 @@ async function resume(handlerInput, speak) {
 async function stop(handlerInput, speech) {
   const { requestEnvelope, responseBuilder } = handlerInput;
   const state = await store.load(requestEnvelope);
+  const screen = MAY_RENDER.includes(Alexa.getRequestType(requestEnvelope)) && tv.showing(requestEnvelope);
+  if (screen) {
+    // Pause holds the picture and the sound where they are; stop and cancel close the screen,
+    // which ends the station playing in it.
+    await store.save(requestEnvelope, { ...state, stationId: screen.id });
+    if (!speech) return responseBuilder.addDirective(tv.pause(screen.token)).getResponse();
+    return responseBuilder.speak(speech).withShouldEndSession(true).getResponse();
+  }
   const offset = requestEnvelope.context?.AudioPlayer?.offsetInMilliseconds || 0;
   const token = requestEnvelope.context?.AudioPlayer?.token || state.token;
   await store.save(requestEnvelope, { ...state, token, offset });
@@ -159,9 +198,8 @@ const PlayStationIntentHandler = {
     if (!station && !meaningful(said)) return resume(handlerInput, true);  // "play something": carry on
     if (!station) {
       const examples = and(stations.slice(0, 3).map(spoken));
-      return handlerInput.responseBuilder
-        .speak(said ? `I don't have a station for ${said}. Try ${examples}.` : `Which station? Try ${examples}.`)
-        .reprompt('Which station would you like?').getResponse();
+      return ask(handlerInput, said ? `I don't have a station for ${said}. Try ${examples}.` : `Which station? Try ${examples}.`,
+        'Which station would you like?');
     }
     return tune(handlerInput, station);
   },
@@ -185,12 +223,16 @@ const WhatsPlayingIntentHandler = {
   async handle(handlerInput) {
     const { requestEnvelope, responseBuilder } = handlerInput;
     const player = requestEnvelope.context?.AudioPlayer;
-    if (!player || !player.token || player.playerActivity === 'IDLE' || player.playerActivity === 'FINISHED' || player.playerActivity === 'STOPPED') {
-      return responseBuilder.speak("Nothing's playing right now. Say play to start HIFI radio.").reprompt('Say play, or name a station.').getResponse();
+    const screen = tv.showing(requestEnvelope);
+    if (!screen && (!player || !player.token || player.playerActivity === 'IDLE' || player.playerActivity === 'FINISHED' || player.playerActivity === 'STOPPED')) {
+      return ask(handlerInput, "Nothing's playing right now. Say play to start HIFI radio.", 'Say play, or name a station.');
     }
     const state = await store.load(requestEnvelope);
     const station = await currentStation(requestEnvelope, state);
-    const held = parseToken(player.token);
+    // On HIFI TV the screen reports which of its tracks is on (tvTrack, counted from the first it played).
+    const held = screen
+      ? (station.tracks.length ? { kind: 'track', index: ((state.index || 0) + (state.tvTrack || 0)) % station.tracks.length } : null)
+      : parseToken(player.token);
     let line;
     if (held?.kind === 'track' && station.tracks[held.index]) {
       const t = station.tracks[held.index];
@@ -201,6 +243,7 @@ const WhatsPlayingIntentHandler = {
         : `This is ${spoken(station)}. ${station.nowPlaying ? "I couldn't get the song title just now." : "It doesn't publish song titles."}`;
     }
     responseBuilder.speak(line);
+    if (screen) return responseBuilder.getResponse();  // ending the session would close the screen
     return answer(handlerInput, { title: station.name, text: line });
   },
 };
@@ -219,6 +262,7 @@ const ListStationsIntentHandler = {
         + `Then there are ${world.length} stations from ${countries.length} countries, like ${and(examples.map(spoken))}. `
         + 'Say play and a station name, a city or a country, or say next to move along the dial.'
       : `HIFI radio has ${stations.length} stations: ${and(house.map(spoken))}. Say play and a station name, or say next to move along the dial.`;
+    if (tv.showing(handlerInput.requestEnvelope)) return ask(handlerInput, speech);
     return handlerInput.responseBuilder.speak(speech).reprompt('Which station would you like?')
       .withSimpleCard('HIFI radio', stations.map(s => `${s.name} — ${s.genre}`).join('\n')).getResponse();
   },
@@ -245,9 +289,7 @@ const FallbackIntentHandler = {
   handle(handlerInput) {
     // An unrecognised first utterance ("open hifi radio" heard oddly) still means: play.
     if (handlerInput.requestEnvelope.session?.new) return LaunchRequestHandler.handle(handlerInput);
-    return handlerInput.responseBuilder
-      .speak("I didn't catch that. Say play and a station name, like play lo fi beats, or say next.")
-      .reprompt('Which station would you like?').getResponse();
+    return ask(handlerInput, "I didn't catch that. Say play and a station name, like play lo fi beats, or say next.", 'Which station would you like?');
   },
 };
 
@@ -292,6 +334,51 @@ const AudioPlayerEventHandler = {
   },
 };
 
+// "Audio only" turns HIFI TV off for this listener: the plain Now Playing screen, through
+// AudioPlayer, which also keeps playing when the screen goes home. "Show the video" turns it on.
+const VideoIntentHandler = {
+  canHandle: intent('VideoOffIntent', 'VideoOnIntent'),
+  async handle(handlerInput) {
+    const { requestEnvelope } = handlerInput;
+    const video = Alexa.getIntentName(requestEnvelope) === 'VideoOnIntent';
+    const state = await store.load(requestEnvelope);
+    await store.save(requestEnvelope, { ...state, video });
+    const station = await currentStation(requestEnvelope, state);
+    if (video && !tv.canShow(requestEnvelope)) return tune(handlerInput, station, { speech: `This device can't show the video. ${announce(station)}` });
+    return tune(handlerInput, station, { speech: video ? `HIFI TV. ${announce(station)}` : `Audio only. ${announce(station)} Say show the video to bring the pictures back.` });
+  },
+};
+
+// The HIFI TV screen talking: its arrows (dial-hint.js), and every half minute a tick that says
+// whether the stream plays and which track is on. A stream the screen can't play goes to
+// AudioPlayer; a live station's song line is brought up to date.
+let dial = null;
+try { dial = require('./dial-hint'); } catch { /* the dial strip is optional */ }
+const ScreenEventHandler = {
+  canHandle: is('Alexa.Presentation.APL.UserEvent'),
+  async handle(handlerInput) {
+    const { requestEnvelope, responseBuilder } = handlerInput;
+    const step = dial?.step(requestEnvelope.request);
+    if (step) return neighbour(handlerInput, step, false);
+    const said = tv.event(requestEnvelope.request);
+    const screen = tv.showing(requestEnvelope);
+    if (!said || said.kind !== 'tick' || (screen && screen.id !== said.id)) return responseBuilder.getResponse();
+    const station = (await catalog.stations()).find(s => s.id === said.id);
+    if (!station) return responseBuilder.getResponse();
+    if (said.failed) {
+      console.log(`tv: ${station.id} would not play on screen; handing it to AudioPlayer`);
+      return tune(handlerInput, station, { speech: null, audioOnly: true });
+    }
+    if (station.tracks.length) {
+      const state = await store.load(requestEnvelope);
+      if (state.tvTrack !== said.track) await store.save(requestEnvelope, { ...state, tvTrack: said.track });
+      return responseBuilder.getResponse();
+    }
+    if (station.nowPlaying && screen) responseBuilder.addDirective(tv.song(screen.token, await catalog.nowPlaying(station)));
+    return responseBuilder.getResponse();
+  },
+};
+
 const SessionEndedRequestHandler = {
   canHandle: is('SessionEndedRequest'),
   handle(handlerInput) {
@@ -325,7 +412,8 @@ const builder = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler, PlayStationIntentHandler, PlayAnythingIntentHandler, NextIntentHandler, PreviousIntentHandler,
     StopIntentHandler, WhatsPlayingIntentHandler, ListStationsIntentHandler, NotForRadioIntentHandler, StartOverIntentHandler,
-    FallbackIntentHandler, PlaybackControllerHandler, AudioPlayerEventHandler, SessionEndedRequestHandler, ExceptionEncounteredHandler,
+    FallbackIntentHandler, VideoIntentHandler, ScreenEventHandler, PlaybackControllerHandler, AudioPlayerEventHandler,
+    SessionEndedRequestHandler, ExceptionEncounteredHandler,
   )
   .addErrorHandlers(ErrorHandler)
   .withCustomUserAgent('hifi-radio/1.0');

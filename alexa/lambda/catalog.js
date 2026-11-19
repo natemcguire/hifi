@@ -18,6 +18,7 @@ function shape(raw) {
     genre: s.genre || '', subtitle: s.subtitle || s.line || '', tagline: s.tagline || '',
     tags: s.tags || [], color: s.color || '#ffffff', stream: s.stream || null, nowPlaying: s.nowPlaying ? SITE + s.nowPlaying : null,
     tracks: (s.tracks || []).map(t => ({ src: `${SITE}/${t.src}`, title: t.title, artist: t.artist, duration: t.duration })),
+    tv: (s.tv || []).map(clip => `${SITE}/${clip}`),  // HIFI TV clips, played on the Echo Show (tv.js)
     cover: `${SITE}/alexa/covers/${s.id}.png`,
   }));
 }
