@@ -1,7 +1,7 @@
 # HIFI radio for Alexa
 
-The HIFI dial on Echo speakers. "Alexa, open HIFI live radio" picks up where you left off;
-"Alexa, ask HIFI live radio for pop girl" tunes a station; "next" and "previous" move along
+The HIFI dial on Echo speakers. "Alexa, open HIFI radio" picks up where you left off;
+"Alexa, ask HIFI radio for pop girl" tunes a station; "next" and "previous" move along
 the dial like the click wheel; "what's playing" names the song. Whenever a station starts by voice (open, resume, by name,
 next, previous) Alexa says "Now listening to live radio on HIFI:" and the station's name.
 
@@ -50,7 +50,7 @@ start renders a new screen with a new token.
 
 The limit: the station plays only while the screen is up. Pressing home or asking Alexa
 something else closes it and stops the station, where AudioPlayer would keep playing. "Alexa,
-ask HIFI live radio for audio only" goes back to AudioPlayer and the plain Now Playing screen
+ask HIFI radio for audio only" goes back to AudioPlayer and the plain Now Playing screen
 for that listener; "…to show the video" turns HIFI TV on again. The screen reports every 30
 seconds whether the stream plays. A stream it can't play goes to AudioPlayer by itself. A tap
 on the picture pauses and plays. Echo devices without a screen never see any of this.
@@ -76,8 +76,8 @@ Testing: any Echo on the developer account hears the development skill. Every re
 leaves one `alexa: in …` / `alexa: out …` line in the Railway log (type, intent, what the player
 holds, no ids), so "Alexa, next did nothing" can be checked against what reached the skill. The ASK CLI's
 `simulate-skill` runs text turns end to end, and `node --test alexa/lambda/*.test.js` checks what is
-said against the station that should play and what Alexa says back. In the simulator use "ask hifi live radio for …"; it turns
-away "open hifi live radio" and most "to play …" phrases ("did not resolve to any intent",
+said against the station that should play and what Alexa says back. In the simulator use "ask hifi radio for …"; it turns
+away "open hifi radio" and most "to play …" phrases ("did not resolve to any intent",
 considered an intent for a different skill) whatever the skill does. It writes numbers its own
 way before the skill sees them ("z one hundred" arrives as "Z1 hundred", "one oh three point
 five" as "10 3.5"), and the voice model answers with up to five loose matches, not one. Publishing is
@@ -86,9 +86,9 @@ of Amazon's certification.
 
 ## Saying things
 
-The invocation name is "hifi live radio", all three words: "Alexa, open HIFI jazz" and "Alexa, ask
+The invocation name is "hifi radio", both words (it was "hifi live radio" until 2026-11-19): "Alexa, open HIFI jazz" and "Alexa, ask
 HIFI to play jazz" do not reach the skill. In one sentence from silence, say "Alexa, ask HIFI
-live radio for jazz" (or "to tune to", "to put on"). "…to play jazz" is the same request to the
+radio for jazz" (or "to tune to", "to put on"). "…to play jazz" is the same request to the
 skill, but Alexa often hands a sentence with "play" and a music name to its own music service
 instead: on 2026-11-18 the simulator did that for most "to play" phrases and for none of the
 "for" ones. Once HIFI is playing, "Alexa, next", "Alexa, previous", "Alexa, pause" and "Alexa,
@@ -96,7 +96,7 @@ resume" go to it without the name.
 
 | You say | It does |
 |---|---|
-| open HIFI live radio | resumes the last station (Radio Paradise the first time) |
+| open HIFI radio | resumes the last station (Radio Paradise the first time) |
 | play lo-fi beats / play Taylor Swift / play something for work | ranks names, tags, genre and lines; plays the best fit |
 | play jazz / play late night jazz / play jazz twenty four | Jazz24 for plain "jazz"; the other two by name |
 | play Z100 / play kiss FM / play KEXP / play one live | a world station by name; "kiss FM" is KIIS FM in Los Angeles |
