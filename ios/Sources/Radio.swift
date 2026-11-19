@@ -1,11 +1,6 @@
 import AVFoundation
 import MediaPlayer
 
-struct VideoSong: Equatable {
-    let title: String
-    let artist: String
-}
-
 struct LiveSong: Decodable, Equatable {
     let artist: String?
     let title: String?
@@ -25,7 +20,6 @@ final class Radio: ObservableObject {
     @Published private(set) var track: Track?
     @Published private(set) var liveSong: LiveSong?
     @Published private(set) var problem: String?
-    @Published private(set) var videoSong: VideoSong?
     @Published var volume: Float = UserDefaults.standard.object(forKey: "volume") as? Float ?? 1 {
         didSet { player.volume = volume; UserDefaults.standard.set(volume, forKey: "volume") }
     }
@@ -92,24 +86,6 @@ final class Radio: ObservableObject {
 
     // Radio semantics: play always rejoins the broadcast now; there is no pause point.
     func start() {
-        // A video station plays on the screen (VideoStation); the radio just keeps its state.
-        if station.isVideo {
-            retryTask?.cancel()
-            pollTask?.cancel()
-            player.pause()
-            player.removeAllItems()
-            queued.removeAll()
-            track = nil
-            videoSong = nil
-            problem = nil
-            #if os(iOS)
-            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)  // WebKit plays it
-            #endif
-            isPlaying = true
-            isBuffering = true
-            updateNowPlaying()
-            return
-        }
         if !station.isLive, let tracks = station.tracks, !tracks.isEmpty {
             let now = rotationAt(tracks, epoch: catalog.epoch)
             play(from: now.index, offset: now.offset)
@@ -140,17 +116,6 @@ final class Radio: ObservableObject {
         isPlaying = true
         isBuffering = true
         updateNowPlaying()
-    }
-
-    // What the video station's page says it's playing.
-    func videoSaid(_ message: [String: Any]) {
-        guard station.isVideo, isPlaying else { return }
-        if let title = message["title"] as? String {
-            videoSong = VideoSong(title: title, artist: message["artist"] as? String ?? "")
-            updateNowPlaying()
-        }
-        if message["playing"] as? Bool == true { isBuffering = false }
-        if let text = message["problem"] as? String { problem = text }
     }
 
     func stop() {
@@ -251,14 +216,11 @@ final class Radio: ObservableObject {
         observers.append(center.addObserver(forName: AVPlayerItem.playbackStalledNotification, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in if self?.station.isLive == true { self?.failed() } }
         })
-        #if os(iOS)
         observers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] note in
             let type = (note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt).flatMap(AVAudioSession.InterruptionType.init)
             let options = AVAudioSession.InterruptionOptions(rawValue: note.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0)
             Task { @MainActor in
                 guard let self else { return }
-                // A video station's sound is the web view's; its starting isn't an interruption.
-                if type == .began, self.station.isVideo { return }
                 if type == .began { self.wasInterrupted = self.isPlaying; self.stop() }
                 else if type == .ended, self.wasInterrupted, options.contains(.shouldResume) { self.start() }
             }
@@ -267,14 +229,13 @@ final class Radio: ObservableObject {
             let reason = (note.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt).flatMap(AVAudioSession.RouteChangeReason.init)
             Task { @MainActor in if reason == .oldDeviceUnavailable { self?.stop() } }  // headphones out: go quiet
         })
-        #endif
         keyValueObservers.append(player.observe(\.currentItem, options: [.new]) { [weak self] _, _ in
             Task { @MainActor in self?.currentItemChanged() }
         })
         keyValueObservers.append(player.observe(\.timeControlStatus, options: [.new]) { [weak self] player, _ in
             let status = player.timeControlStatus
             Task { @MainActor in
-                guard let self, !self.station.isVideo else { return }
+                guard let self else { return }
                 self.isBuffering = self.isPlaying && status != .playing
                 if status == .playing { self.problem = nil; self.updateNowPlaying() }
             }
@@ -288,11 +249,9 @@ final class Radio: ObservableObject {
     private var wasInterrupted = false
 
     private func activateSession() {
-        #if os(iOS)
         let session = AVAudioSession.sharedInstance()
         try? session.setCategory(.playback, mode: .default, policy: .longFormAudio)
         try? session.setActive(true)
-        #endif
     }
 
     // MARK: Lock screen and Control Center
@@ -311,7 +270,6 @@ final class Radio: ObservableObject {
     }
 
     var displayTitle: String {
-        if station.isVideo { return videoSong?.title ?? station.displayName }
         if station.isLive { return liveSong?.title ?? station.displayName }
         return track?.title ?? station.displayName
     }
@@ -322,7 +280,6 @@ final class Radio: ObservableObject {
     var spotifyTrackId: String? { station.isLive ? liveSong?.trackId : nil }
 
     var displayArtist: String {
-        if station.isVideo { return videoSong?.artist ?? station.genre }
         if station.isLive { return liveSong?.artist ?? station.genre }
         return track?.artist ?? station.genre
     }

@@ -6,12 +6,11 @@ screenshots, review contact, and (with --submit) the build and review submission
 The app record itself must exist first: Apple's API cannot create apps, so it is
 made once by hand in App Store Connect (bundle ID com.natesoftware.hifi).
 
-Run as: withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--mac] [--screenshots] [--submit]
+Run as: withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--screenshots] [--submit]
 With --screenshots it replaces only the screenshots (taking a version waiting for review out
 of review first, as Apple requires; add --submit to send it back).
-With --mac it fills the Mac App Store version of the same record (created if missing),
-skipping the app-wide parts (category, age rating, price, territories) the iPhone
-submission already set, and submits the newest processed Mac build.
+HIFI is iPhone and iPad only: there is no Mac app, and nothing here touches the macOS
+version in App Store Connect.
 Review contact comes from HIFI_REVIEW_FIRST, HIFI_REVIEW_LAST, HIFI_REVIEW_EMAIL and
 HIFI_REVIEW_PHONE, or the same keys in scripts/devices.local (never committed).
 """
@@ -20,7 +19,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 sys.argv_saved = sys.argv
-src = (HERE / "make-signing.py").read_text().split('\nmac() if "--mac"')[0]
+src = (HERE / "make-signing.py").read_text().split('\nstore() if "--store"')[0]
 sys.argv = [sys.argv[0]]
 ns = {"__file__": str(HERE / "make-signing.py")}
 exec(compile(src.replace("IPHONE_UDIDS = iphones()", "IPHONE_UDIDS = []"), "make-signing.py", "exec"), ns)
@@ -29,8 +28,7 @@ api = ns["api"]
 
 BUNDLE_ID = "com.natesoftware.hifi"
 SHOTS = HERE.parent / "Screenshots"
-PLATFORM = "MAC_OS" if "--mac" in sys.argv else "IOS"
-MAC = PLATFORM == "MAC_OS"
+PLATFORM = "IOS"
 # Name and subtitle are app-wide (30 characters each) and only change with a version in an
 # editable state. Keywords (100 characters, comma-separated, no repeats of name or subtitle
 # words) and the texts are per version. Promotional text can change any time (--promo).
@@ -65,9 +63,9 @@ HIFI TV plays old-TV clips behind Now Playing, with the song and station on a sh
 Connect Spotify if you want to. The heart next to a live song saves it to your Liked Songs, and your playlists show up on the click wheel, with the Nate's Software HIFI playlist up top. Spotify's own page handles the sign-in; we never see your password.
 
 Also in the box:
-{"• Change stations from the wheel, your keyboard's media keys or Control Center" if MAC else "• Change stations from the wheel, the lock screen or your headphones"}
-{"• Song, artist and station in Now Playing, drawn like the old screen" if MAC else "• Song, artist and station on the lock screen, drawn like the old screen"}
-{"• The window sits in a corner and keeps playing while you work" if MAC else "• Picture in Picture: leave the app and HIFI shrinks into a small clip-on player"}
+• Change stations from the wheel, the lock screen or your headphones
+• Song, artist and station on the lock screen, drawn like the old screen
+• Picture in Picture: leave the app and HIFI shrinks into a small clip-on player
 • Keeps playing in the background
 • No ads, no tracking
 
@@ -80,7 +78,7 @@ Made by Nate's Software.""",
 PRIVACY_URL = "https://hifi.nates-software.com/privacy"
 COPYRIGHT = "2026 Nate McGuire"
 # iPhone 6.9" and iPad 13" sets; App Store Connect scales them for smaller devices.
-SETS = {"APP_DESKTOP": "mac"} if MAC else {"APP_IPHONE_67": "iphone", "APP_IPAD_PRO_3GEN_129": "ipad"}
+SETS = {"APP_IPHONE_67": "iphone", "APP_IPAD_PRO_3GEN_129": "ipad"}
 
 
 def local(key):
@@ -125,10 +123,7 @@ def main():
         return promo(app)
     if "--screenshots" in sys.argv:
         return shots_only(app)
-    if MAC:
-        version = mac_version(app)
-    else:
-        version = app_wide(app)
+    version = app_wide(app)
     fill(app, version)
 
 
@@ -136,7 +131,7 @@ def shots_only(app):
     """--screenshots: replace only the editable version's screenshots, leaving its text alone.
     Apple refuses screenshots while a version waits for review, so a waiting version is taken
     out of review first; --submit sends it back."""
-    version = mac_version(app) if MAC else ios_version(app)
+    version = ios_version(app)
     if version["attributes"]["appStoreState"] == "WAITING_FOR_REVIEW":
         for s in api("GET", f"/v1/reviewSubmissions?filter[app]={app['id']}&filter[state]=WAITING_FOR_REVIEW")["data"]:
             if s["attributes"].get("platform") == PLATFORM:
@@ -265,19 +260,6 @@ def promo(app):
             print("promotional text updated on", v["attributes"]["versionString"], loc["attributes"]["locale"])
 
 
-def mac_version(app):
-    """The Mac App Store version 1.0 under the same record, made on first run."""
-    try:
-        version = editable_version(app)
-        print("mac version:", version["attributes"]["versionString"], version["attributes"]["appStoreState"])
-    except StopIteration:
-        version = api("POST", "/v1/appStoreVersions", {"data": {"type": "appStoreVersions",
-            "attributes": {"platform": "MAC_OS", "versionString": "1.0", "releaseType": "AFTER_APPROVAL"},
-            "relationships": {"app": {"data": {"type": "apps", "id": app["id"]}}}}})["data"]
-        print("mac version created: 1.0")
-    return version
-
-
 def fill(app, version):
     """The version: copyright, listing text, screenshots, review contact, and with --submit the build."""
     patch("appStoreVersions", version["id"], {"copyright": COPYRIGHT})
@@ -301,9 +283,7 @@ def fill(app, version):
                        "the app is open; leaving Now Playing stops it. "
                        "Spotify is optional: the heart next to a live song and the Playlists menu ask the listener to connect "
                        "their own Spotify account (Spotify's own sign-in page, PKCE, no password reaches us). Everything else "
-                       "works without it."
-                       + (" This is the Mac version of the iPhone app already on the App Store: the same player in a "
-                          "resizable window, sandboxed, with the media keys and Control Center for playback." if MAC else "")}
+                       "works without it."}
     existing = api("GET", f"/v1/appStoreVersions/{version['id']}/appStoreReviewDetail")
     if existing.get("data"):
         patch("appStoreReviewDetails", existing["data"]["id"], detail)

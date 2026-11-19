@@ -5,11 +5,7 @@ import SwiftUI
 // a dark tile in the station's color, with its name. Rendered once per station.
 // A station with HIFI TV clips shows a still from its clip on the lock screen instead.
 enum Artwork {
-    #if os(macOS)
-    typealias PlatformImage = NSImage
-    #else
     typealias PlatformImage = UIImage
-    #endif
 
     @MainActor private static var cache: [String: PlatformImage] = [:]
 
@@ -18,11 +14,7 @@ enum Artwork {
         if let hit = cache[station.id] { return hit }
         let renderer = ImageRenderer(content: Cover(station: station).frame(width: 600, height: 600))
         renderer.scale = 1
-        #if os(macOS)
-        let image = renderer.nsImage ?? NSImage()
-        #else
         let image = renderer.uiImage ?? UIImage()
-        #endif
         cache[station.id] = image
         return image
     }
@@ -46,11 +38,7 @@ enum Artwork {
         guard let frame = try? await generator.image(at: CMTime(seconds: 1, preferredTimescale: 600)).image,
               let square = squared(frame, side: 544) else { return false }
         if stills.count > 12 { stills.removeAll() }
-        #if os(macOS)
-        stills[clip] = NSImage(cgImage: square, size: NSSize(width: square.width, height: square.height))
-        #else
         stills[clip] = UIImage(cgImage: square)
-        #endif
         return true
     }
 
@@ -77,11 +65,7 @@ enum Artwork {
         let renderer = ImageRenderer(content: LockScreen(station: station, title: title, artist: artist, position: position)
             .frame(width: 600, height: 600))
         renderer.scale = 2
-        #if os(macOS)
-        let image = renderer.nsImage ?? NSImage()
-        #else
         let image = renderer.uiImage ?? UIImage()
-        #endif
         if screens.count > 24 { screens.removeAll() }
         screens[key] = image
         return image

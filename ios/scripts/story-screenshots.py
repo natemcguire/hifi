@@ -8,9 +8,8 @@ Inputs: the raw simulator captures in Screenshots/story/raw/{iphone,ipad} (captu
 HIFI_SHOTS_RAW=Screenshots/story/raw scripts/capture-screenshots.sh) and the ink drawings in
 Screenshots/story/art (scripts/story-art.py). Output: Screenshots/story/{iphone,ipad}, the
 same pixel sizes as the captures (1320x2868 and 2064x2752), plus strip.jpg in each, the
-whole run side by side. The Mac set (2880x1800) comes from the window captures in
-Screenshots/story/raw/mac (HIFI_SHOTS_RAW=Screenshots/story/raw scripts/mac-screenshots.sh).
-Run as: python3 ios/scripts/story-screenshots.py [iphone] [ipad] [mac] Needs Pillow. Light work; fine on the mini.
+whole run side by side.
+Run as: python3 ios/scripts/story-screenshots.py [iphone] [ipad] Needs Pillow. Light work; fine on the mini.
 """
 import json, math, random, sys
 from pathlib import Path
@@ -470,88 +469,5 @@ def render(kind):
     print("rendered", kind, W, "x", H)
 
 
-# The Mac set: the same six beats, landscape. The first headline says Mac, not hand.
-MAC_FIRST = [[("Free", "circle"), (" live radio", None)], [("on your desk.", None)]]
-
-
-def window(raw, height):
-    """The captured Mac window (its own corners and traffic lights), scaled."""
-    w = raw.convert("RGBA")
-    return w.resize((round(w.width * height / w.height), height), Image.LANCZOS)
-
-
-def render_mac():
-    raw_dir = STORY / "raw" / "mac"
-    shots = {p.stem: Image.open(p) for p in raw_dir.glob("*.png")}
-    W, H = 2880, 1800
-    N = len(SLIDES)
-    strip = Image.new("RGB", (W * N, H), PAPER)
-    head, sub, margin = 168, 50, 180
-    tops = []
-    for i, slide in enumerate(SLIDES):
-        slide = dict(slide, head=MAC_FIRST) if i == 0 else slide
-        top = 300
-        y = headline(strip, slide, i * W + margin, top, head, 1300, seed=i * 10)
-        y = subline(strip, slide["sub"], i * W + margin, y + 40, sub, 1050)
-        tops.append(y)
-    wh = 1520
-    # 1. Home in the window, the dancer beside it.
-    dancer = load_art("dancer", 1020)
-    ink(strip, dancer, (margin + 60, H - dancer.height + 40))
-    win = window(shots["1-main"], wh)
-    lifted(strip, win, (W - win.width - 200, (H - win.height) // 2), shadow=0.3)
-    # 2. Now Playing, and what HIFI does not do, crossed out.
-    x0 = W
-    win = window(shots["2-tv"], wh)
-    lifted(strip, win, (x0 + W - win.width - 260, (H - win.height) // 2), shadow=0.3)
-    for j, (text, small, angle, fx, fy) in enumerate([("COMMERCIAL BREAK", "back after these messages", 5, 260, 1050),
-                                                       ("SIGN UP TO LISTEN", "create an account to continue", -4, 1050, 1250)]):
-        st = sticker(600, text, small).rotate(angle, resample=Image.BICUBIC, expand=True)
-        lifted(strip, st, (x0 + fx, fy))
-        cross(strip, (x0 + fx + 40, fy + 20, x0 + fx + st.width - 40, fy + st.height - 20), 17, 21 + j)
-    # 3. The Radio list, stations flying out of it.
-    x0 = 2 * W
-    win = window(shots["3-radio"], wh)
-    wx = x0 + W - win.width - 700
-    lifted(strip, win, (wx, (H - win.height) // 2), shadow=0.3)
-    for j, (name, place, color) in enumerate(stations_for_cards()[:5]):
-        c = card(640, name, place, "LIVE", color)
-        lifted(strip, c.rotate((-1) ** j * 3, resample=Image.BICUBIC, expand=True),
-               (wx + win.width - 220 + (j % 2) * 140, 260 + j * round(c.height * 1.3)))
-    # 4. Your country, your language: the country rows, hellos around the window.
-    x0 = 3 * W
-    win = window(shots["7-world"], wh)
-    wx = x0 + W - win.width - 600
-    lifted(strip, win, (wx, (H - win.height) // 2), shadow=0.3)
-    rnd = random.Random(7)
-    greet = hellos()
-    for j, (g, sc, name, city) in enumerate(greet[:12]):
-        b = bubble(190, g, sc, name, city, tail_left=j % 2 == 0).rotate(rnd.uniform(-5, 5), resample=Image.BICUBIC, expand=True)
-        if j < 4:  # under the headline, left of the window
-            bx, by = x0 + margin + (j % 2) * 420, tops[3] + 140 + (j // 2) * 300
-        else:  # two columns to the right of the window
-            k = j - 4
-            bx, by = wx + win.width - 190 + (k % 2) * 330, 110 + (k // 2) * 400 + (k % 2) * 180
-        lifted(strip, b, (bx, min(by, H - b.height - 40)), shadow=0.18)
-    # 5. The music lover.
-    x0 = 4 * W
-    lover = load_art("lover", 1750)
-    ink(strip, lover, (x0 + W - lover.width - 200, H - lover.height + 40))
-    note(strip, "made with love\n\u2014 Nate", (x0 + margin + 40, tops[4] + 120), 70, angle=-6)
-    # 6. The crate and the app, playing.
-    x0 = 5 * W
-    crate = load_art("crate", 950)
-    ink(strip, crate, (x0 + 420, H - crate.height + 30))
-    win = window(shots["4-live"], wh)
-    lifted(strip, win, (x0 + W - win.width - 200, (H - win.height) // 2), shadow=0.3)
-    note(strip, f"all {TOTAL} stations,\nall free", (x0 + margin + 40, tops[5] + 140), 76, angle=-5)
-    out = STORY / "mac"
-    out.mkdir(parents=True, exist_ok=True)
-    for i in range(N):
-        strip.crop((i * W, 0, (i + 1) * W, H)).save(out / f"{i + 1}.png", optimize=True)
-    strip.resize((strip.width * 600 // H, 600), Image.LANCZOS).save(out / "strip.jpg", quality=88)
-    print("rendered mac", W, "x", H)
-
-
-for kind in sys.argv[1:] or ("iphone", "ipad", "mac"):
-    render_mac() if kind == "mac" else render(kind)
+for kind in sys.argv[1:] or ("iphone", "ipad"):
+    render(kind)

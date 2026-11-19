@@ -2,10 +2,8 @@ import AppKit
 
 // App icons: a mini iPod click wheel on a white body. Drawn at 1024px.
 // `Icon.swift out.png` is the square iOS icon (iOS masks it).
-// `Icon.swift out.png --mac` adds the rounded tile and margin macOS expects.
-let mac = CommandLine.arguments.contains("--mac")
 let size = 1024.0
-let tile = mac ? CGRect(x: 100, y: 100, width: 824, height: 824) : CGRect(x: 0, y: 0, width: size, height: size)
+let tile = CGRect(x: 0, y: 0, width: size, height: size)
 let bitmap = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 1024, pixelsHigh: 1024, bitsPerSample: 8, samplesPerPixel: 4,
                               hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
 NSGraphicsContext.saveGraphicsState()
@@ -28,13 +26,7 @@ func circle(_ center: CGPoint, _ radius: CGFloat) -> CGPath {
 }
 
 // Body: brushed white plastic, a little cooler at the bottom.
-let body = mac ? CGPath(roundedRect: tile, cornerWidth: 185, cornerHeight: 185, transform: nil) : CGPath(rect: tile, transform: nil)
-if mac {
-    cg.saveGState()
-    cg.setShadow(offset: CGSize(width: 0, height: -10), blur: 28, color: rgb(0x000000, 0.35))
-    cg.addPath(body); cg.setFillColor(rgb(0xf4f4f6)); cg.fillPath()
-    cg.restoreGState()
-}
+let body = CGPath(rect: tile, transform: nil)
 linear([rgb(0xffffff), rgb(0xf1f1f3), rgb(0xdcdde1)], in: body, from: tile.maxY, to: tile.minY)
 
 let center = CGPoint(x: tile.midX, y: tile.midY)

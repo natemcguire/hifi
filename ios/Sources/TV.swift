@@ -1,21 +1,11 @@
 import AVFoundation
 import SwiftUI
-import WebKit
-#if os(iOS)
 import UIKit
-#elseif os(macOS)
-import AppKit
-#endif
 
 // HIFI TV and video stations on the Now Playing screen.
 
-#if os(iOS)
 typealias PlatformView = UIView
 typealias PlatformRepresentable = UIViewRepresentable
-#else
-typealias PlatformView = NSView
-typealias PlatformRepresentable = NSViewRepresentable
-#endif
 
 // A station's clip, muted and looping, filling its frame with hard pixels. A new
 // clip loads under the old one and crossfades in once its first frame is ready.
@@ -35,13 +25,7 @@ struct LoopingVideo: PlatformRepresentable {
     }
 
     final class LayerView: PlatformView {
-        #if os(iOS)
         override func layoutSubviews() { super.layoutSubviews(); layer.sublayers?.forEach { $0.frame = bounds } }
-        #else
-        override init(frame: CGRect) { super.init(frame: frame); wantsLayer = true }
-        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-        override func layout() { super.layout(); layer?.sublayers?.forEach { $0.frame = bounds } }
-        #endif
     }
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -58,11 +42,7 @@ struct LoopingVideo: PlatformRepresentable {
         slot.player.isMuted = true
         slot.player.preventsDisplaySleepDuringVideoPlayback = false
         slot.looper = AVPlayerLooper(player: slot.player, templateItem: AVPlayerItem(url: url))
-        #if os(iOS)
         view.layer.addSublayer(slot.layer)
-        #else
-        view.layer?.addSublayer(slot.layer)
-        #endif
         let old = coordinator.current
         coordinator.current = slot
         slot.ready = slot.layer.observe(\.isReadyForDisplay, options: [.initial, .new]) { layer, _ in
@@ -87,15 +67,9 @@ struct LoopingVideo: PlatformRepresentable {
         slot.player.play()
     }
 
-    #if os(iOS)
     func makeUIView(context: Context) -> LayerView { let view = LayerView(frame: .zero); show(url, in: view, context.coordinator); return view }
     func updateUIView(_ view: LayerView, context: Context) { show(url, in: view, context.coordinator) }
     static func dismantleUIView(_ view: LayerView, coordinator: Coordinator) { coordinator.current?.player.pause() }
-    #else
-    func makeNSView(context: Context) -> LayerView { let view = LayerView(frame: .zero); show(url, in: view, context.coordinator); return view }
-    func updateNSView(_ view: LayerView, context: Context) { show(url, in: view, context.coordinator) }
-    static func dismantleNSView(_ view: LayerView, coordinator: Coordinator) { coordinator.current?.player.pause() }
-    #endif
 }
 
 // Which clip a station shows: it goes with the station and a 30-second slot (the
@@ -247,7 +221,6 @@ struct FullTV: View {
         .environment(\.colorScheme, .dark)
         // A station without clips (skipped to from the lock screen, say) has nothing to fill the screen with.
         .onChange(of: radio.station.clips.isEmpty) { _, empty in if empty { close() } }
-        #if os(iOS)
         .statusBarHidden()
         .persistentSystemOverlays(.hidden)
         .onAppear {
@@ -258,11 +231,9 @@ struct FullTV: View {
             UIApplication.shared.isIdleTimerDisabled = false
             OrientationLock.set(OrientationLock.normal)
         }
-        #endif
     }
 }
 
-#if os(iOS)
 // Which ways the app may turn: whatever Info.plist allows, or landscape only while HIFI TV
 // is full screen. HIFIApp installs it as the app delegate.
 final class OrientationLock: NSObject, UIApplicationDelegate {
@@ -281,7 +252,6 @@ final class OrientationLock: NSObject, UIApplicationDelegate {
         }
     }
 }
-#endif
 
 // The fine dot screen of an old set, over the clip.
 struct DotScreen: View {
@@ -308,67 +278,6 @@ extension View {
     // Clear liquid glass where the system has it, so the clip shows through; a light
     // dark wash before that. The words carry their own shadow.
     @ViewBuilder func hifiGlass(radius: CGFloat) -> some View {
-        #if os(iOS)
         glassEffect(.clear.tint(.black.opacity(0.06)), in: RoundedRectangle(cornerRadius: radius))
-        #else
-        if #available(macOS 26, *) {
-            glassEffect(.clear.tint(.black.opacity(0.06)), in: RoundedRectangle(cornerRadius: radius))
-        } else {
-            background(Color.black.opacity(0.12), in: RoundedRectangle(cornerRadius: radius))
-                .overlay(RoundedRectangle(cornerRadius: radius).strokeBorder(.white.opacity(0.2), lineWidth: 1))
-        }
-        #endif
     }
-}
-
-// A video station (101X Chillville): hifi.nates-software.com/video plays the
-// rotation in YouTube's privacy-enhanced player and tells the radio what's on.
-struct VideoStation: PlatformRepresentable {
-    let station: Station
-    @EnvironmentObject private var radio: Radio
-
-    final class Coordinator: NSObject, WKScriptMessageHandler {
-        weak var radio: Radio?
-        func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard let body = message.body as? [String: Any] else { return }
-            Task { @MainActor [weak radio] in radio?.videoSaid(body) }
-        }
-    }
-
-    func makeCoordinator() -> Coordinator { Coordinator() }
-
-    private func make(_ coordinator: Coordinator) -> WKWebView {
-        coordinator.radio = radio
-        let config = WKWebViewConfiguration()
-        config.mediaTypesRequiringUserActionForPlayback = []
-        #if os(iOS)
-        config.allowsInlineMediaPlayback = true
-        #endif
-        config.userContentController.add(coordinator, name: "hifi")
-        let web = WKWebView(frame: .zero, configuration: config)
-        #if os(iOS)
-        web.isOpaque = false
-        web.backgroundColor = .black
-        web.scrollView.isScrollEnabled = false
-        #endif
-        var url = Catalog.base.appending(path: "video")
-        url.append(queryItems: [URLQueryItem(name: "station", value: station.id)])
-        web.load(URLRequest(url: url))
-        return web
-    }
-
-    private static func dismantle(_ web: WKWebView) {
-        web.configuration.userContentController.removeScriptMessageHandler(forName: "hifi")
-        web.loadHTMLString("", baseURL: nil)
-    }
-
-    #if os(iOS)
-    func makeUIView(context: Context) -> WKWebView { make(context.coordinator) }
-    func updateUIView(_ view: WKWebView, context: Context) {}
-    static func dismantleUIView(_ view: WKWebView, coordinator: Coordinator) { dismantle(view) }
-    #else
-    func makeNSView(context: Context) -> WKWebView { make(context.coordinator) }
-    func updateNSView(_ view: WKWebView, context: Context) {}
-    static func dismantleNSView(_ view: WKWebView, coordinator: Coordinator) { dismantle(view) }
-    #endif
 }

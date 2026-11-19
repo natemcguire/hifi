@@ -1,6 +1,6 @@
 # HIFI
 
-A click-wheel iPod internet radio for the browser, iPhone, Mac and Alexa: sixteen live house stations (four of them for Christmas), 95 big stations from 35 countries and four synth stations made here.
+A click-wheel iPod internet radio for the browser, iPhone, iPad and Alexa: sixteen live house stations (four of them for Christmas), 95 big stations from 35 countries and four synth stations made here.
 
 ```sh
 npm install && npm run dev    # builds dist/ and serves the site with wrangler dev
@@ -55,7 +55,7 @@ npm run release    # clean commit required; builds, deploys the nsw-hifi Worker,
 
 ### Web-only stations
 
-A station under `webStations` in `stations.json` is on the web player only. The iPhone and Mac
+A station under `webStations` in `stations.json` is on the web player only. The iPhone and iPad
 app and the Alexa skill read `stations`, so they never show it, whatever build they are. A new
 station whose permission is still open goes in `webStations` first and moves to `stations` when
 Nate clears it. RDS did on 2026-11-15, and the 97 world stations on 2026-11-18, the day they
@@ -64,7 +64,7 @@ were added. The list is empty now.
 ### World stations
 
 97 stations added on 2026-11-18, in `stations` since Nate cleared them that day, so the web
-player, the iPhone and Mac app and the Alexa skill all play them:
+player, the iPhone and iPad app and the Alexa skill all play them:
 
 - **Late Night Jazz** (Ella Radio): slow instrumental ballads, piano trios and tenor sax. The
   closest free stream to the Spotify playlist Dark Academia Jazz; Jazz24 is the broader one.
@@ -115,42 +115,32 @@ any host the stream redirects to.
 
 RDS song titles come from the station's Icecast status through `/api/now-playing?station=rds`.
 
-## iPhone and Mac app
+## iPhone and iPad app
 
 `ios/` is a native SwiftUI player styled like a classic click-wheel iPod, generated with
 [XcodeGen](https://github.com/yonaskolb/XcodeGen). It plays the same catalog with background
-audio and lock-screen controls.
+audio and lock-screen controls. HIFI is iPhone and iPad only: the Mac app was removed on
+2026-11-19 (Nate: "Don't ever submit to the Mac App Store", then "remove the whole Mac app").
+Nothing here builds, signs or submits for macOS, and `/download` on the site now goes to the
+App Store listing.
 
 1. Set your Apple team in `ios/project.yml` and your bundle IDs.
 2. `cp ios/scripts/devices.example ios/scripts/devices.local`, list your iPhones and name the Mac
-   that compiles (`HIFI_BUILD_HOST`). The DMG, App Store and screenshot scripts compile there
+   that compiles (`HIFI_BUILD_HOST`). The App Store and screenshot scripts compile there
    unsigned and sign here; the keys stay on this Mac. `HIFI_BUILD_HOST=local` compiles here.
 3. `ios/scripts/make-signing.py` (App Store Connect API key) creates a dedicated certificate,
-   keychain and profile; add `--mac` for the Mac certificate.
-4. `ios/scripts/build-iphone.sh && ios/scripts/install-iphone.sh`, or
-   `ios/scripts/build-mac.sh && ios/scripts/install-mac.sh`.
-5. Mac download outside the App Store: `make-signing.py --developer-id` (the Developer ID
-   certificate needs the Account Holder; the script explains the manual step), then
-   `withkeys ios/scripts/build-dmg.sh` signs, notarizes and staples `download/HIFI.dmg`,
-   which the site serves at `/download`.
-6. Another Mac of yours: `withkeys ios/scripts/send-mac.sh HOST` builds that DMG, copies it
-   over SSH and installs it in `/Applications` (`--reuse` sends the last build). That Mac needs
-   no checkout.
-7. App Store: `withkeys ios/scripts/upload-appstore.sh` compiles and uploads the iPhone build;
+   keychain and profile; `--store` adds the distribution certificate and App Store profile.
+4. `ios/scripts/build-iphone.sh && ios/scripts/install-iphone.sh`.
+5. App Store: `withkeys ios/scripts/upload-appstore.sh` compiles and uploads the iPhone build;
    `withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--submit]` fills the listing.
-   For the Mac App Store (same record, universal bundle ID): `make-signing.py --mac-store`
-   once, `ios/scripts/mac-screenshots.sh` then `frame-screenshots.py --mac` for the
-   2880x1800 screenshots, `withkeys ios/scripts/upload-mac-appstore.sh` for the sandboxed
-   build, and `appstore-listing.py --mac [--submit]` for the Mac version.
-8. Story screenshots (the listing since 2026-11-19, iPhone, iPad and Mac): six slides that read
-   as one strip, ink drawings on paper, in `ios/Screenshots/story/{iphone,ipad,mac}`, copied as
-   `1-free.png` … `6-why-free.png` into `ios/Screenshots/{iphone,ipad,mac}`, which is what the
+6. Story screenshots (the listing since 2026-11-19, iPhone and iPad): six slides that read
+   as one strip, ink drawings on paper, in `ios/Screenshots/story/{iphone,ipad}`, copied as
+   `1-free.png` … `6-why-free.png` into `ios/Screenshots/{iphone,ipad}`, which is what the
    listing uploads (`frame-screenshots.py` writes the older framed set there). Capture with
-   `HIFI_SHOTS_RAW=Screenshots/story/raw` in front of `capture-screenshots.sh` and
-   `mac-screenshots.sh`, draw with `keys run --only GROK_API_KEY -- python3 -I
-   ios/scripts/story-art.py ios/Screenshots/story/art`, then
-   `python3 ios/scripts/story-screenshots.py`. To ship them, copy a set into
-   `ios/Screenshots/{iphone,ipad,mac}`, then `appstore-listing.py [--mac] --screenshots`
+   `HIFI_SHOTS_RAW=Screenshots/story/raw` in front of `capture-screenshots.sh`, draw with
+   `keys run --only GROK_API_KEY -- python3 -I ios/scripts/story-art.py ios/Screenshots/story/art`,
+   then `python3 ios/scripts/story-screenshots.py`. To ship them, copy a set into
+   `ios/Screenshots/{iphone,ipad}`, then `appstore-listing.py --screenshots`
    replaces only the screenshots; a version waiting for review is taken out of review first
    (Apple refuses screenshots then), and `--submit` sends it back.
 

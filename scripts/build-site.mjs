@@ -1,12 +1,10 @@
 import {mkdir,rm,cp,copyFile,lstat,readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
-import {existsSync} from 'node:fs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 await rm(root+'dist',{recursive:true,force:true});await mkdir(root+'dist');
 for(const file of ['index.html','landing.html','privacy.html','spotify.html','spotify.js','video.html','video.js','landing.css','landing.js','app.js','styles.css','favicon.svg','stations.json']) await copyFile(root+file,root+'dist/'+file);
-// download/ holds the notarized Mac DMG once one is built (ios/scripts/build-dmg.sh).
-for(const dir of ['engine','tracks','shots','playlists','tv','download'].filter(dir=>dir!=='download'||existsSync(root+dir))) await cp(root+dir,root+'dist/'+dir,{recursive:true,filter:async source=>{if((await lstat(source)).isSymbolicLink())throw Error('Symlink not allowed in public assets');return true;}});
+for(const dir of ['engine','tracks','shots','playlists','tv']) await cp(root+dir,root+'dist/'+dir,{recursive:true,filter:async source=>{if((await lstat(source)).isSymbolicLink())throw Error('Symlink not allowed in public assets');return true;}});
 // Cover art and icons for the Alexa skill (alexa/scripts/make-covers.py), at /alexa/.
 await cp(root+'alexa/assets',root+'dist/alexa',{recursive:true});
 // Notes meant to be read in a browser (noindex), at /docs/<name>.html.

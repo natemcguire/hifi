@@ -4,7 +4,7 @@ a new private key, an Apple Development certificate for it, a development
 profile for com.natesoftware.hifi on the iPhones in devices.local, and a dedicated
 hifi-build keychain that codesign can use without prompts.
 
-Run as: withkeys <python with pyjwt> ios/scripts/make-signing.py [--mac | --store | --developer-id | --mac-store]
+Run as: withkeys <python with pyjwt> ios/scripts/make-signing.py [--store]
 Needs ASC_API_KEY_ID, ASC_API_KEY_ISSUER_ID, ASC_API_KEY_PATH. Prints only IDs.
 """
 import base64, json, os, plistlib, secrets, subprocess, sys, time, urllib.error, urllib.request
@@ -124,26 +124,6 @@ def main():
     print("profile:", PROFILE_NAME, uuid)
 
 
-def mac():
-    """Adds a Mac development certificate for the same key, so the Mac build signs
-    from the same hifi-build keychain. No profile needed: no restricted entitlements."""
-    key, cer = DIR / "dev.key", DIR / "mac.cer"
-    if not cer.exists():
-        csr = DIR / "mac.csr"
-        run("openssl", "req", "-new", "-key", str(key), "-out", str(csr), "-subj", "/CN=HIFI Mac Development/O=Nate's Software/C=US")
-        csr_body = "".join(l for l in csr.read_text().splitlines() if "CERTIFICATE REQUEST" not in l)
-        created = api("POST", "/v1/certificates", {"data": {"type": "certificates", "attributes": {
-            "certificateType": "MAC_APP_DEVELOPMENT", "csrContent": csr_body}}})
-        cer.write_bytes(base64.b64decode(created["data"]["attributes"]["certificateContent"]))
-        print("mac certificate created:", created["data"]["id"])
-    pw = (DIR / "keychain-password").read_text()
-    run("security", "unlock-keychain", "-p", pw, str(KEYCHAIN))
-    subprocess.run(["security", "import", str(cer), "-k", str(KEYCHAIN), "-T", "/usr/bin/codesign"], capture_output=True)
-    sha1 = run("openssl", "x509", "-inform", "DER", "-in", str(cer), "-noout", "-fingerprint", "-sha1").stdout.decode().split("=")[1].strip().replace(":", "")
-    (DIR / "mac-identity").write_text(sha1)
-    print("mac identity sha1:", sha1)
-
-
 def store():
     """Adds an Apple Distribution certificate for the same key and an App Store
     profile, for archives uploaded to App Store Connect (scripts/upload-appstore.sh)."""
@@ -182,95 +162,4 @@ def store():
     print("profile:", name, uuid)
 
 
-def developer_id():
-    """Adds a Developer ID Application certificate for the same key, for Mac builds
-    handed out on the web outside the App Store (scripts/build-dmg.sh). No profile:
-    the Mac app uses no restricted entitlements. Apple may allow only the Account
-    Holder's key to create this kind of certificate."""
-    key, cer = DIR / "dev.key", DIR / "devid.cer"
-    if not cer.exists():
-        kind = os.environ.get("HIFI_DEVID_TYPE", "DEVELOPER_ID_APPLICATION_G2")
-        existing = api("GET", f"/v1/certificates?filter[certificateType]={kind}&limit=50")["data"]
-        print(f"existing {kind} certificates on the account:", len(existing))
-        csr = DIR / "devid.csr"
-        run("openssl", "req", "-new", "-key", str(key), "-out", str(csr), "-subj", "/CN=HIFI Developer ID/O=Nate's Software/C=US")
-        csr_body = "".join(l for l in csr.read_text().splitlines() if "CERTIFICATE REQUEST" not in l)
-        created = api("POST", "/v1/certificates", {"data": {"type": "certificates", "attributes": {
-            "certificateType": kind, "csrContent": csr_body}}})
-        cer.write_bytes(base64.b64decode(created["data"]["attributes"]["certificateContent"]))
-        (DIR / "devid-certificate-id").write_text(created["data"]["id"])
-        print("developer id certificate created:", created["data"]["id"])
-    pw = (DIR / "keychain-password").read_text()
-    run("security", "unlock-keychain", "-p", pw, str(KEYCHAIN))
-    subprocess.run(["security", "import", str(cer), "-k", str(KEYCHAIN), "-T", "/usr/bin/codesign"], capture_output=True)
-    # codesign needs Apple's Developer ID intermediate to build the chain.
-    for ca in ("DeveloperIDG2CA.cer", "DeveloperIDCA.cer"):
-        ca_file = DIR / ca
-        if not ca_file.exists():
-            urllib.request.urlretrieve(f"https://www.apple.com/certificateauthority/{ca}", ca_file)
-        subprocess.run(["security", "import", str(ca_file), "-k", str(KEYCHAIN)], capture_output=True)
-    sha1 = run("openssl", "x509", "-inform", "DER", "-in", str(cer), "-noout", "-fingerprint", "-sha1").stdout.decode().split("=")[1].strip().replace(":", "")
-    (DIR / "devid-identity").write_text(sha1)
-    print("developer id identity sha1:", sha1)
-
-
-def mac_store():
-    """Mac App Store: a Mac Installer Distribution certificate for the same key (the
-    .pkg App Store Connect takes is signed with it) and a Mac App Store profile for
-    the Apple Distribution certificate from --store, which signs the app itself
-    (scripts/upload-mac-appstore.sh). The bundle ID is universal, so the Mac app
-    joins the iPhone app's record under com.natesoftware.hifi."""
-    key, cer = DIR / "dev.key", DIR / "installer.cer"
-    if not cer.exists():
-        csr = DIR / "installer.csr"
-        run("openssl", "req", "-new", "-key", str(key), "-out", str(csr), "-subj", "/CN=HIFI Installer/O=Nate's Software/C=US")
-        csr_body = "".join(l for l in csr.read_text().splitlines() if "CERTIFICATE REQUEST" not in l)
-        created = api("POST", "/v1/certificates", {"data": {"type": "certificates", "attributes": {
-            "certificateType": "MAC_INSTALLER_DISTRIBUTION", "csrContent": csr_body}}})
-        cer.write_bytes(base64.b64decode(created["data"]["attributes"]["certificateContent"]))
-        (DIR / "installer-certificate-id").write_text(created["data"]["id"])
-        print("installer certificate created:", created["data"]["id"])
-    pw = (DIR / "keychain-password").read_text()
-    run("security", "unlock-keychain", "-p", pw, str(KEYCHAIN))
-    subprocess.run(["security", "import", str(cer), "-k", str(KEYCHAIN), "-T", "/usr/bin/productbuild", "-T", "/usr/bin/codesign"], capture_output=True)
-    # The private key's own access list was written for codesign alone, and productbuild
-    # signs the .pkg in-process, so the keychain would put up a password dialog for it
-    # (and the dialog wants this keychain's random password, not the login one). Re-import
-    # the key with productbuild allowed: drop the Apple Distribution identity (certificate
-    # and key), then bring both back from a fresh PKCS#12. OpenSSL 3+ must write the legacy
-    # PKCS#12 form or `security import` rejects it ("MAC verification failed").
-    if "productbuild" not in subprocess.run(["security", "dump-keychain", "-a", str(KEYCHAIN)], capture_output=True).stdout.decode():
-        dist_pem, p12 = DIR / "dist.pem", DIR / "rekey.p12"
-        run("openssl", "x509", "-inform", "DER", "-in", str(DIR / "dist.cer"), "-out", str(dist_pem))
-        p12_pw = secrets.token_urlsafe(16)
-        legacy = ["-legacy"] if b"OpenSSL 3" in run("openssl", "version").stdout or b"OpenSSL 4" in run("openssl", "version").stdout else []
-        run("openssl", "pkcs12", "-export", *legacy, "-inkey", str(DIR / "dev.key"), "-in", str(dist_pem), "-out", str(p12), "-passout", f"pass:{p12_pw}")
-        subprocess.run(["security", "delete-identity", "-c", "Apple Distribution: Nate McGuire (42Y5ADDZL2)", str(KEYCHAIN)], capture_output=True)
-        run("security", "import", str(p12), "-k", str(KEYCHAIN), "-P", p12_pw, "-T", "/usr/bin/codesign", "-T", "/usr/bin/productbuild", "-T", "/usr/bin/pkgbuild", "-T", "/usr/bin/security")
-        run("security", "set-key-partition-list", "-S", "apple-tool:,apple:,codesign:", "-s", "-k", pw, str(KEYCHAIN))
-        p12.unlink(); dist_pem.unlink()
-        print("signing key re-imported with productbuild allowed")
-    sha1 = run("openssl", "x509", "-inform", "DER", "-in", str(cer), "-noout", "-fingerprint", "-sha1").stdout.decode().split("=")[1].strip().replace(":", "")
-    (DIR / "installer-identity").write_text(sha1)
-    print("installer identity sha1:", sha1)
-    name = "HIFI Mac App Store"
-    bundle = next(b for b in api("GET", f"/v1/bundleIds?filter[identifier]={BUNDLE_ID}&limit=20")["data"]
-                  if b["attributes"]["identifier"] == BUNDLE_ID)
-    for old in api("GET", f"/v1/profiles?filter[name]={urllib.request.quote(name)}")["data"]:
-        api("DELETE", f"/v1/profiles/{old['id']}")
-    profile = api("POST", "/v1/profiles", {"data": {"type": "profiles",
-        "attributes": {"name": name, "profileType": "MAC_APP_STORE"},
-        "relationships": {
-            "bundleId": {"data": {"type": "bundleIds", "id": bundle["id"]}},
-            "certificates": {"data": [{"type": "certificates", "id": (DIR / "dist-certificate-id").read_text().strip()}]}}}})["data"]
-    content = base64.b64decode(profile["attributes"]["profileContent"])
-    uuid = profile["attributes"]["uuid"]
-    folder = HOME / "Library/Developer/Xcode/UserData/Provisioning Profiles"
-    folder.mkdir(parents=True, exist_ok=True)
-    (folder / f"{uuid}.provisionprofile").write_bytes(content)
-    (DIR / "mac-store-profile").write_text(f"{uuid}.provisionprofile")
-    print("profile:", name, uuid)
-
-
-mac() if "--mac" in sys.argv else store() if "--store" in sys.argv else developer_id() if "--developer-id" in sys.argv \
-    else mac_store() if "--mac-store" in sys.argv else main()
+store() if "--store" in sys.argv else main()

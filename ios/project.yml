@@ -2,7 +2,6 @@ name: HIFI
 options:
   deploymentTarget:
     iOS: '26.0'
-    macOS: '15.0'
   createIntermediateGroups: true
 settings:
   base:
@@ -31,6 +30,10 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.natesoftware.hifi
         PROVISIONING_PROFILE_SPECIFIER: HIFI iPhone Development
         TARGETED_DEVICE_FAMILY: '1,2'
+        # iPhone and iPad only: no Mac Catalyst, no "Designed for iPad" Mac or Vision builds.
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
     info:
       path: Config/Info.plist
@@ -48,31 +51,6 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        ITSAppUsesNonExemptEncryption: false
-        # nswhifi:// brings Spotify's sign-in back to the app, even when the
-        # browser doing the sign-in (Chrome, say) opens it as a plain link.
-        CFBundleURLTypes:
-          - CFBundleURLName: com.natesoftware.hifi.spotify
-            CFBundleURLSchemes: [nswhifi]
-  HIFI-Mac:
-    type: application
-    platform: macOS
-    sources:
-      - Sources
-      - Resources/Assets.xcassets
-      - Resources/PrivacyInfo.xcprivacy
-      - path: ../stations.json
-        buildPhase: resources
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.natesoftware.hifi.mac
-        ENABLE_APP_SANDBOX: NO
-        ENABLE_HARDENED_RUNTIME: NO
-    info:
-      path: Config/Info-Mac.plist
-      properties:
-        CFBundleDisplayName: HIFI
-        LSApplicationCategoryType: public.app-category.music
         ITSAppUsesNonExemptEncryption: false
         # nswhifi:// brings Spotify's sign-in back to the app, even when the
         # browser doing the sign-in (Chrome, say) opens it as a plain link.

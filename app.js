@@ -2,7 +2,7 @@ import { rotationAt } from './engine/scheduler.js';
 import { createStorage } from './engine/storage.js';
 import { installWindowShortcuts } from './engine/windowShortcuts.js';
 
-// HIFI as a classic click-wheel iPod: the same player as the iPhone and Mac apps
+// HIFI as a classic click-wheel iPod: the same player as the iPhone and iPad app
 // (ios/Sources/IPod.swift). The device fills the window: screen over wheel when
 // tall, side by side when wide.
 const $ = id => document.getElementById(id);

@@ -1,10 +1,6 @@
 import SwiftUI
-#if os(iOS)
 import AudioToolbox
 import UIKit
-#elseif os(macOS)
-import AppKit
-#endif
 
 // HIFI as a classic click-wheel iPod. The device body fills the whole window
 // on every screen: stacked (screen over wheel) when tall, side by side when wide.
@@ -56,9 +52,6 @@ struct IPodView: View {
     @State private var searchClosing = false  // the pill is on its way out: no caret, no keyboard
     @State private var searchArrivedWithPage = false  // the search opened from another page, so the Radio list came with it
     @State private var fullTV = false  // HIFI TV filling the whole display
-    #if os(macOS)
-    @State private var tvMadeFullScreen = false  // the window went full screen for it, so it comes back out after
-    #endif
     @FocusState private var searchFocused: Bool
     @FocusState private var focused: Bool
     @Namespace private var highlight
@@ -105,23 +98,17 @@ struct IPodView: View {
             }
             .frame(width: size.width, height: size.height)
         }
-        #if os(macOS)
-        .padding(.top, 22)  // clear of the traffic lights in the hidden title bar
-        #endif
         .ignoresSafeArea(.keyboard)  // the search field sits just under the screen; the wheel keeps its room
         .background {
             Shell.body.ignoresSafeArea()
         }
         // The Christmas look is laid over the iPod, which stays exactly where it is (nothing moves to make
-        // room): lights up in the status bar strip (the title bar on the Mac), clear of the garland, then
+        // room): lights up in the status bar strip, clear of the garland, then
         // snow over everything (the tinsel and candy canes sit on the screen, the wreath on the wheel).
         .overlay(alignment: .top) {
             if christmas {
                 ChristmasLights()
                     .ignoresSafeArea(edges: .top)
-                    #if os(macOS)
-                    .padding(.leading, 72)  // past the traffic lights
-                    #endif
             }
         }
         .overlay {
@@ -134,16 +121,6 @@ struct IPodView: View {
         .onAppear {
             focused = true
             #if DEBUG
-            #if os(macOS)
-            // Mac App Store screenshots: `-shotSize 840x1400` sizes the window (ios/scripts/mac-screenshots.sh).
-            if let spec = UserDefaults.standard.string(forKey: "shotSize"), let window = NSApp.windows.first {
-                let parts = spec.split(separator: "x").compactMap { Double($0) }
-                if parts.count == 2 {
-                    window.setContentSize(NSSize(width: parts[0], height: parts[1]))
-                    window.center()
-                }
-            }
-            #endif
             // App Store screenshots: `-screenshot home|tv|synthTV|radio|world|synth|nowPlaying|live|playlists|connect` opens that page.
             switch UserDefaults.standard.string(forKey: "screenshot") {
             case "radio", "synth": stack = [.main, .band("radio")]
@@ -182,21 +159,11 @@ struct IPodView: View {
             }
             #endif
         }
-        // A video station needs the screen: playing one jumps to Now Playing.
-        .onChange(of: "\(radio.station.id) \(radio.isPlaying)") {
-            if radio.station.isVideo, radio.isPlaying, page != .nowPlaying {
-                forward = true
-                withAnimation(.easeInOut(duration: 0.25)) { stack.append(.nowPlaying) }
-            }
-        }
-        #if os(iOS)
         .onChange(of: scenePhase) {
-            if scenePhase == .background, radio.station.isVideo { radio.stop() }
             // The app can stay in memory for days, so launch alone is too rare: a station added
             // since then shows up the next time the app comes to the front.
             if scenePhase == .active { Task { await radio.refreshCatalog() } }
         }
-        #endif
         .onKeyPress(.upArrow) { key(nil) { rotate(-1) } }
         .onKeyPress(.downArrow) { key(nil) { rotate(1) } }
         .onKeyPress(.leftArrow) { searchFocused ? .ignored : key(.previous) { fullTV ? radio.skipTV(-1) : radio.skip(-1) } }
@@ -218,10 +185,6 @@ struct IPodView: View {
             searchOpen = true
             searchFocused = true
             touched()
-            #if os(macOS)
-            // Focusing a field selects its text on the Mac, which would make the next letter replace this one.
-            Task { for _ in 0..<5 { try? await Task.sleep(for: .milliseconds(30)); Self.moveCaretToEnd() } }
-            #endif
             return .handled
         }
         .task(id: page) {
@@ -236,35 +199,9 @@ struct IPodView: View {
                 try? await Task.sleep(for: .seconds(20))
             }
         }
-        #if os(iOS)
         .fullScreenCover(isPresented: $spotify.showConnect) { SpotifyConnectView(spotify: spotify) }
         .fullScreenCover(isPresented: $fullTV) { FullTV { fullTV = false }.environmentObject(radio) }
-        #else
-        // HIFI TV full screen: the clip fills the window, and the window goes full screen with it.
-        .overlay {
-            if fullTV { FullTV { fullTV = false }.transition(.opacity) }
-        }
-        .animation(.easeOut(duration: 0.25), value: fullTV)
-        .onChange(of: fullTV) { _, on in
-            guard let window = NSApp.keyWindow ?? NSApp.windows.first else { return }
-            let isFull = window.styleMask.contains(.fullScreen)
-            if on, !isFull { tvMadeFullScreen = true; window.toggleFullScreen(nil) }
-            if !on, isFull, tvMadeFullScreen { window.toggleFullScreen(nil) }
-            if !on { tvMadeFullScreen = false }
-        }
-        // The Mac gets the same full white page, filling the whole window.
-        .overlay {
-            if spotify.showConnect {
-                SpotifyConnectView(spotify: spotify)
-                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
-                    .onExitCommand { spotify.showConnect = false }
-            }
-        }
-        .animation(.easeOut(duration: 0.25), value: spotify.showConnect)
-        #endif
-        #if os(iOS)
         .background { ShuffleHost(radio: radio).frame(width: 120, height: 120).allowsHitTesting(false) }
-        #endif
         // Backlight: the screen dims after a quiet spell, like the iPod's timer.
         .task(id: lastTouch) {
             guard backlight > 0 else { return }
@@ -279,13 +216,6 @@ struct IPodView: View {
     }
 
     // A key press flashes the matching part of the wheel, so the keyboard shows where it "clicked".
-    #if os(macOS)
-    private static func moveCaretToEnd() {
-        guard let editor = NSApp.keyWindow?.firstResponder as? NSTextView else { return }
-        editor.setSelectedRange(NSRange(location: (editor.string as NSString).length, length: 0))
-    }
-    #endif
-
     private func key(_ region: WheelRegion?, _ action: () -> Void) -> KeyPress.Result {
         if let region { flashWheel(region) }
         touched()
@@ -463,11 +393,9 @@ struct IPodView: View {
                             .focused($searchFocused)
                             .autocorrectionDisabled()
                             .onSubmit { select() }
-                            #if os(iOS)
                             .textInputAutocapitalization(.never)
                             .submitLabel(.go)
                             .keyboardType(.webSearch)
-                            #endif
                             .onAppear {
                                 // The keyboard comes up once the pill has opened, not in the middle of it.
                                 Task { try? await Task.sleep(for: .milliseconds(searchArrivedWithPage ? 420 : 260)); searchFocused = true }
@@ -512,11 +440,7 @@ struct IPodView: View {
         .animation(.spring(duration: 0.5, bounce: 0.28), value: searchOpen)  // bubbles open
         .onChange(of: query) { for p in stack { if case .band = p { selection[p] = 0 } } }
         return Group {
-            #if os(iOS)
             GlassEffectContainer { strip }
-            #else
-            if #available(macOS 26, *) { GlassEffectContainer { strip } } else { strip }
-            #endif
         }
     }
 
@@ -638,13 +562,11 @@ struct IPodView: View {
             _ = shuffleTick
             var list = [Row(title: "Backlight", chevron: false, value: backlight == 0 ? "Always On" : "\(backlight) Seconds"),
                         Row(title: "Spotify", chevron: false, value: spotify.isConnected ? "Connected" : "Connect")]
-            #if os(iOS)
             list.insert(Row(title: "Clicker", chevron: false, value: clicker ? "On" : "Off"), at: 0)
             if ShufflePlayer.shared.isSupported {
                 list.append(Row(title: "Mini Shuffle", chevron: false, value: ShufflePlayer.shared.isActive ? "Showing" : "Open"))
                 list.append(Row(title: "Shuffle on Home", chevron: false, value: ShufflePlayer.shared.automatic ? "On" : "Off"))
             }
-            #endif
             return list
         default:
             return []
@@ -768,10 +690,8 @@ struct IPodView: View {
             switch rows[safe: index]?.title {
             case "Clicker": clicker.toggle()
             case "Spotify": if spotify.isConnected { spotify.disconnect() } else { spotify.showConnect = true }
-            #if os(iOS)
             case "Mini Shuffle": ShufflePlayer.shared.toggle()
             case "Shuffle on Home": ShufflePlayer.shared.automatic.toggle(); shuffleTick += 1
-            #endif
             case "Backlight":
                 let options = [10, 30, 60, 0]
                 backlight = options[((options.firstIndex(of: backlight) ?? 1) + 1) % options.count]
@@ -795,8 +715,6 @@ struct IPodView: View {
     private func menu() {
         touched()
         guard stack.count > 1 else { return }
-        // Leaving a video stops it, the way MENU stops a movie on an iPod.
-        if page == .nowPlaying, radio.station.isVideo, radio.isPlaying { radio.stop() }
         if case .band = page, searchOpen { closeSearch() }
         if case .band(let band) = page, Self.country(band) != nil { query = "" }  // a search inside a country stays there
         forward = false
@@ -809,19 +727,9 @@ private extension Array {
 }
 
 private extension View {
-    // The search field's liquid glass pill on the iPod's body; a frosted pill before macOS 26.
+    // The search field's liquid glass pill on the iPod's body.
     @ViewBuilder func searchGlass() -> some View {
-        #if os(iOS)
         glassEffect(.regular.interactive(), in: Capsule()).glassEffectTransition(.materialize)
-        #else
-        if #available(macOS 26, *) {
-            glassEffect(.regular.interactive(), in: Capsule()).glassEffectTransition(.materialize)
-        } else {
-            background(.ultraThinMaterial, in: Capsule())
-                .overlay(Capsule().strokeBorder(.white.opacity(0.6), lineWidth: 1))
-                .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
-        }
-        #endif
     }
 }
 
@@ -871,8 +779,6 @@ extension IPodView {
         await pause(2.5)
         press(.next); await pause(6)  // the next station, from the wheel
         await back(1.5)
-        if let i = live.firstIndex(where: { $0?.isVideo == true }) { await open(i, settle: 12) }  // 101X Chillville: official videos
-        await back()  // MENU stops the video
         await back()
         // Synth Sounds: our own music on a shared clock, with pause and play.
         await open(1, settle: 2)
@@ -925,9 +831,7 @@ private struct NowPlaying: View {
     @Binding var fullTV: Bool
 
     var body: some View {
-        if radio.station.isVideo, radio.isPlaying {
-            VideoStation(station: radio.station).id(radio.station.id)
-        } else if !radio.station.clips.isEmpty {
+        if !radio.station.clips.isEmpty {
             tv
         } else {
             classic
@@ -1202,7 +1106,6 @@ struct ClickWheel: View {
     @State private var startedOnRing = false
     @State private var pressed: WheelRegion?
     @State private var thumb: Double?  // finger angle while scrolling
-    @State private var hover: WheelRegion?
     @State private var releaseTask: Task<Void, Never>?
 
     private var hub: CGFloat { diameter * 0.36 }
@@ -1219,7 +1122,7 @@ struct ClickWheel: View {
                 Wedge(region: region, inner: hub / diameter)
                     .fill(RadialGradient(colors: [Color.black.opacity(0.03), Color.black.opacity(0.13)],
                                          center: .center, startRadius: hub / 2, endRadius: diameter / 2))
-                    .opacity(active == region ? 1 : hover == region ? 0.35 : 0)
+                    .opacity(active == region ? 1 : 0)
             }
             if let thumb {
                 // A soft glow under the finger while scrolling.
@@ -1239,15 +1142,6 @@ struct ClickWheel: View {
         .frame(width: diameter, height: diameter)
         .contentShape(Circle())
         .gesture(DragGesture(minimumDistance: 0).onChanged(changed).onEnded(ended))
-        #if os(macOS)
-        .onContinuousHover { phase in
-            switch phase {
-            case .active(let point): hover = region(at: point)
-            case .ended: hover = nil
-            }
-        }
-        .animation(.easeOut(duration: 0.12), value: hover)
-        #endif
         .accessibilityElement()
         .accessibilityLabel("Click wheel")
     }
@@ -1258,9 +1152,6 @@ struct ClickWheel: View {
             .fill(LinearGradient(colors: down ? [Color(hex: "#d4d6d9"), Color(hex: "#eeeff0")] : [Color(hex: "#fbfbfb"), Color(hex: "#e2e3e5")],
                                  startPoint: .top, endPoint: .bottom))
             .overlay(Circle().stroke(Color.black.opacity(down ? 0.22 : 0.14), lineWidth: 1))
-            .overlay {
-                if hover == .center && !down { Circle().fill(Color.black.opacity(0.03)) }
-            }
             .frame(width: hub, height: hub)
             .scaleEffect(down ? 0.95 : 1)
             .shadow(color: .black.opacity(down ? 0.02 : 0.12), radius: down ? 0.5 : 2, y: down ? 0 : 1)
@@ -1268,7 +1159,7 @@ struct ClickWheel: View {
 
     private func label(_ content: some View, region: WheelRegion, x: CGFloat = 0, y: CGFloat = 0) -> some View {
         content
-            .foregroundStyle(active == region ? Color(hex: "#4d5358") : hover == region ? Color(hex: "#7f858b") : Color(hex: "#a3a8ad"))
+            .foregroundStyle(active == region ? Color(hex: "#4d5358") : Color(hex: "#a3a8ad"))
             .scaleEffect(active == region ? 0.88 : 1)
             .offset(x: x * diameter * 0.37, y: y * diameter * 0.37)
     }
@@ -1378,20 +1269,12 @@ enum Feedback {
     private static var clicker: Bool { UserDefaults.standard.object(forKey: "clicker") as? Bool ?? true }
 
     static func tick() {
-        #if os(iOS)
         UISelectionFeedbackGenerator().selectionChanged()
         if clicker { AudioServicesPlaySystemSound(1104) }
-        #elseif os(macOS)
-        NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
-        #endif
     }
 
     static func click() {
-        #if os(iOS)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         if clicker { AudioServicesPlaySystemSound(1104) }
-        #elseif os(macOS)
-        NSHapticFeedbackManager.defaultPerformer.perform(.generic, performanceTime: .now)
-        #endif
     }
 }

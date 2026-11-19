@@ -15,7 +15,7 @@ run_worker_first = true
 html_handling = "none"
 not_found_handling = "none"
 
-# The Mac download counter (worker.js Downloads).
+# The old Mac download counter (worker.js Downloads), kept so its stored count isn't deleted.
 [[durable_objects.bindings]]
 name = "DOWNLOADS"
 class_name = "Downloads"

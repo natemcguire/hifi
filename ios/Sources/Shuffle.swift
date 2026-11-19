@@ -1,5 +1,4 @@
 import SwiftUI
-#if os(iOS)
 import AVKit
 import Combine
 
@@ -151,7 +150,6 @@ struct ShuffleHost: UIViewRepresentable {
     }
     func updateUIView(_ uiView: SampleBufferView, context: Context) {}
 }
-#endif
 
 // The 2nd-generation iPod shuffle in white, filling the whole picture so it floats on the
 // home screen as an object, not a window: brushed aluminium, the round control pad on the

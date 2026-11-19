@@ -40,7 +40,7 @@ code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:#ececf0;pa
 <h2>At a glance</h2>
 <ul>
 <li><strong>Apple is the open door.</strong> HomePod plays any iPhone app that answers Siri's media requests (SiriKit <code>INPlayMediaIntent</code>). There is no partner program any more, so "Hey Siri, play Z100 on HIFI" can work on HomePod in <strong>about a week</strong>, using the app we already ship.</li>
-<li><strong>AirPlay already works.</strong> The iPhone and Mac app set the long-form audio policy and fill in Now Playing, so HIFI already plays on HomePod, Apple TV and AirPlay 2 Sonos speakers from the phone. Only a quick check is needed.</li>
+<li><strong>AirPlay already works.</strong> The iPhone and iPad app sets the long-form audio policy and fill in Now Playing, so HIFI already plays on HomePod, Apple TV and AirPlay 2 Sonos speakers from the phone. Only a quick check is needed.</li>
 <li><strong>Google voice is closed.</strong> Conversational Actions shut down in June 2023. Radio by voice on Nest now comes only from Google's media partners (TuneIn, iHeart and the like), with no application form. <strong>Google Cast is open</strong>: casting from the app and web player to Nest speakers and Hubs costs $5 and about a week.</li>
 <li><strong>Sonos is possible but slow.</strong> The Sonos Music API partner process takes <strong>four to six months</strong> of review and preview. Our rebroadcast of stations like Z100 may be questioned; the house stations are the safer start.</li>
 <li><strong>Skip the dead and closed ones:</strong> Gemini for Home, Sonos Voice Control, Alexa built into Sonos and Bose speakers, Bixby, Meta Portal and Cortana.</li>
@@ -53,7 +53,7 @@ code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:#ececf0;pa
 <table>
 <thead><tr><th>Platform</th><th>Can a free radio app get on today?</th><th>Route</th><th>Effort</th><th>Cost</th><th>Hurdles</th><th>Reuses from Alexa</th></tr></thead>
 <tbody>
-<tr><td><strong>HomePod (AirPlay)</strong></td><td class="yes">Yes, already</td><td>AirPlay 2 from the iPhone and Mac app</td><td>Under a day to check</td><td>None</td><td>None</td><td>Nothing needed</td></tr>
+<tr><td><strong>HomePod (AirPlay)</strong></td><td class="yes">Yes, already</td><td>AirPlay 2 from the iPhone and iPad app</td><td>Under a day to check</td><td>None</td><td>None</td><td>Nothing needed</td></tr>
 <tr><td><strong>HomePod and iPhone Siri</strong></td><td class="yes">Yes</td><td>SiriKit Media Intents in the iOS app; HomePod hands the request to the iPhone</td><td>3–5 days</td><td>None</td><td>App Store review only; app must be on the owner's iPhone</td><td>Ranker (port to Swift), catalog, last station</td></tr>
 <tr><td><strong>Google Nest speakers and Hubs (casting)</strong></td><td class="yes">Yes</td><td>Google Cast SDK in the iOS app and web player</td><td>3–6 days</td><td>$5 one time (custom receiver)</td><td>No review; iOS local-network prompt</td><td>Catalog, now-playing metadata</td></tr>
 <tr><td><strong>Google Nest (voice)</strong></td><td class="partner">Partner only</td><td>Media Actions radio feed, invite only</td><td>—</td><td>—</td><td>No application route</td><td>Catalog would become the feed</td></tr>

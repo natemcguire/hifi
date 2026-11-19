@@ -25,6 +25,13 @@ Radio row per `country`) started there too. Nate cleared them the same day and t
 `stations`; `webStations` is empty. Their stream hosts are in `MEDIA_HOSTS` in `worker.js`; the
 list and what was left out are in `README.md` under World stations.
 
+## No Mac app, never the Mac App Store (Nate, 2026-11-19)
+
+"Don't ever submit to the Mac App Store", then "remove the whole Mac app (only iOS remains)".
+HIFI ships for iPhone and iPad only. Don't add a macOS target, Mac Catalyst or "Designed for
+iPad" on Mac, a DMG or Mac screenshots, and never submit, upload or edit anything for the macOS
+version in App Store Connect. `/download` on the site redirects to the App Store listing.
+
 ## A station change reaches Alexa by its own deploy
 
 The apps and the skill read the live `stations.json`, so a station in `stations` plays on Alexa as
@@ -40,4 +47,4 @@ A name Alexa would read badly gets a `say` in the catalog ("kiss FM" for KIIS FM
 - `npm run release` needs a clean commit. It builds, deploys the `nsw-hifi` Worker and checks the
   live bytes. If that check fails, look at what's live before deploying again.
 - The Alexa skill has its own deploy: `alexa/scripts/deploy.sh` (see `alexa/README.md`).
-- Everything else (URL parameters, the iOS and Mac app, synth tracks) is in `README.md`.
+- Everything else (URL parameters, the iPhone and iPad app, synth tracks) is in `README.md`.

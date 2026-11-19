@@ -67,7 +67,7 @@ final class SpotifyAccount: NSObject, ObservableObject {
         }
     }
 
-    // Chrome, as the Mac's sign-in browser, can open nswhifi:// as an ordinary link
+    // A sign-in browser such as Chrome can open nswhifi:// as an ordinary link
     // instead of handing it to the sign-in session, so the app finishes it here.
     func handle(_ url: URL) {
         guard url.scheme == "nswhifi", url.host == "spotify", let pending else { return }
@@ -255,12 +255,8 @@ final class SpotifyAccount: NSObject, ObservableObject {
 extension SpotifyAccount: ASWebAuthenticationPresentationContextProviding {
     nonisolated func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         MainActor.assumeIsolated {
-            #if os(iOS)
             let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
             return scenes.flatMap(\.windows).first { $0.isKeyWindow } ?? ASPresentationAnchor()
-            #else
-            return NSApplication.shared.keyWindow ?? ASPresentationAnchor()
-            #endif
         }
     }
 }
@@ -423,9 +419,7 @@ struct SpotifyOwnAppView: View {
                         .font(.system(size: 15, design: .monospaced))
                         .textFieldStyle(.plain)
                         .autocorrectionDisabled()
-                        #if os(iOS)
                         .textInputAutocapitalization(.never)
-                        #endif
                         .padding(12)
                         .background(RoundedRectangle(cornerRadius: 10).fill(Color(hex: "#f2f2f4")))
                 }
@@ -492,12 +486,7 @@ struct SpotifyOwnAppView: View {
     }
 
     private func copy(_ text: String) {
-        #if os(iOS)
         UIPasteboard.general.string = text
-        #else
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(text, forType: .string)
-        #endif
         copied = true
     }
 }

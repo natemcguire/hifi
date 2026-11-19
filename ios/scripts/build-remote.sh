@@ -1,9 +1,8 @@
 #!/bin/zsh
-# Compiles HIFI for iPhone and Mac on another Mac (HIFI_BUILD_HOST, default the
-# MacBook Air from devices.local) so this one stays quiet, then signs the results
+# Compiles HIFI for iPhone and iPad on another Mac (HIFI_BUILD_HOST, default the
+# MacBook Air from devices.local) so this one stays quiet, then signs the result
 # here with HIFI's own keys. The keys never leave this Mac. Output lands where
-# build-iphone.sh and build-mac.sh put it, so install-iphone.sh and install-mac.sh
-# work unchanged.
+# build-iphone.sh puts it, so install-iphone.sh works unchanged.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 [[ -f scripts/devices.local ]] && source scripts/devices.local
@@ -16,15 +15,11 @@ rsync -a --delete --exclude build --exclude devices.local --exclude __pycache__ 
 rsync -a ../stations.json ${host}:Library/Caches/hifi-build/stations.json
 ssh $host 'mkdir -p ~/Library/Caches/hifi-build/ios && cd ~/Library/Caches/hifi-build/ios && xcodegen generate --quiet &&
   xcodebuild -project HIFI.xcodeproj -scheme HIFI -configuration Release -destination generic/platform=iOS \
-    -derivedDataPath build/iphone CODE_SIGNING_ALLOWED=NO build -quiet 2>&1 | grep -E "error:" ; \
-  xcodebuild -project HIFI.xcodeproj -scheme HIFI-Mac -configuration Release \
-    -derivedDataPath build/mac CODE_SIGNING_ALLOWED=NO build -quiet 2>&1 | grep -E "error:" ; true'
+    -derivedDataPath build/iphone CODE_SIGNING_ALLOWED=NO build -quiet 2>&1 | grep -E "error:" ; true'
 
 iphone=build/iphone/Build/Products/Release-iphoneos
-mac=build/mac/Build/Products/Release
-rm -rf $iphone/HIFI.app $mac/HIFI.app && mkdir -p $iphone $mac
+rm -rf $iphone/HIFI.app && mkdir -p $iphone
 rsync -a ${host}:Library/Caches/hifi-build/ios/$iphone/HIFI.app $iphone/
-rsync -a ${host}:Library/Caches/hifi-build/ios/$mac/HIFI.app $mac/
 
 security unlock-keychain -p "$(cat $signing/keychain-password)" $keychain
 profile=$(grep -l "HIFI iPhone Development" ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/*.mobileprovision | head -1)
@@ -40,6 +35,5 @@ cat > $entitlements <<EOF
 </dict></plist>
 EOF
 codesign --force --sign "$(cat $signing/identity)" --keychain $keychain --entitlements $entitlements --generate-entitlement-der $iphone/HIFI.app
-codesign --force --deep --sign "$(cat $signing/mac-identity)" --keychain $keychain $mac/HIFI.app
 rm -f $entitlements
-echo "built and signed $iphone/HIFI.app and $mac/HIFI.app (compiled on $host)"
+echo "built and signed $iphone/HIFI.app (compiled on $host)"

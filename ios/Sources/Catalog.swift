@@ -7,15 +7,12 @@ struct Catalog: Decodable {
     let stations: [Station]
     // Names for the `country` codes the world stations carry ("DE": "Germany").
     let countries: [String: String]?
-    // Stations that play official videos (101X Chillville). Older builds don't read
-    // this list, so they never see a station they can't play.
-    let videoStations: [Station]?
     // Server-side switches (stations.json "features"); absent means off.
     let features: Features?
 
-    // One list, the order the Radio menu shows: live stations, the video station, then Synth Sounds.
+    // One list, the order the Radio menu shows: live stations, then Synth Sounds.
     var all: [Station] {
-        stations.filter { $0.band != "synth" } + (videoStations ?? []) + stations.filter { $0.band == "synth" }
+        stations.filter { $0.band != "synth" } + stations.filter { $0.band == "synth" }
     }
 
     // The Christmas look as the server has it. The app ORs this with the listener's own
@@ -66,12 +63,10 @@ struct Station: Decodable, Identifiable, Equatable {
     let support: String?
     let tracks: [Track]?
     let tv: [String]?      // HIFI TV clips for Now Playing
-    let video: String?     // "youtube" for a video station
-    let label: String?     // a name with its own capitals, like "101X Chillville"
+    let label: String?     // a name with its own capitals, like "Y2K Chill-Out"
 
     var isLive: Bool { stream != nil }
     var hasSongFeed: Bool { isLive && nowPlaying != nil }
-    var isVideo: Bool { video != nil }
     var displayName: String { label ?? name.capitalized }
     var clips: [URL] { (tv ?? []).map { Catalog.base.appending(path: $0) } }
     var tint: Color { Color(hex: color) }

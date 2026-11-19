@@ -3,25 +3,14 @@ import SwiftUI
 @main
 struct HIFIApp: App {
     @StateObject private var radio = Radio()
-    #if os(iOS)
     @UIApplicationDelegateAdaptor(OrientationLock.self) private var orientation
-    #endif
 
     var body: some Scene {
         WindowGroup {
             IPodView()
                 .environmentObject(radio)
                 .onOpenURL { SpotifyAccount.shared.handle($0) }
-                #if os(macOS)
-                .frame(minWidth: 340, minHeight: 520)
-                .handlesExternalEvents(preferring: ["*"], allowing: ["*"])  // a link reuses this window
-                #endif
         }
-        #if os(macOS)
-        .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 420, height: 700)
-        .windowResizability(.contentMinSize)
-        #endif
     }
 }
 
