@@ -26,6 +26,13 @@ Live stations stream straight from the catalog. The synth stations (dial-up, sha
 summer, night build, pixel drift) play their tracks back to back; the next one is queued
 before each ends. The video stations are HIFI TV only and are left out.
 
+On an Echo Show the picture is the player's Now Playing screen, drawn from each Play
+directive's title and art. A station started by voice ends the session and sends no card on a
+screen device: a card covers the player and, with the session left open, kept the old screen up
+after a switch until the skill was restarted. Every play gets a new token (`live:z100#…`),
+because the Echo Show reuses the art it cached for a token for days. `switch.test.js` runs
+next, previous and by-name switches back and forth, by voice and by the screen's buttons.
+
 ## Deploying
 
 The endpoint runs on Railway (project `hifi`, service `alexa`, `lambda/server.js`), behind

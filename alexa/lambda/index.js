@@ -12,9 +12,14 @@ const store = require('./store');
 const DEFAULT_STATION = 'radio-paradise';
 
 // ----- tokens: what the player is holding -----
-const tokenFor = (station, index) => station.stream ? `live:${station.id}` : `track:${station.id}:${index}`;
+// Every play gets a token of its own ("live:z100#lq3k9a1"). The Echo Show keeps the title and art
+// it showed for a token for up to five days, so a token used again (back to a station heard
+// before, or a station whose cover changed) could bring back old art instead of the station now
+// playing. The part after # only makes the token new; the station and track are before it.
+let plays = 0;
+const tokenFor = (station, index) => `${station.stream ? `live:${station.id}` : `track:${station.id}:${index}`}#${Date.now().toString(36)}${(plays++ % 1296).toString(36)}`;
 function parseToken(token) {
-  const m = /^(live|track):([a-z0-9-]+)(?::(\d+))?$/.exec(token || '');
+  const m = /^(live|track):([a-z0-9-]+)(?::(\d+))?(?:#[a-z0-9]+)?$/.exec(token || '');
   return m ? { kind: m[1], id: m[2], index: m[3] ? Number(m[3]) : 0 } : null;
 }
 
@@ -38,7 +43,7 @@ async function currentStation(envelope, state) {
   return stations.find(s => s.id === id) || stations.find(s => s.id === DEFAULT_STATION) || stations[0];
 }
 
-function play(builder, station, { index = 0, offset = 0, behavior = 'REPLACE_ALL', previous = null } = {}) {
+function play(builder, station, { index = 0, offset = 0, behavior = 'REPLACE_ALL', previous = null, token = tokenFor(station, index) } = {}) {
   const live = Boolean(station.stream);
   if (!live && !station.tracks.length) return builder;
   const track = live ? null : station.tracks[((index % station.tracks.length) + station.tracks.length) % station.tracks.length];
@@ -49,19 +54,36 @@ function play(builder, station, { index = 0, offset = 0, behavior = 'REPLACE_ALL
     art: { sources: [{ url: station.cover }] },
     backgroundImage: { sources: [{ url: station.cover }] },
   };
-  return builder.addAudioPlayerPlayDirective(behavior, url, tokenFor(station, index), offset, previous || undefined, metadata);
+  return builder.addAudioPlayerPlayDirective(behavior, url, token, offset, previous || undefined, metadata);
+}
+
+// ----- the Echo Show screen -----
+// On a device with a screen the player's Now Playing screen (the metadata above) is the picture.
+// A card in the same response is screen content of the skill's own: it covers the player, and
+// with shouldEndSession unset it holds the session open for up to 30 seconds. Switching
+// stations in that state moved the audio but left the screen behind until the skill was
+// restarted. So a play by voice ends the session and sends no card where there is a screen;
+// speakers keep the card, which only shows in the Alexa app. Button presses and the player's own
+// requests (PlaybackController, AudioPlayer) may carry neither, so they are left alone.
+const hasScreen = envelope => Boolean(envelope.context?.Viewport);
+const byVoice = envelope => ['LaunchRequest', 'IntentRequest'].includes(Alexa.getRequestType(envelope));
+function answer(handlerInput, { title, text } = {}) {
+  const { requestEnvelope, responseBuilder } = handlerInput;
+  if (!byVoice(requestEnvelope)) return responseBuilder.getResponse();
+  if (title && !hasScreen(requestEnvelope)) responseBuilder.withSimpleCard(title, text);
+  return responseBuilder.withShouldEndSession(true).getResponse();
 }
 
 async function tune(handlerInput, station, { speech, index, offset = 0 } = {}) {
   const { requestEnvelope, responseBuilder } = handlerInput;
   const state = await store.load(requestEnvelope);
   const start = index ?? (station.tracks.length ? Math.floor(Math.random() * station.tracks.length) : 0);
-  await store.save(requestEnvelope, { ...state, stationId: station.id, token: tokenFor(station, start), index: start, offset });
-  play(responseBuilder, station, { index: start, offset });
-  if (speech !== null) {
-    responseBuilder.speak(speech ?? announce(station)).withSimpleCard(station.name, station.tagline || station.genre);
-  }
-  return responseBuilder.getResponse();
+  const token = tokenFor(station, start);
+  await store.save(requestEnvelope, { ...state, stationId: station.id, token, index: start, offset });
+  play(responseBuilder, station, { index: start, offset, token });
+  if (speech === null) return answer(handlerInput);
+  responseBuilder.speak(speech ?? announce(station));
+  return answer(handlerInput, { title: station.name, text: station.tagline || station.genre });
 }
 
 async function neighbour(handlerInput, step, speak) {
@@ -178,7 +200,8 @@ const WhatsPlayingIntentHandler = {
       line = now ? `This is ${now.title}${now.artist ? ` by ${now.artist}` : ''}, on ${spoken(station)}.`
         : `This is ${spoken(station)}. ${station.nowPlaying ? "I couldn't get the song title just now." : "It doesn't publish song titles."}`;
     }
-    return responseBuilder.speak(line).withSimpleCard(station.name, line).getResponse();
+    responseBuilder.speak(line);
+    return answer(handlerInput, { title: station.name, text: line });
   },
 };
 
