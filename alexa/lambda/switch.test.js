@@ -49,7 +49,10 @@ function checkSwitch({ response, play }, expected, { voice, screen }, seen) {
   seen.add(token);
   const station = stations.find(s => s.id === expected);
   const { metadata } = play.audioItem;
-  if (station.stream) assert.strictEqual(metadata.title, station.name, 'the screen shows the new station');
+  if (station.stream) {
+    assert.strictEqual(metadata.title, 'HIFI Live Radio', 'the big text on the Now Playing screen');
+    assert.ok(metadata.subtitle.startsWith(station.label || station.name), 'the small line shows the new station and where it is from');
+  }
   else assert.match(metadata.subtitle, new RegExp(`${station.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`));
   assert.ok(metadata.art.sources[0].url.includes(`/${expected}.png`), 'the new station\'s art');
   if (voice) {

@@ -12,6 +12,7 @@
 // to the skill. If the stream won't play there, the skill hands it to AudioPlayer (fallback()).
 // Echo devices without a screen never see any of this.
 
+const about = require('./about');
 let dial = null;
 try { dial = require('./dial-hint'); } catch { /* the dial strip is optional */ }
 
@@ -67,10 +68,12 @@ function document() {
   const words = {
     type: 'Container', position: 'absolute', left: '4vw', right: '22vw', bottom: dial ? '24vh' : '6vh',
     items: [
-      // A track station names its track; a live station the song the skill last heard of, or its genre.
-      { type: 'Text', id: 'hifi-song', text: "${tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].title : (song != '' ? song : tv.genre)}", fontSize: '6vh', fontWeight: 'bold', color: '#FFFFFF', maxLines: 1 },
-      { type: 'Text', id: 'hifi-artist', text: '${tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].artist : singer}', fontSize: '4.4vh', fontWeight: '600', color: '#FFFFFF', opacity: 0.9, maxLines: 1 },
-      { type: 'Text', text: '${tv.name}', fontSize: '3.4vh', fontWeight: 'bold', color: '${tv.color}', maxLines: 1, paddingTop: '0.6vh' },
+      // Until the sound starts: "HIFI Live Radio", "Starting up stream". Then a track station
+      // names its track; a live station the song the skill last heard of, or its genre.
+      { type: 'Text', id: 'hifi-song', text: "${!started ? 'HIFI Live Radio' : tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].title : (song != '' ? song : tv.genre)}", fontSize: '6vh', fontWeight: 'bold', color: '#FFFFFF', maxLines: 1 },
+      { type: 'Text', id: 'hifi-artist', text: "${!started ? 'Starting up stream' : tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].artist : singer}", fontSize: '4.4vh', fontWeight: '600', color: '#FFFFFF', opacity: 0.9, maxLines: 1 },
+      // The station and where it's from, small: "Jazz24 · Seattle" (about.js).
+      { type: 'Text', text: '${tv.place}', fontSize: '3.4vh', fontWeight: 'bold', color: '${tv.color}', maxLines: 1, paddingTop: '0.6vh' },
     ],
   };
   return {
@@ -81,7 +84,7 @@ function document() {
       item: {
         type: 'Container', id: 'hifi-tv', width: '100vw', height: '100vh',
         bind: [
-          { name: 'paused', value: false }, { name: 'failed', value: false }, { name: 'track', value: 0 },
+          { name: 'paused', value: false }, { name: 'failed', value: false }, { name: 'track', value: 0 }, { name: 'started', value: false },
           { name: 'song', value: '${tv.song}' }, { name: 'singer', value: '${tv.artist}' },
           { name: 'clip', value: false },   // the clip is playing; until then the still shows
         ],
@@ -97,7 +100,10 @@ function document() {
           {
             type: 'Video', id: 'hifi-audio', position: 'absolute', top: 0, left: 0, width: 1, height: 1,
             source: '${tv.audio}', autoplay: true, audioTrack: 'background', scale: 'best-fit',
-            onPlay: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'paused', value: false }],
+            onPlay: [
+              { type: 'SetValue', componentId: 'hifi-tv', property: 'paused', value: false },
+              { type: 'SetValue', componentId: 'hifi-tv', property: 'started', value: true },
+            ],
             onPause: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'paused', value: true }],
             onTrackUpdate: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'track', value: '${event.trackIndex}' }],
             onTrackFail: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'failed', value: true }],
@@ -167,7 +173,7 @@ function render(responseBuilder, station, { index = 0, now = null } = {}) {
     type: 'Alexa.Presentation.APL.RenderDocument', token, document: document(),
     datasources: {
       tv: {
-        id: station.id, name: station.name, genre: station.genre, color: station.color,
+        id: station.id, name: station.name, place: about.line(station), genre: station.genre, color: station.color,
         still: station.cover, song: now?.title || '', artist: now?.artist || '',
         tracks: tracks.map(t => ({ title: t.title, artist: t.artist })), audio, clips,
       },

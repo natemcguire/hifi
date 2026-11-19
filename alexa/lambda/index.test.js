@@ -19,7 +19,10 @@ function envelope(request) {
 }
 const intent = (name, slots = {}) => envelope({ type: 'IntentRequest', intent: { name, confirmationStatus: 'NONE', slots } });
 const said = async env => (await skill.invoke(env)).response.outputSpeech?.ssml?.replace(/<\/?speak>/g, '') ?? null;
+const about = require('./about');
 const line = id => `Now listening to live radio on HIFI: ${stations.find(s => s.id === id).label || ''}`;
+// …then what it is and where it's from: "This is UK feel-good hits from Heart in London."
+const full = id => `${line(id)}. ${about.describe(stations.find(s => s.id === id), s => s.label)}`;
 
 test('open the first time welcomes and announces the station', async () => {
   const speech = await said(envelope({ type: 'LaunchRequest' }));
@@ -30,15 +33,22 @@ test('a station by name, resume, open, next and previous all announce it', async
   const heart = stations.findIndex(s => s.id === 'heart');
   assert.ok(heart > 0);
   const station = { name: 'station', value: 'heart', confirmationStatus: 'NONE' };
-  assert.strictEqual(await said(intent('PlayStationIntent', { station })), `${line('heart')}.`);
-  assert.strictEqual(await said(intent('AMAZON.ResumeIntent')), `${line('heart')}.`);
-  assert.strictEqual(await said(envelope({ type: 'LaunchRequest' })), `${line('heart')}.`);
-  assert.match(await said(intent('AMAZON.NextIntent')), /^Now listening to live radio on HIFI: .+\.$/);
-  assert.strictEqual(await said(intent('AMAZON.PreviousIntent')), `${line('heart')}.`);
+  assert.strictEqual(await said(intent('PlayStationIntent', { station })), full('heart'));
+  assert.strictEqual(await said(intent('AMAZON.ResumeIntent')), full('heart'));
+  assert.strictEqual(await said(envelope({ type: 'LaunchRequest' })), full('heart'));
+  assert.match(await said(intent('AMAZON.NextIntent')), /^Now listening to live radio on HIFI: [^.]+\. This is .+ from .+ in .+\.$/);
+  assert.strictEqual(await said(intent('AMAZON.PreviousIntent')), full('heart'));
 });
 
 test('the play button on the device stays quiet', async () => {
   assert.strictEqual(await said(envelope({ type: 'PlaybackController.NextCommandIssued' })), null);
+});
+
+test('the announcement says what the station is and where it is from', async () => {
+  assert.strictEqual(full('heart'), 'Now listening to live radio on HIFI: Heart. This is UK feel-good hits from Heart in London.');
+  const jazz = { name: 'station', value: 'jazz24', confirmationStatus: 'NONE' };
+  assert.strictEqual(await said(intent('PlayStationIntent', { station: jazz })),
+    'Now listening to live radio on HIFI: jazz24. This is Classic jazz from Jazz24 in Seattle.');
 });
 
 // "Alexa, next" while a station plays: Amazon's own next and previous, the station-flavoured

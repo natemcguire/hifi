@@ -9,6 +9,7 @@ const catalog = require('./catalog');
 const { rank, meaningful } = require('./search');
 const store = require('./store');
 const tv = require('./tv');
+const about = require('./about');
 
 const DEFAULT_STATION = 'radio-paradise';
 
@@ -32,8 +33,9 @@ const spoken = station => station.say
   || (station.country && station.label ? station.label.replace(/&/g, 'and').replace(/!+$/, '')
     : station.name.toLowerCase().replace(/!+$/, '').replace(/\blo-fi\b/g, 'lo fi').replace(/\by2k\b/g, 'Y 2 K'));
 // What Alexa says whenever a station starts by voice: open, resume, a station by name, next and
-// previous all say the same line, so the listener always hears where they are.
-const announce = station => `Now listening to live radio on HIFI: ${spoken(station)}.`;
+// previous all say the same line, so the listener always hears where they are, then one short
+// sentence on what it is and where it's from ("This is Classic jazz from Jazz24 in Seattle.").
+const announce = station => `Now listening to live radio on HIFI: ${spoken(station)}. ${about.describe(station, spoken)}`.trim();
 const and = names => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
 
 // ----- playback -----
@@ -50,9 +52,11 @@ function play(builder, station, { index = 0, offset = 0, behavior = 'REPLACE_ALL
   if (!live && !station.tracks.length) return builder;
   const track = live ? null : station.tracks[((index % station.tracks.length) + station.tracks.length) % station.tracks.length];
   const url = live ? station.stream : track.src;
+  // The Echo Show's Now Playing screen: "HIFI Live Radio" big, the station and where it's from
+  // small ("Jazz24 · Seattle"). Both short, so neither runs off the screen.
   const metadata = {
-    title: live ? station.name : track.title,
-    subtitle: live ? station.genre || station.tagline : `${track.artist} · ${station.name}`,
+    title: live ? 'HIFI Live Radio' : track.title,
+    subtitle: live ? about.line(station) : `${track.artist} · ${station.name}`,
     art: { sources: [{ url: station.cover }] },
     backgroundImage: { sources: [{ url: station.cover }] },
   };
@@ -109,7 +113,7 @@ async function tune(handlerInput, station, { speech, index, offset = 0, audioOnl
   play(responseBuilder, station, { index: start, offset, token });
   if (speech === null) return answer(handlerInput);
   responseBuilder.speak(speech ?? announce(station));
-  return answer(handlerInput, { title: station.name, text: station.tagline || station.genre });
+  return answer(handlerInput, { title: 'HIFI Live Radio', text: `Starting up stream\n${about.line(station)}` });
 }
 
 async function neighbour(handlerInput, step, speak) {
