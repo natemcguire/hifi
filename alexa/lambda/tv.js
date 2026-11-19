@@ -64,20 +64,41 @@ function loop(items, total) {
 const tick = { type: 'SendEvent', arguments: [EVENT, 'tick', '${tv.id}', '${failed}', '${track}'] };
 const media = (id, command) => ({ type: 'ControlMedia', componentId: id, command });
 
+// Type sizes in dp from Amazon's Alexa type ramp, by how far away the screen is read: an Echo
+// Show 5 on a nightstand (Display 6, Body, Metadata), an Echo Show 8 or 10 or an Echo Hub across
+// a kitchen (Display 5), an Echo Show 15 or 21 on a wall (Display 4), Fire TV across a room. A
+// later block wins where its "when" holds. Nothing is smaller than 24 dp, Amazon's smallest.
+const SIZES = [
+  { dimensions: { songSize: 48, artistSize: 36, placeSize: 28, cornerSize: 32 } },
+  { when: "${viewport.height < 600 || viewport.shape == 'round'}", dimensions: { songSize: 40, artistSize: 32, placeSize: 24, cornerSize: 28 } },
+  { when: "${viewport.width >= 1920 || viewport.height >= 1920}", dimensions: { songSize: 74, artistSize: 48, placeSize: 40, cornerSize: 48 } },
+  { when: "${viewport.mode == 'tv'}", dimensions: { songSize: 48, artistSize: 36, placeSize: 32, cornerSize: 32 } },
+];
+const ROUND = "viewport.shape == 'round'";
+const STILL = 'Math.min(viewport.width * 0.36, viewport.height * 0.5)';   // the cover's side, in dp
+// What a pause says: a touch screen can be tapped, a TV has a remote, every one hears "resume".
+const PAUSED = "${viewport.mode == 'tv' ? 'Paused. Say “Alexa, resume.”' : 'Paused. Tap to play, or say “Alexa, resume.”'}";
+
 function document() {
+  // The words sit above the dial strip (dial-hint.js), and on a round screen in the middle,
+  // inside the circle.
+  const above = dial ? `\${${dial.HEIGHT.slice(2, -1)} + viewport.height * (${ROUND} ? 0.13 : 0.03)}` : '6vh';
   const words = {
-    type: 'Container', position: 'absolute', left: '4vw', right: '22vw', bottom: dial ? '24vh' : '6vh',
+    type: 'Container', position: 'absolute', bottom: above,
+    left: `\${${ROUND} ? '14vw' : '4vw'}`, right: `\${${ROUND} ? '14vw' : '22vw'}`,
+    alignItems: `\${${ROUND} ? 'center' : 'start'}`,
     items: [
       // Until the sound starts: "HIFI Live Radio", "Starting up stream". Then a track station
       // names its track; a live station the song the skill last heard of, or its genre.
-      { type: 'Text', id: 'hifi-song', text: "${!started ? 'HIFI Live Radio' : tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].title : (song != '' ? song : tv.genre)}", fontSize: '6vh', fontWeight: 'bold', color: '#FFFFFF', maxLines: 1 },
-      { type: 'Text', id: 'hifi-artist', text: "${!started ? 'Starting up stream' : tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].artist : singer}", fontSize: '4.4vh', fontWeight: '600', color: '#FFFFFF', opacity: 0.9, maxLines: 1 },
+      { type: 'Text', id: 'hifi-song', text: "${!started ? 'HIFI Live Radio' : tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].title : (song != '' ? song : tv.genre)}", fontSize: '@songSize', fontWeight: 'bold', color: '#FFFFFF', maxLines: 1 },
+      { type: 'Text', id: 'hifi-artist', text: "${!started ? 'Starting up stream' : tv.tracks.length > 0 ? tv.tracks[track % tv.tracks.length].artist : singer}", fontSize: '@artistSize', fontWeight: '600', color: '#FFFFFF', opacity: 0.9, maxLines: 1,
+        display: "${started && tv.tracks.length == 0 && singer == '' ? 'none' : 'normal'}" },   // no empty line under a live station's genre
       // The station and where it's from, small: "Jazz24 · Seattle" (about.js).
-      { type: 'Text', text: '${tv.place}', fontSize: '3.4vh', fontWeight: 'bold', color: '${tv.color}', maxLines: 1, paddingTop: '0.6vh' },
+      { type: 'Text', text: '${tv.place}', fontSize: '@placeSize', fontWeight: 'bold', color: '${tv.color}', maxLines: 1, paddingTop: '0.6vh' },
     ],
   };
   return {
-    type: 'APL', version: MIN_APL, theme: 'dark',
+    type: 'APL', version: MIN_APL, theme: 'dark', resources: SIZES,
     ...(dial ? { graphics: dial.graphics } : {}),
     mainTemplate: {
       parameters: ['tv'],
@@ -91,15 +112,18 @@ function document() {
         // The song comes from the skill every half minute; the first ask, after 8 seconds, also
         // tells the skill whether the stream played. Here, not on the document, so the ask sees
         // the values bound above; on a named sequencer, so touches and voice commands don't stop it.
+        // screenLock holds the screen up while the ticks run (about eight hours). Before APL
+        // 2024.2 some Echo devices time a document out while its videos play on the background
+        // channel or muted, which would close the screen and stop the station with it.
         onMount: [{
-          type: 'Sequential', sequencer: 'hifi-tick',
+          type: 'Sequential', sequencer: 'hifi-tick', screenLock: true,
           commands: [{ type: 'Idle', delay: 8000 }, tick, { type: 'Sequential', repeatCount: 1000, commands: [{ type: 'Idle', delay: TICK_MS }, tick] }],
         }],
         items: [
           // The sound: the stream (or the tracks in turn), out of sight under the clip.
           {
             type: 'Video', id: 'hifi-audio', position: 'absolute', top: 0, left: 0, width: 1, height: 1,
-            source: '${tv.audio}', autoplay: true, audioTrack: 'background', scale: 'best-fit',
+            source: '${tv.audio}', autoplay: true, audioTrack: 'background', screenLock: true, scale: 'best-fit',
             onPlay: [
               { type: 'SetValue', componentId: 'hifi-tv', property: 'paused', value: false },
               { type: 'SetValue', componentId: 'hifi-tv', property: 'started', value: true },
@@ -117,9 +141,15 @@ function document() {
             source: '${tv.still}', scale: 'best-fill', filters: [{ type: 'Blur', radius: 40 }],
           },
           { type: 'Frame', position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.35)' },
+          // The sharp cover in the middle, cut off above the arrows strip drawn into its lower
+          // part (make-covers.py: the strip starts 23/32 of the way down), so the screen shows one
+          // strip, the real one with buttons, and the cover clears the words on every screen. Not
+          // on a round screen, where the words take the middle.
           {
-            type: 'Image', position: 'absolute', top: '8vh', left: '30vw', width: '40vw', height: '50vh',
-            source: '${tv.still}', scale: 'best-fit', display: "${clip ? 'invisible' : 'normal'}",
+            type: 'Frame', position: 'absolute', top: '11vh', left: `\${(viewport.width - ${STILL}) / 2}`,
+            width: `\${${STILL}}`, height: `\${${STILL} * 23 / 32}`,
+            display: "${clip || viewport.shape == 'round' ? 'invisible' : 'normal'}",
+            item: { type: 'Image', width: `\${${STILL}}`, height: `\${${STILL}}`, source: '${tv.still}', scale: 'fill' },
           },
           // The picture: the clip, full screen and silent, shown once it plays. A tap pauses both,
           // another plays them.
@@ -132,7 +162,7 @@ function document() {
             ],
             item: {
               type: 'Video', id: 'hifi-clip', width: '100vw', height: '100vh', scale: 'best-fill',
-              source: '${tv.clips}', autoplay: true, audioTrack: 'none', opacity: '${clip ? 1 : 0}',
+              source: '${tv.clips}', autoplay: true, audioTrack: 'none', screenLock: true, opacity: '${clip ? 1 : 0}',
               onPlay: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'clip', value: true }],
               onTrackFail: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'clip', value: false }],
             },
@@ -143,12 +173,14 @@ function document() {
             background: { type: 'linear', colorRange: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.72)'], inputRange: [0, 1], angle: 180 },
           },
           {
-            type: 'Text', text: 'HIFI TV', position: 'absolute', top: '4vh', right: '4vw',
-            fontSize: '4vh', fontWeight: '900', fontStyle: 'italic', color: '#FFFFFF',
+            type: 'Text', text: 'HIFI TV', position: 'absolute', top: `\${${ROUND} ? '12vh' : '4vh'}`,
+            left: '4vw', right: '4vw', textAlign: `\${${ROUND} ? 'center' : 'right'}`,
+            fontSize: '@cornerSize', fontWeight: '900', fontStyle: 'italic', color: '#FFFFFF',
           },
           {
-            type: 'Text', text: 'Paused. Tap to play.', position: 'absolute', top: '4vh', left: '4vw',
-            fontSize: '4vh', fontWeight: 'bold', color: '#FFFFFF', display: "${paused ? 'normal' : 'invisible'}",
+            type: 'Text', text: PAUSED, position: 'absolute', top: `\${${ROUND} ? '22vh' : '4vh'}`,
+            left: `\${${ROUND} ? '14vw' : '4vw'}`, right: `\${${ROUND} ? '14vw' : '24vw'}`, textAlign: `\${${ROUND} ? 'center' : 'left'}`, maxLines: 2,
+            fontSize: '@cornerSize', fontWeight: 'bold', color: '#FFFFFF', display: "${paused ? 'normal' : 'invisible'}",
           },
           words,
           ...(dial ? [dial.layer()] : []),

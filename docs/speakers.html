@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HIFI on other home speakers — HIFI</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f5f7;color:#1d1d1f;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+h1{font-size:34px;line-height:1.15;margin:0 0 6px}
+.meta{color:#6e6e73;margin:0 0 28px}
+h2{font-size:23px;margin:44px 0 10px;padding-top:8px;border-top:1px solid #d2d2d7}
+h3{font-size:18px;margin:24px 0 6px}
+.glance{background:#fff;border-radius:14px;padding:20px 24px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.glance h2{border:0;margin:0 0 8px;padding:0}
+.glance ul{margin:0;padding-left:20px}
+.glance li{margin:6px 0}
+.table{overflow-x:auto;background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid #e5e5ea}
+th{background:#fafafa;font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.yes{color:#0a7d32;font-weight:600}.partner{color:#a05a00;font-weight:600}.no{color:#b3261e;font-weight:600}
+ol.order li{margin:8px 0}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:8px 0}
+dt{font-weight:600;color:#424245}dd{margin:0}
+.note{color:#6e6e73;font-size:14px}
+a{color:#0066cc}
+code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:#ececf0;padding:1px 4px;border-radius:4px}
+</style>
+</head>
+<body>
+<main>
+<h1>HIFI on other home speakers</h1>
+<p class="meta">Where a free live-radio app can get on Google, Apple, Sonos and the rest, what it costs and what the Alexa skill already gives us. Researched 19 November 2026.</p>
+
+<section class="glance">
+<h2>At a glance</h2>
+<ul>
+<li><strong>Apple is the open door.</strong> HomePod plays any iPhone app that answers Siri's media requests (SiriKit <code>INPlayMediaIntent</code>). There is no partner program any more, so "Hey Siri, play Z100 on HIFI" can work on HomePod in <strong>about a week</strong>, using the app we already ship.</li>
+<li><strong>AirPlay already works.</strong> The iPhone and Mac app set the long-form audio policy and fill in Now Playing, so HIFI already plays on HomePod, Apple TV and AirPlay 2 Sonos speakers from the phone. Only a quick check is needed.</li>
+<li><strong>Google voice is closed.</strong> Conversational Actions shut down in June 2023. Radio by voice on Nest now comes only from Google's media partners (TuneIn, iHeart and the like), with no application form. <strong>Google Cast is open</strong>: casting from the app and web player to Nest speakers and Hubs costs $5 and about a week.</li>
+<li><strong>Sonos is possible but slow.</strong> The Sonos Music API partner process takes <strong>four to six months</strong> of review and preview. Our rebroadcast of stations like Z100 may be questioned; the house stations are the safer start.</li>
+<li><strong>Skip the dead and closed ones:</strong> Gemini for Home, Sonos Voice Control, Alexa built into Sonos and Bose speakers, Bixby, Meta Portal and Cortana.</li>
+<li><strong>Reuse:</strong> the catalog (<code>stations.json</code>), the now-playing feed and the station ranker carry over everywhere. The ranker is the piece worth porting to Swift (Siri) or serving from the Railway backend (Sonos).</li>
+</ul>
+</section>
+
+<h2>Comparison</h2>
+<div class="table">
+<table>
+<thead><tr><th>Platform</th><th>Can a free radio app get on today?</th><th>Route</th><th>Effort</th><th>Cost</th><th>Hurdles</th><th>Reuses from Alexa</th></tr></thead>
+<tbody>
+<tr><td><strong>HomePod (AirPlay)</strong></td><td class="yes">Yes, already</td><td>AirPlay 2 from the iPhone and Mac app</td><td>Under a day to check</td><td>None</td><td>None</td><td>Nothing needed</td></tr>
+<tr><td><strong>HomePod and iPhone Siri</strong></td><td class="yes">Yes</td><td>SiriKit Media Intents in the iOS app; HomePod hands the request to the iPhone</td><td>3–5 days</td><td>None</td><td>App Store review only; app must be on the owner's iPhone</td><td>Ranker (port to Swift), catalog, last station</td></tr>
+<tr><td><strong>Google Nest speakers and Hubs (casting)</strong></td><td class="yes">Yes</td><td>Google Cast SDK in the iOS app and web player</td><td>3–6 days</td><td>$5 one time (custom receiver)</td><td>No review; iOS local-network prompt</td><td>Catalog, now-playing metadata</td></tr>
+<tr><td><strong>Google Nest (voice)</strong></td><td class="partner">Partner only</td><td>Media Actions radio feed, invite only</td><td>—</td><td>—</td><td>No application route</td><td>Catalog would become the feed</td></tr>
+<tr><td><strong>Sonos (in the Sonos app)</strong></td><td class="partner">Yes, through a long partner process</td><td>Sonos Music API (SMAPI) service on Railway</td><td>5–8 days build, 4–6 months process</td><td>No fee found</td><td>Application, validation, preview with an SLA; rights review of rebroadcast stations</td><td>Catalog as browse tree, ranker as search, now-playing</td></tr>
+<tr><td><strong>Sonos (voice)</strong></td><td class="no">No</td><td>Sonos Voice Control has a closed list of services</td><td>—</td><td>—</td><td>Closed</td><td>—</td></tr>
+<tr><td><strong>Alexa on Sonos, Bose and other "Alexa built-in"</strong></td><td class="no">Probably no</td><td>Same skill, but third-party audio skills reportedly don't play there</td><td>Test one device</td><td>None</td><td>Amazon restriction (reports, not confirmed for 2026)</td><td>All of it, if it plays</td></tr>
+<tr><td><strong>Fire TV and Echo Hub</strong></td><td class="yes">Yes, already</td><td>The existing skill (HIFI TV screen on Fire TV and Hub)</td><td>Done</td><td>None</td><td>None</td><td>All of it</td></tr>
+<tr><td><strong>Android phones, Android Auto, Google voice "on HIFI"</strong></td><td class="yes">Yes, with an Android app</td><td>Media3 <code>MediaLibraryService</code>; Assistant search reaches it</td><td>2–4 weeks (new app)</td><td>$25 Play fee</td><td>Play review; 12-tester closed test for a personal account</td><td>Ranker, catalog, state, now-playing</td></tr>
+<tr><td><strong>CarPlay</strong></td><td class="yes">Yes</td><td>CarPlay audio entitlement, station list template</td><td>3–5 days</td><td>None</td><td>Entitlement request (days)</td><td>Catalog</td></tr>
+<tr><td><strong>Apple TV, Roku</strong></td><td class="yes">Yes</td><td>tvOS app; Roku channel</td><td>4–10 days each</td><td>None</td><td>App Store review; Roku certification</td><td>Catalog, now-playing</td></tr>
+<tr><td><strong>Samsung Bixby, Meta Portal, Cortana</strong></td><td class="no">No</td><td>Discontinued</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Apple: HomePod, Siri, Apple TV, CarPlay</h2>
+<h3>AirPlay 2 (works now)</h3>
+<p>The app already sets <code>AVAudioSession</code> to <code>.playback</code> with the <code>.longFormAudio</code> policy and fills in <code>MPNowPlayingInfoCenter</code> and <code>MPRemoteCommandCenter</code> (<code>ios/Sources/Radio.swift</code>). That is what HomePod, Apple TV and AirPlay 2 Sonos speakers need. To check on a device: the station name and art on the HomePod's Now Playing, and play, pause and skip from Control Center. An AirPlay button (<code>AVRoutePickerView</code>) in the player would make it easier to find; today it is only in Control Center.</p>
+<h3>Siri on HomePod and iPhone</h3>
+<dl>
+<dt>Status</dt><dd><strong>Open.</strong> Since WWDC23, any app that supports SiriKit Media Intents is supported on HomePod. HomePod forwards the request to the owner's iPhone, which starts HIFI and plays to the HomePod. Since HomePod 17.4 Siri learns which app you use; there is no default-service picker.</dd>
+<dt>Route</dt><dd>An Intents extension handling <code>INPlayMediaIntent</code>: resolve "Z100", "jazz" or "something for work" to a station, then play in the app (<code>handleInApp</code>). Add App Shortcuts (<code>AudioPlaybackIntent</code>) for "Hey Siri, play HIFI".</dd>
+<dt>Effort</dt><dd>3–5 days, plus 1–2 for App Shortcuts.</dd>
+<dt>Hurdles</dt><dd>Normal App Store review. The app must be on the owner's iPhone on the same Wi-Fi, with Recognize My Voice on; the first request asks for Siri permission; the app must answer within 10 seconds.</dd>
+<dt>Reuse</dt><dd>The station ranker (<code>alexa/lambda/search.js</code>, which already mirrors the app's <code>StationSearch</code>) for names, tags, genres and folded numbers; the catalog; "play HIFI" resumes the last station as on Alexa.</dd>
+</dl>
+<p class="note">Not confirmed: whether Apple's newer App Intents audio schema replaces SiriKit on HomePod in iOS 27. SiriKit media intents are not marked deprecated in Apple's documentation today.</p>
+<h3>CarPlay and Apple TV</h3>
+<p>CarPlay needs the free <code>carplay-audio</code> entitlement (a form; days to approve) and a station list in CarPlay's templates, 3–5 days. Apple TV is a tvOS target reusing the Swift player, 4–8 days. Both reuse the catalog; Siri on Apple TV opens the app through the same media intents.</p>
+
+<h2>Google: Nest speakers, Nest Hub, Android</h2>
+<h3>Voice on Nest (closed)</h3>
+<p>Google shut down Conversational Actions on 13 June 2023 and pointed radio stations to aggregators. Spoken radio requests on Nest now come from Media Actions feeds (schema.org <code>RadioBroadcastService</code>, which does accept internet-only stations), but Google works with "a limited number of providers at a time" and has no application form. Gemini for Home uses the same media partners and has no developer route that we could find.</p>
+<h3>Google Cast (open)</h3>
+<dl>
+<dt>Route</dt><dd>The Cast SDK in the iPhone app and the Web Sender SDK in the web player. The Default Media Receiver plays MP3, AAC and HLS with no registration; a styled receiver for the Nest Hub screen costs $5 once, with "supports audio-only devices" ticked.</dd>
+<dt>Effort</dt><dd>3–6 days for both.</dd>
+<dt>Hurdles</dt><dd>No review. The iPhone asks for local-network access.</dd>
+<dt>Reuse</dt><dd>The catalog's stream URLs and the now-playing feed as Cast metadata. The station art for the Echo Show (<code>/alexa/covers/</code>, <code>/alexa/backgrounds/</code>) suits the Nest Hub as is.</dd>
+</dl>
+<h3>Android app</h3>
+<p>The one route to "Hey Google, play jazz on HIFI" without a partnership is an Android app with a Media3 <code>MediaLibraryService</code>: Assistant sends the spoken search to the app (<code>onPlayFromSearch</code>), and the same service makes HIFI an Android Auto app. It is a new Kotlin app, 2–4 weeks, $25 to Google Play, and a personal Play account must first run a 12-tester, 14-day closed test (an organisation account for McGuire LLC is reportedly exempt; not confirmed by Google). The ranker, catalog, state and now-playing all carry over.</p>
+
+<h2>Sonos</h2>
+<dl>
+<dt>Status</dt><dd><strong>Open on paper, slow in practice.</strong> A service joins through the Sonos Music API (SMAPI): register as a partner, build against the developer portal sandbox, then roughly 6 weeks of application review, 6 of validation and 6–8 of preview before it is listed. No fee is stated.</dd>
+<dt>Route</dt><dd>A SMAPI (SOAP) service, which could be another route on the Railway service that runs the Alexa skill. HIFI needs no sign-in, which keeps it simple.</dd>
+<dt>Effort</dt><dd>5–8 days to build browse, search and now-playing; then months of process.</dd>
+<dt>Hurdles</dt><dd>Brand assets, an FAQ page, an SLA during preview. Sonos reviews content rights, so relaying broadcasters such as Z100 or KIIS FM may be questioned; Radio Paradise, SomaFM and HIFI's own synth stations are the safer opening set. The old local "customSD" test route no longer works on S2.</dd>
+<dt>Reuse</dt><dd>High: the catalog becomes the browse tree, the ranker becomes search, <code>stations.json</code> gives stream URLs and now-playing.</dd>
+</dl>
+<p>Sonos Voice Control only plays a closed list of services (Sonos Radio, Apple Music, Amazon Music, Spotify and a few others). AirPlay 2 Sonos speakers already get HIFI from the iPhone.</p>
+
+<h2>Amazon beyond the Echo</h2>
+<ul>
+<li><strong>Fire TV, Echo Hub, every Echo Show:</strong> already covered by the skill, including the HIFI TV screen.</li>
+<li><strong>Alexa built into Sonos, Bose and other brands:</strong> reports say third-party audio skills don't play there, and Amazon has closed its Alexa Built-in developer tools. Not confirmed for 2026; one test on a friend's Sonos One would settle it.</li>
+<li><strong>Alexa+:</strong> nothing published yet on how custom AudioPlayer skills behave under Alexa+. Worth a test on an Alexa+ Echo.</li>
+</ul>
+
+<h2>Others</h2>
+<ul>
+<li><strong>Roku:</strong> a SceneGraph channel with certification, 5–10 days, no voice reuse.</li>
+<li><strong>TuneIn and other directories:</strong> only HIFI's own synth stations would qualify, and only as a continuous stream rather than MP3 files. A listing would make "play HIFI Synth on TuneIn" work on Google, Alexa and Sonos, under TuneIn's name. US stations paid $249 a quarter in 2022; current terms not confirmed.</li>
+<li><strong>Dead:</strong> Samsung's Galaxy Home never shipped widely and Bixby has no developer activity since 2019; Meta Portal ended in 2022; Cortana skills ended in 2021.</li>
+</ul>
+
+<h2>Recommended order</h2>
+<ol class="order">
+<li><strong>Check AirPlay on a HomePod</strong> (under a day). It already works on paper; confirm art and controls, and add an AirPlay button to the player.</li>
+<li><strong>Siri media intents in the iOS app</strong> (about a week). The only open voice route on a major speaker other than Alexa: "Hey Siri, play Z100 on HIFI" on iPhone and HomePod.</li>
+<li><strong>Google Cast in the app and web player</strong> (about a week, $5). The only open way onto Nest speakers and Hubs.</li>
+<li><strong>CarPlay</strong> (about a week). Free entitlement, same catalog and intents.</li>
+<li><strong>Apply to Sonos early</strong>, then build the SMAPI service on Railway while the review runs. Start with the house stations.</li>
+<li><strong>Android app with Android Auto</strong> (2–4 weeks), when Google voice and cars are worth a new app.</li>
+<li><strong>Roku and Apple TV</strong>, nice to have.</li>
+</ol>
+
+<h2>Sources</h2>
+<ul class="note">
+<li>Google: <a href="https://developers.google.com/assistant/ca-sunset">Conversational Actions sunset</a>, <a href="https://developers.google.com/actions/media">Media Actions</a>, <a href="https://developers.google.com/actions/media/radiostations-specification">radio station feed spec</a>, <a href="https://james.cridland.net/blog/2026/how-google-speakers-radio-works/">James Cridland, how radio works on Google speakers (2026)</a>, <a href="https://developers.google.com/cast/docs/registration">Cast registration</a>, <a href="https://developer.android.com/media/implement/assistant">Assistant and media apps</a>, <a href="https://support.google.com/googleplay/android-developer/answer/14151465">Play testing requirement</a></li>
+<li>Apple: <a href="https://developer.apple.com/videos/play/wwdc2023/10104/">WWDC23 session 10104</a>, <a href="https://developer.apple.com/videos/play/tech-talks/10854">Tech Talk 10854</a>, <a href="https://www.macrumors.com/2024/03/05/playing-third-party-services-homepod-update">HomePod 17.4 change</a>, <a href="https://developer.apple.com/documentation/carplay/requesting-carplay-entitlements">CarPlay entitlements</a>, <a href="https://developer.apple.com/documentation/appintents/audioplaybackintent">AudioPlaybackIntent</a></li>
+<li>Sonos: <a href="https://docs.sonos.com/docs/submit-your-service">submit your service</a>, <a href="https://docs.sonos.com/docs/key-requirements">key requirements</a>, <a href="https://docs.sonos.com/docs/test-your-service">testing</a>, <a href="https://support.sonos.com/en/article/content-services-that-work-with-sonos-voice-control-and-sonos-27voice">Sonos Voice Control services</a></li>
+<li>Amazon: <a href="https://developer.amazon.com/en-US/docs/alexa/custom-skills/use-long-form-audio.html">long-form audio</a>, <a href="https://support.bose.co.uk/article/smart-speaker-500-using-amazon-alexa">Bose and Alexa</a></li>
+<li>Others: <a href="https://developer.roku.com/dev/docs/certification">Roku certification</a>, <a href="https://radioinsight.com/headlines/218462/tunein-reopens-platform-for-new-submissions-but-with-a-cost/">TuneIn submissions (2022)</a></li>
+</ul>
+</main>
+</body>
+</html>

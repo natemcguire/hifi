@@ -20,6 +20,16 @@ const graphics = {
   },
 };
 
+// Sizes come from the screen's short side in landscape terms (U: the height of a 16:10 screen
+// as wide as this one), so a portrait Echo Show 15 or a round Echo Spot gets the proportions of
+// an Echo Show 10 instead of a strip a fifth of a tall screen. Each has a floor from Amazon's
+// guidance for screens seen at arm's length and across the room: the arrows are buttons of at
+// least 68 dp, the words at least 28 dp.
+const U = 'Math.min(viewport.height, viewport.width * 0.625)';
+const ROUND = "viewport.shape == 'round'";
+// The strip's height, which tv.js also uses to keep the song above it.
+const HEIGHT = `\${Math.max(${U} * 0.21, 96)}`;
+
 function arrow(direction) {
   const left = direction === 'previous';
   return {
@@ -29,29 +39,34 @@ function arrow(direction) {
     role: 'button',
     onPress: [{ type: 'SendEvent', arguments: [EVENT, direction] }],
     item: {
-      type: 'Frame', paddingLeft: '${viewport.height * 0.03}', paddingRight: '${viewport.height * 0.03}',
+      type: 'Frame', minWidth: 68, minHeight: 68, alignItems: 'center', justifyContent: 'center',
+      paddingLeft: `\${Math.max(${U} * 0.03, 12)}`, paddingRight: `\${Math.max(${U} * 0.03, 12)}`,
       item: {
         type: 'VectorGraphic', source: left ? 'hifiArrowLeft' : 'hifiArrowRight', scale: 'best-fit',
-        width: '${viewport.height * 0.11}', height: '${viewport.height * 0.14}',
+        width: `\${Math.max(${U} * 0.11, 44)}`, height: `\${Math.max(${U} * 0.14, 56)}`,
       },
     },
   };
 }
 
-// The strip, placed at the bottom over everything else in a full-screen Container.
+// The strip, placed at the bottom over everything else in a full-screen Container. On a round
+// screen it is drawn in from the edges and up from the bottom, where the circle would cut it.
 function layer() {
   return {
-    type: 'Frame', id: 'hifi-dial-hint', position: 'absolute', left: 0, right: 0, bottom: 0,
-    height: '${viewport.height * 0.21}', backgroundColor: 'rgba(11, 13, 15, 0.88)',
+    type: 'Frame', id: 'hifi-dial-hint', position: 'absolute', left: 0, right: 0,
+    bottom: `\${${ROUND} ? viewport.height * 0.1 : 0}`,
+    height: HEIGHT, backgroundColor: 'rgba(11, 13, 15, 0.88)',
     item: {
       type: 'Container', direction: 'row', alignItems: 'center', justifyContent: 'spaceBetween',
-      width: '100%', height: '100%', paddingLeft: '${viewport.width * 0.02}', paddingRight: '${viewport.width * 0.02}',
+      width: '100%', height: '100%',
+      paddingLeft: `\${${ROUND} ? viewport.width * 0.12 : viewport.width * 0.02}`,
+      paddingRight: `\${${ROUND} ? viewport.width * 0.12 : viewport.width * 0.02}`,
       items: [
         arrow('previous'),
         {
           type: 'Text', text: HINT, grow: 1, shrink: 1, textAlign: 'center', textAlignVertical: 'center',
           color: '#FFFFFF', fontWeight: 'bold', maxLines: 2,
-          fontSize: '${Math.min(viewport.height * 0.075, viewport.width * 0.045)}',
+          fontSize: `\${Math.max(Math.min(${U} * 0.075, viewport.width * 0.045), 28)}`,
         },
         arrow('next'),
       ],
@@ -66,4 +81,4 @@ function step(request) {
   return args[1] === 'next' ? 1 : args[1] === 'previous' ? -1 : null;
 }
 
-module.exports = { HINT, EVENT, graphics, layer, step };
+module.exports = { HINT, EVENT, HEIGHT, graphics, layer, step };

@@ -67,6 +67,40 @@ Stop pauses the screen's sound at once rather than leaving it to Alexa's timeout
 reports (`Alexa.Presentation.APL.RuntimeError`, such as a clip or picture that won't load) go to
 the service log as `screen error:`.
 
+### Screen design: Amazon's guidance, every Echo screen
+
+Checked against Amazon's APL design guidance (type ramp, touch targets, viewport profiles, known
+issues) on 2026-11-19; `lambda/screen.test.js` holds the rules, `scripts/apl-preview.mjs` draws
+the real response.
+
+- **Every screen listed.** The manifest names the seven standard viewport profiles (Echo Spot
+  round, Echo Show 5, 8, 10 and Hub, 15 and 21, Echo Show 15 upright, Fire TV), so none is drawn
+  scaled and letterboxed.
+- **Type for the distance.** Sizes are dp from Amazon's type ramp by how far away the screen is
+  read: song 40 / artist 32 / station 24 on an Echo Show 5, 48 / 36 / 28 on an 8, 10 or Hub,
+  74 / 48 / 40 on a 15 or 21, 48 / 36 / 32 on Fire TV. Nothing is under 24 dp. A live station
+  with no artist shows no empty line.
+- **Touch targets.** The arrows are buttons of at least 68 dp (Amazon's minimum for screens
+  used at arm's length), and the strip and its words (28 dp or more) are sized from the short
+  side, so an upright Echo Show 15 gets a strip, not a fifth of the screen.
+- **Round and TV.** On a round screen the strip is drawn in from the edge and the words sit in
+  the middle; on Fire TV, which has no touch, a pause says "Say “Alexa, resume.”" instead of
+  "Tap to play".
+- **One strip.** The covers carry the arrows for the plain Now Playing screen, so HIFI TV crops
+  its sharp cover above them: the only strip on screen is the one whose arrows work.
+- **The screen stays up while the station plays.** Before APL 2024.2 some devices time out a
+  document whose videos play on the background channel or muted, which here would stop the
+  station. Both videos and the half-minute ticks carry `screenLock`.
+- **Voice on screen.** "Next or Back to change stations" names the voice commands; the pause
+  line names "Alexa, resume".
+
+To look at it: `npm i --prefix .scratch/pw playwright-core` once, then
+`node ~/Projects/assistant/scripts/heavy.mjs -- node alexa/scripts/apl-preview.mjs [station-id]`.
+It asks the skill for each device's screen, draws it with Amazon's APL renderer (the
+WebAssembly build the Alexa Skills Toolkit uses) in headless Chrome on the Air or Pro, taps the
+right arrow (it must send "next") and the picture (it must pause), and leaves PNGs in
+`.scratch/apl/`.
+
 ## Deploying
 
 The endpoint runs on Railway (project `hifi`, service `alexa`, `lambda/server.js`), behind

@@ -17,7 +17,7 @@ const walk = (node, out = []) => {
 test('the strip reads exactly "Next or Back to change stations" between a left and a right arrow', () => {
   const strip = dial.layer();
   assert.strictEqual(strip.position, 'absolute');
-  assert.strictEqual(strip.bottom, 0);
+  assert.match(String(strip.bottom), /: 0\}$/, 'on the bottom edge of a rectangular screen');
   const row = strip.item.items;
   assert.strictEqual(row.length, 3);
   assert.strictEqual(row[0].type, 'TouchWrapper');
