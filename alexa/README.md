@@ -159,6 +159,12 @@ skill for half an hour, and Nate's Echo Shows sent "HIFI radio" to SiriusXM. Wri
 "open hi fi radio" and "ask hi fi radio for jazz" reach it and play. Each rename also costs a few
 minutes in which Alexa routes neither name.
 
+The one-sentence "ask" form is the dependable one while the skill is unpublished. At 11:34 and
+11:39 ET on 2026-11-19, with no rename since 10:03, "ask hi fi radio for jazz" reached the endpoint
+and played Jazz24, while "open", "start" and "launch hi fi radio" (which had reached it from 9:45
+to 9:51) went to another skill in the simulator. Tell listeners "Alexa, ask HIFI radio for jazz"
+(or any station) first; once it plays, "next", "previous", "pause" and "resume" need no name.
+
 | You say | It does |
 |---|---|
 | open HIFI radio | resumes the last station (Radio Paradise the first time) |
