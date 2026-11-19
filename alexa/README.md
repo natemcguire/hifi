@@ -1,7 +1,7 @@
-# HIFI Live Radio for Alexa
+# HIFI Live for Alexa
 
-The HIFI dial on Echo speakers. "Alexa, open HIFI live radio" picks up where you left off;
-"Alexa, ask HIFI live radio for pop girl" tunes a station; "next" and "previous" move along
+The HIFI dial on Echo speakers. "Alexa, open HIFI live" picks up where you left off;
+"Alexa, ask HIFI live for pop girl" tunes a station; "next" and "previous" move along
 the dial like the click wheel; "what's playing" names the song. Whenever a station starts by voice (open, resume, by name,
 next, previous) Alexa says "Now listening to live radio on HIFI:" and the station's name.
 
@@ -55,7 +55,7 @@ start renders a new screen with a new token.
 
 The limit: the station plays only while the screen is up. Pressing home or asking Alexa
 something else closes it and stops the station, where AudioPlayer would keep playing. "Alexa,
-ask HIFI live radio for audio only" goes back to AudioPlayer and the plain Now Playing screen
+ask HIFI live for audio only" goes back to AudioPlayer and the plain Now Playing screen
 for that listener; "…to show the video" turns HIFI TV on again. The screen reports every 30
 seconds whether the stream plays. A stream it can't play goes to AudioPlayer by itself. A tap
 on the picture pauses and plays. Echo devices without a screen never see any of this.
@@ -133,9 +133,9 @@ of Amazon's certification.
 
 ## Saying things
 
-The invocation name is "hifi live radio" and the skill's name is "HIFI Live Radio". Say "Alexa, ask
-HIFI live radio for jazz" (or any station; also "to tune to", "to put on"), or "Alexa, open HIFI
-live radio". Once HIFI is playing, "Alexa, next", "Alexa, previous", "Alexa, pause" and "Alexa,
+The invocation name is "hifi live" and the skill's name is "HIFI Live" (Nate, 2026-11-19 12:21 ET:
+"take radio out of the command and just say open hifi live"). Say "Alexa, ask HIFI live for jazz"
+(or any station; also "to tune to", "to put on"), or "Alexa, open HIFI live". Once HIFI is playing, "Alexa, next", "Alexa, previous", "Alexa, pause" and "Alexa,
 resume" go to it without the name.
 
 "HIFI radio" can't be the name. An Echo writes the spoken "HIFI radio" as "hifi radio" or "hi-fi
@@ -145,9 +145,9 @@ radio for jazz" and "open hifi radio", 110 minutes after the last model build. O
 "ask hi fi radio for jazz" reached HIFI, and no Echo writes it that way. Nate's Echos answered
 "Sorry, HIFI radio is not supported on this device" (8:45 and 11:50 ET) while the endpoint log had
 no request from them. That is the other skill's answer, not ours. The name went "hifi live radio",
-"hifi radio", "hi fi radio" and back to "hifi live radio" that day; "hifi live radio" is the one
-that reached the skill from Nate's own Echo Show. Don't change it again: each model build leaves
-routing unsettled for a while.
+"hifi radio", "hi fi radio", back to "hifi live radio" and then, at Nate's request, "hifi live"
+that day. Each model build leaves routing unsettled for a while, so judge a new name by the
+endpoint log, not by the simulator in the first minutes.
 
 "Alexa, open HIFI jazz" and "Alexa, ask HIFI to play jazz" do not reach the skill. "…to play jazz"
 is the same request to the skill as "…for jazz", but Alexa often hands a sentence with "play" and a
@@ -169,7 +169,7 @@ carries the player's state (`player=IDLE:…` or `PLAYING:…`); the simulator's
 
 | You say | It does |
 |---|---|
-| open HIFI live radio | resumes the last station (Radio Paradise the first time) |
+| open HIFI live | resumes the last station (Radio Paradise the first time) |
 | play lo-fi beats / play Taylor Swift / play something for work | ranks names, tags, genre and lines; plays the best fit |
 | play jazz / play late night jazz / play jazz twenty four | Jazz24 for plain "jazz"; the other two by name |
 | play Z100 / play kiss FM / play KEXP / play one live | a world station by name; "kiss FM" is KIIS FM in Los Angeles |

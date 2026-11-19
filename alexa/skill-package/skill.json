@@ -4,13 +4,13 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "name": "HIFI Live Radio",
+          "name": "HIFI Live",
           "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, jazz, lo-fi, Christmas and big stations like Z100.",
-          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live radio for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
           "examplePhrases": [
-            "Alexa, open hifi live radio",
-            "Alexa, ask hifi live radio for lo-fi beats",
-            "Alexa, ask hifi live radio what's playing"
+            "Alexa, open hifi live",
+            "Alexa, ask hifi live for lo-fi beats",
+            "Alexa, ask hifi live what's playing"
           ],
           "keywords": [
             "radio",
@@ -31,13 +31,13 @@
           "largeIconUri": "https://hifi.nates-software.com/alexa/icon-512.png"
         },
         "en-GB": {
-          "name": "HIFI Live Radio",
+          "name": "HIFI Live",
           "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, jazz, lo-fi, Christmas and big stations like Z100.",
-          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live radio for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
           "examplePhrases": [
-            "Alexa, open hifi live radio",
-            "Alexa, ask hifi live radio for lo-fi beats",
-            "Alexa, ask hifi live radio what's playing"
+            "Alexa, open hifi live",
+            "Alexa, ask hifi live for lo-fi beats",
+            "Alexa, ask hifi live what's playing"
           ],
           "keywords": [
             "radio",
@@ -58,13 +58,13 @@
           "largeIconUri": "https://hifi.nates-software.com/alexa/icon-512.png"
         },
         "en-CA": {
-          "name": "HIFI Live Radio",
+          "name": "HIFI Live",
           "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, jazz, lo-fi, Christmas and big stations like Z100.",
-          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live radio for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
           "examplePhrases": [
-            "Alexa, open hifi live radio",
-            "Alexa, ask hifi live radio for lo-fi beats",
-            "Alexa, ask hifi live radio what's playing"
+            "Alexa, open hifi live",
+            "Alexa, ask hifi live for lo-fi beats",
+            "Alexa, ask hifi live what's playing"
           ],
           "keywords": [
             "radio",
@@ -85,13 +85,13 @@
           "largeIconUri": "https://hifi.nates-software.com/alexa/icon-512.png"
         },
         "en-AU": {
-          "name": "HIFI Live Radio",
+          "name": "HIFI Live",
           "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, jazz, lo-fi, Christmas and big stations like Z100.",
-          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live radio for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
           "examplePhrases": [
-            "Alexa, open hifi live radio",
-            "Alexa, ask hifi live radio for lo-fi beats",
-            "Alexa, ask hifi live radio what's playing"
+            "Alexa, open hifi live",
+            "Alexa, ask hifi live for lo-fi beats",
+            "Alexa, ask hifi live what's playing"
           ],
           "keywords": [
             "radio",
@@ -112,13 +112,13 @@
           "largeIconUri": "https://hifi.nates-software.com/alexa/icon-512.png"
         },
         "en-IN": {
-          "name": "HIFI Live Radio",
+          "name": "HIFI Live",
           "summary": "The HIFI stations on your Echo: Radio Paradise, SomaFM, jazz, lo-fi, Christmas and big stations like Z100.",
-          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live radio\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live radio for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
+          "description": "HIFI is a small, hand-picked radio dial: Radio Paradise, SomaFM favourites like Groove Salad and Indie Pop Rocks, Pop Girl Radio, four Christmas stations, Late Night Jazz and Jazz24, and HIFI's own synth stations with original instrumental tracks for work, late nights and summer. It also carries 95 big stations from 35 countries, such as Z100, KIIS FM, Heart, 1LIVE and triple j.\n\nSay \"Alexa, open HIFI live\" to pick up where you left off. Ask for a station by name, by mood or by what it plays, as in \"Alexa, ask HIFI live for jazz\": \"play lo-fi beats\", \"play something for work\", \"play Taylor Swift\", \"play jazz\", \"play Z100\". A city or a country works too. Say \"next\" to move along the dial, \"what's playing\" for the song, and \"list stations\" to hear what is on.\n\nHIFI is also an iPhone and iPad app, and lives at hifi.nates-software.com.",
           "examplePhrases": [
-            "Alexa, open hifi live radio",
-            "Alexa, ask hifi live radio for lo-fi beats",
-            "Alexa, ask hifi live radio what's playing"
+            "Alexa, open hifi live",
+            "Alexa, ask hifi live for lo-fi beats",
+            "Alexa, ask hifi live what's playing"
           ],
           "keywords": [
             "radio",
@@ -140,7 +140,7 @@
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Say \"open hifi live radio\" (HIFI live radio) to start playing. Try \"play pop girl\", \"play something for work\", \"play jazz\", \"play z one hundred\", \"next\", \"what's playing\", \"list stations\", \"pause\" and \"resume\". The synth stations (dial-up, shareware summer, night build, pixel drift) play original tracks back to back; the rest are live streams. No account linking, no purchases.",
+      "testingInstructions": "Say \"open hifi live\" (HIFI live) to start playing. Try \"play pop girl\", \"play something for work\", \"play jazz\", \"play z one hundred\", \"next\", \"what's playing\", \"list stations\", \"pause\" and \"resume\". The synth stations (dial-up, shareware summer, night build, pixel drift) play original tracks back to back; the rest are live streams. No account linking, no purchases.",
       "category": "STREAMING_SERVICE",
       "distributionCountries": []
     },

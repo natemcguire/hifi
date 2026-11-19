@@ -52,5 +52,5 @@ for model in alexa/skill-package/interactionModels/custom/*.json; do
     --interaction-model "file:$model" >/dev/null
   wait_for interactionModel "$locale"
 done
-echo "Deployed skill $skill. Try: \"Alexa, ask HIFI live radio for jazz\"."
+echo "Deployed skill $skill. Try: \"Alexa, ask HIFI live for jazz\"."
 echo "To publish: ask smapi submit-skill-for-certification --skill-id $skill"

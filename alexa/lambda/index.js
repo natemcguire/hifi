@@ -1,6 +1,6 @@
 'use strict';
-// HIFI radio for Alexa. "Alexa, open HIFI live radio" plays where you left off; "Alexa, ask HIFI
-// live radio for Pop Girl" tunes a station; next and previous move along the dial, like the
+// HIFI radio for Alexa. "Alexa, open HIFI live" plays where you left off; "Alexa, ask HIFI
+// live for Pop Girl" tunes a station; next and previous move along the dial, like the
 // click wheel. Live stations stream straight from the catalog; the synth stations play their
 // tracks one after another and queue the next before each one ends.
 
