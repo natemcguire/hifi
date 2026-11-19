@@ -144,9 +144,16 @@ struct IPodView: View {
                 }
             }
             #endif
-            // App Store screenshots: `-screenshot home|tv|synthTV|radio|synth|nowPlaying|live|playlists|connect` opens that page.
+            // App Store screenshots: `-screenshot home|tv|synthTV|radio|world|synth|nowPlaying|live|playlists|connect` opens that page.
             switch UserDefaults.standard.string(forKey: "screenshot") {
             case "radio", "synth": stack = [.main, .band("radio")]
+            case "world":  // the Radio list on its country rows, a French station playing
+                if let station = radio.stations.first(where: { $0.id == "nrj" }) { radio.tune(station) }
+                stack = [.main, .band("radio")]
+                // after the list is up, so the change scrolls it down to France's row
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    if let index = playingRow("radio") { selection[.band("radio")] = index }
+                }
             case "nowPlaying": radio.start(); stack = [.main, .nowPlaying]
             case "settings": stack = [.main, .settings]
             case "playlists": stack = [.main, .playlists]

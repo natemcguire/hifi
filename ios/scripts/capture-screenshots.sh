@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 host=${HIFI_BUILD_HOST:-${HIFI_RELAY_HOST:?set HIFI_BUILD_HOST in scripts/devices.local}}
 raw=${HIFI_SHOTS_RAW:-Screenshots/raw}
 # name: the screenshot page each raw file shows
-pages=(1-main:home 2-tv:tv 3-radio:radio 4-live:live 5-synth:synthTV 6-connect:connect)
+pages=(${=HIFI_SHOTS_PAGES:-1-main:home 2-tv:tv 3-radio:radio 4-live:live 5-synth:synthTV 6-connect:connect})  # HIFI_SHOTS_PAGES="7-world:world" captures only those
 devices=("iphone:iPhone 17 Pro Max" "ipad:iPad Pro 13-inch (M5)")
 
 ssh $host 'mkdir -p ~/Library/Caches/hifi-build/ios'

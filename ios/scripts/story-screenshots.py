@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""The story App Store screenshots: five slides that read as one strip, in an ink-and-paper
-style. Free live radio in your hand; no ads; stations from everywhere; built by a music
-lover for music lovers; that's why it's free.
+"""The story App Store screenshots: six slides that read as one strip, in an ink-and-paper
+style. Free live radio in your hand; no ads; stations from everywhere; your own country's
+stations in your own language, still free; built by a music lover for music lovers; that's
+why it's free. The station and country counts come from stations.json.
 
 Inputs: the raw simulator captures in Screenshots/story/raw/{iphone,ipad} (capture with
 HIFI_SHOTS_RAW=Screenshots/story/raw scripts/capture-screenshots.sh) and the ink drawings in
@@ -26,14 +27,22 @@ INK = (23, 23, 26)
 BLUE = (47, 91, 255)
 MUTED = (96, 92, 86)
 
+# The counts in the copy, from the catalog the apps read.
+_CATALOG = json.loads(STATIONS.read_text())["stations"]
+TOTAL = len(_CATALOG)
+WORLD = sum(1 for x in _CATALOG if x.get("country"))
+COUNTRIES = len({x["country"] for x in _CATALOG if x.get("country")})
+
 # The copy, in order. Each headline is lines of (text, mark); mark is None, "circle" or "strike".
 SLIDES = [
     {"raw": "1-main", "head": [[("Free", "circle"), (" live radio", None)], [("in the palm", None)], [("of your hand.", None)]],
-     "sub": "115 stations, live, from all over the world."},
+     "sub": f"{TOTAL} stations, live, from all over the world."},
     {"raw": "2-tv", "head": [[("No ", None), ("ads.", "strike")], [("No sign-up.", None)], [("Just music.", None)]],
      "sub": "HIFI never plays an ad of its own. Press play and it plays."},
     {"raw": "3-radio", "head": [[("From Seattle", None)], [("to Sydney", None)], [("to ", None), ("Lagos.", "under")]],
-     "sub": "Listener-supported favorites and the big hit stations of 36 countries."},
+     "sub": f"Listener-supported favorites and the big hit stations of {COUNTRIES} countries."},
+    {"raw": "7-world", "head": [[("Your country.", None)], [("Your language.", None)], [("Still ", None), ("free.", "circle")]],
+     "sub": f"{WORLD} stations from {COUNTRIES} countries, each country its own row, in its own language."},
     {"raw": None, "head": [[("Built by a", None)], [("music lover,", None)], [("for ", None), ("music lovers.", "under")]],
      "sub": "Made by one person who loves radio, not by an ad company."},
     {"raw": "4-live", "head": [[("That’s why", None)], [("it’s ", None), ("free.", "circle")]],
@@ -291,6 +300,57 @@ def stations_for_cards():
     return [(name, place, data[sid].get("color") or "#2f5bff") for sid, name, place in picks if sid in data]
 
 
+# Hello in the languages the world stations speak, each with a real station in stations.json:
+# (greeting, script, station id, the station as it's known, city).
+HELLOS = [("Bonjour", "latin", "nrj", "NRJ", "Paris"), ("Hallo", "latin", "1live", "1LIVE", "Cologne"),
+          ("Hola", "latin", "los40", "LOS40", "Madrid"), ("Ciao", "latin", "radio-105", "Radio 105", "Milan"),
+          ("Olá", "latin", "antena-1", "Antena 1", "São Paulo"), ("Hej", "latin", "sr-p3", "P3", "Stockholm"),
+          ("Merhaba", "latin", "power-turk", "Power Türk", "Istanbul"), ("שלום", "hebrew", "galgalatz", "Galgalatz", "Tel Aviv"),
+          ("สวัสดี", "thai", "cool-fahrenheit", "Cool Fahrenheit", "Bangkok"), ("Kumusta", "latin", "love-radio", "Love Radio", "Manila"),
+          ("Cześć", "latin", "rmf-fm", "RMF FM", "Kraków"), ("Halo", "latin", "prambors", "Prambors", "Jakarta"),
+          ("Hoi", "latin", "qmusic", "Qmusic", "Amsterdam"), ("مرحبا", "arabic", "hit-radio", "Hit Radio", "Rabat"),
+          ("Moi", "latin", "ylex", "YleX", "Helsinki"), ("Hei", "latin", "nrk-p3", "NRK P3", "Oslo")]
+
+
+def hello_face(script, size):
+    if script == "hebrew":
+        f = ImageFont.truetype("/System/Library/Fonts/SFHebrew.ttf", size)
+        f.set_variation_by_name("Bold")
+        return f
+    if script == "thai":
+        return ImageFont.truetype("/System/Library/Fonts/Supplemental/Thonburi.ttc", size, index=1)
+    if script == "arabic":
+        return ImageFont.truetype("/System/Library/Fonts/Supplemental/GeezaPro.ttc", size, index=1)
+    return serif(size, "Bold", italic=True)
+
+
+def hellos():
+    """The HELLOS whose station is still in the catalog."""
+    ids = {x["id"] for x in _CATALOG}
+    return [(g, sc, name, city) for g, sc, sid, name, city in HELLOS if sid in ids]
+
+
+def bubble(height, greeting, script, station, city, tail_left=True):
+    """A speech bubble on paper: the hello big in blue, the station and city small under it."""
+    gf = hello_face(script, round(height * 0.4))
+    lf = sans(round(height * 0.15), "Semibold")
+    d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    label = f"{station} · {city}"
+    w = round(max(d0.textlength(greeting, font=gf), d0.textlength(label, font=lf)) + height * 0.6)
+    tail = round(height * 0.22)
+    c = Image.new("RGBA", (w, height + tail), (0, 0, 0, 0))
+    d = ImageDraw.Draw(c)
+    line = max(3, height // 45)
+    tx = round(w * (0.26 if tail_left else 0.74))
+    d.polygon([(tx - tail * 0.6, height - line * 2), (tx + tail * 0.5, height - line * 2), (tx - tail * 0.2 * (1 if tail_left else -1) - tail * 0.5, height + tail - line)],
+              fill=(255, 255, 255, 255), outline=INK, width=line)
+    d.rounded_rectangle((0, 0, w - 1, height - 1), round(height * 0.3), fill=(255, 255, 255, 255), outline=INK, width=line)
+    d.line([(tx - tail * 0.6 + line, height - line), (tx + tail * 0.5 - line, height - line)], fill=(255, 255, 255, 255), width=line * 2)
+    d.text((w // 2, round(height * 0.42)), greeting, font=gf, fill=BLUE, anchor="mm")
+    d.text((w // 2, round(height * 0.78)), label, font=lf, fill=MUTED, anchor="mm")
+    return c
+
+
 def render(kind):
     raw_dir = STORY / "raw" / kind
     shots = {p.stem: Image.open(p).convert("RGB") for p in raw_dir.glob("*.png")}
@@ -344,27 +404,62 @@ def render(kind):
         cy = tops[2] + round(H * 0.08) + j * round(c.height * 1.32)
         lifted(strip, c.rotate((-1) ** j * 3, resample=Image.BICUBIC, expand=True), (cx, cy))
 
-    # 4. The music lover, the person behind it.
+    # 4. Your country, your language: the Radio list on its country rows, kept clear; the hellos
+    # sit on the phone's top corners and in staggered rows over the click wheel below the list.
     x0 = 3 * W
+    ph = phone(shots["7-world"], round(W * (0.6 if not tablet else 0.5)))
+    bezel = (ph.width - round(W * (0.6 if not tablet else 0.5))) // 2
+    phx, phy = x0 + (W - ph.width) // 2, tops[3] + round(H * 0.045)
+    lifted(strip, ph, (phx, phy))
+    list_end = phy + bezel + round((ph.height - 2 * bezel) * (0.44 if not tablet else 0.55))
+    greet = hellos()
+    bh = round(185 * s)
+    rnd = random.Random(7)
+    made = [bubble(bh, g, sc, name, city, tail_left=k % 2 == 0) for k, (g, sc, name, city) in enumerate(greet)]
+    made = [m.rotate(rnd.uniform(-5, 5), resample=Image.BICUBIC, expand=True) for m in made]
+    # the two corners: half off the phone, over its top bezel and status bar
+    lifted(strip, made[0], (phx - round(made[0].width * 0.45), phy - round(made[0].height * 0.35)), shadow=0.18)
+    lifted(strip, made[1], (phx + ph.width - round(made[1].width * 0.55), phy - round(made[1].height * 0.25)), shadow=0.18)
+    # rows under the list, as many as fit, each row spread across the page
+    y, k, row = list_end + round(H * 0.03), 2, 0
+    while k < len(made):
+        fit, width = [], 0
+        while k + len(fit) < len(made) and width + made[k + len(fit)].width <= W * 0.98 and len(fit) < (3 if row % 2 == 0 else 2):
+            width += made[k + len(fit)].width
+            fit.append(made[k + len(fit)])
+        tallest = max(m.height for m in fit)
+        if y + tallest > H - round(H * 0.012):
+            break
+        gap = (W - width) / (len(fit) + 1)
+        bx = x0 + gap
+        for m in fit:
+            lifted(strip, m, (round(bx), y + rnd.randint(-round(H * 0.006), round(H * 0.006))), shadow=0.18)
+            bx += m.width + gap
+        k += len(fit)
+        y += round(tallest * 0.96)
+        row += 1
+
+    # 5. The music lover, the person behind it.
+    x0 = 4 * W
     if not tablet:
         lover = load_art("lover", round(2150 * s))
         ink(strip, lover, (x0 + (W - lover.width) // 2, H - lover.height + round(80 * s)))
-        spot = (x0 + W - round(W * 0.42), tops[3] + round(H * 0.02))
+        spot = (x0 + W - round(W * 0.42), tops[4] + round(H * 0.02))
     else:  # below the subline, to the right, the note in the space to its left
-        lover = load_art("lover", H - tops[3] + round(H * 0.01))
-        ink(strip, lover, (x0 + W - lover.width + round(W * 0.06), tops[3] - round(H * 0.02)))
-        spot = (x0 + margin, tops[3] + round(H * 0.16))
+        lover = load_art("lover", H - tops[4] + round(H * 0.01))
+        ink(strip, lover, (x0 + W - lover.width + round(W * 0.06), tops[4] - round(H * 0.02)))
+        spot = (x0 + margin, tops[4] + round(H * 0.16))
     note(strip, "made with love\n— Nate", spot, round(64 * s) if not tablet else round(80 * s), angle=-6)
 
-    # 5. The crate of records and the app, playing.
-    x0 = 4 * W
+    # 6. The crate of records and the app, playing.
+    x0 = 5 * W
     crate = load_art("crate", round(1500 * s))
     ink(strip, crate, (x0 - round(crate.width * 0.2), H - crate.height + round(60 * s)))
     ph = phone(shots["4-live"], round(W * 0.48 if not tablet else W * 0.46))
-    lifted(strip, ph, (x0 + W - ph.width - round(W * 0.09), tops[4] + round(H * 0.06)), angle=-4)
-    note(strip, "all 115 stations,\nall free", (x0 + round(W * 0.06), tops[4] + round(H * 0.08)), round(70 * s), angle=-5)
-    arrow(strip, [(x0 + round(W * 0.2), tops[4] + round(H * 0.17)), (x0 + round(W * 0.28), tops[4] + round(H * 0.23)),
-                  (x0 + round(W * 0.42), tops[4] + round(H * 0.25))], round(9 * s), 51)
+    lifted(strip, ph, (x0 + W - ph.width - round(W * 0.09), tops[5] + round(H * 0.06)), angle=-4)
+    note(strip, f"all {TOTAL} stations,\nall free", (x0 + round(W * 0.06), tops[5] + round(H * 0.08)), round(70 * s), angle=-5)
+    arrow(strip, [(x0 + round(W * 0.2), tops[5] + round(H * 0.17)), (x0 + round(W * 0.28), tops[5] + round(H * 0.23)),
+                  (x0 + round(W * 0.42), tops[5] + round(H * 0.25))], round(9 * s), 51)
 
     out = STORY / kind
     out.mkdir(parents=True, exist_ok=True)
@@ -375,7 +470,7 @@ def render(kind):
     print("rendered", kind, W, "x", H)
 
 
-# The Mac set: the same five beats, landscape. The first headline says Mac, not hand.
+# The Mac set: the same six beats, landscape. The first headline says Mac, not hand.
 MAC_FIRST = [[("Free", "circle"), (" live radio", None)], [("on your desk.", None)]]
 
 
@@ -423,18 +518,33 @@ def render_mac():
         c = card(640, name, place, "LIVE", color)
         lifted(strip, c.rotate((-1) ** j * 3, resample=Image.BICUBIC, expand=True),
                (wx + win.width - 220 + (j % 2) * 140, 260 + j * round(c.height * 1.3)))
-    # 4. The music lover.
+    # 4. Your country, your language: the country rows, hellos around the window.
     x0 = 3 * W
+    win = window(shots["7-world"], wh)
+    wx = x0 + W - win.width - 600
+    lifted(strip, win, (wx, (H - win.height) // 2), shadow=0.3)
+    rnd = random.Random(7)
+    greet = hellos()
+    for j, (g, sc, name, city) in enumerate(greet[:12]):
+        b = bubble(190, g, sc, name, city, tail_left=j % 2 == 0).rotate(rnd.uniform(-5, 5), resample=Image.BICUBIC, expand=True)
+        if j < 4:  # under the headline, left of the window
+            bx, by = x0 + margin + (j % 2) * 420, tops[3] + 140 + (j // 2) * 300
+        else:  # two columns to the right of the window
+            k = j - 4
+            bx, by = wx + win.width - 190 + (k % 2) * 330, 110 + (k // 2) * 400 + (k % 2) * 180
+        lifted(strip, b, (bx, min(by, H - b.height - 40)), shadow=0.18)
+    # 5. The music lover.
+    x0 = 4 * W
     lover = load_art("lover", 1750)
     ink(strip, lover, (x0 + W - lover.width - 200, H - lover.height + 40))
-    note(strip, "made with love\n\u2014 Nate", (x0 + margin + 40, tops[3] + 120), 70, angle=-6)
-    # 5. The crate and the app, playing.
-    x0 = 4 * W
+    note(strip, "made with love\n\u2014 Nate", (x0 + margin + 40, tops[4] + 120), 70, angle=-6)
+    # 6. The crate and the app, playing.
+    x0 = 5 * W
     crate = load_art("crate", 950)
     ink(strip, crate, (x0 + 420, H - crate.height + 30))
     win = window(shots["4-live"], wh)
     lifted(strip, win, (x0 + W - win.width - 200, (H - win.height) // 2), shadow=0.3)
-    note(strip, "all 115 stations,\nall free", (x0 + margin + 40, tops[4] + 140), 76, angle=-5)
+    note(strip, f"all {TOTAL} stations,\nall free", (x0 + margin + 40, tops[5] + 140), 76, angle=-5)
     out = STORY / "mac"
     out.mkdir(parents=True, exist_ok=True)
     for i in range(N):

@@ -16,7 +16,7 @@ keychain=$HOME/Library/Keychains/hifi-build.keychain-db
 host=${HIFI_BUILD_HOST:-${HIFI_RELAY_HOST:-local}}
 app=build/mac-shot/HIFI.app
 raw=${HIFI_SHOTS_RAW:-Screenshots/raw}
-pages=(1-main:home 2-tv:tv 3-radio:radio 4-live:live 5-synth:synthTV 6-connect:connect)
+pages=(${=HIFI_SHOTS_PAGES:-1-main:home 2-tv:tv 3-radio:radio 4-live:live 5-synth:synthTV 6-connect:connect})  # HIFI_SHOTS_PAGES="7-world:world" captures only those
 
 if [[ ${1:-} != --reuse ]]; then
   rm -rf $app && mkdir -p build/mac-shot
