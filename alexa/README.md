@@ -21,6 +21,11 @@ next, previous) Alexa says "Now listening to live radio on HIFI:" and the statio
 - `assets/` — cover art for the Echo Show and the store icons, drawn by
   `python3 alexa/scripts/make-covers.py` (same cover as the app) and served from the site at
   `https://hifi.nates-software.com/alexa/`.
+  Every cover and the full-screen background (`assets/backgrounds/`, 1280x800, behind the
+  player's Now Playing screen) carry a dark strip along the bottom: a left arrow, "Next or Back to
+  change stations", a right arrow. The HIFI TV screen draws the same strip over the clip
+  (`lambda/dial-hint.js`), and there the arrows are buttons: left is the previous station, right
+  the next. After redrawing the covers, bump `ART` in `catalog.js` so devices fetch them again.
 
 Live stations stream straight from the catalog. The synth stations (dial-up, shareware
 summer, night build, pixel drift) play their tracks back to back; the next one is queued

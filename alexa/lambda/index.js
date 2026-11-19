@@ -58,7 +58,9 @@ function play(builder, station, { index = 0, offset = 0, behavior = 'REPLACE_ALL
     title: live ? 'HIFI Live Radio' : track.title,
     subtitle: live ? about.line(station) : `${track.artist} · ${station.name}`,
     art: { sources: [{ url: station.cover }] },
-    backgroundImage: { sources: [{ url: station.cover }] },
+    // The full-screen picture behind it, 16:10 so nothing is cropped: the arrows and "Next or
+    // Back to change stations" along the bottom (make-covers.py).
+    backgroundImage: { sources: [{ url: station.background || station.cover }] },
   };
   return builder.addAudioPlayerPlayDirective(behavior, url, token, offset, previous || undefined, metadata);
 }

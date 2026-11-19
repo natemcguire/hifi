@@ -8,6 +8,9 @@ const path = require('path');
 
 const SITE = 'https://hifi.nates-software.com';
 const TTL = 5 * 60 * 1000;
+// Bumped when the covers are redrawn (alexa/scripts/make-covers.py), so Echo Shows and the
+// site's cache fetch the new art instead of the day-old copy. 2: the arrows and "Next or Back".
+const ART = 2;
 let cached = null, cachedAt = 0;
 
 const playable = s => Boolean(s.stream) || (Array.isArray(s.tracks) && s.tracks.length > 0);
@@ -20,7 +23,7 @@ function shape(raw) {
     tags: s.tags || [], color: s.color || '#ffffff', stream: s.stream || null, nowPlaying: s.nowPlaying ? SITE + s.nowPlaying : null,
     tracks: (s.tracks || []).map(t => ({ src: `${SITE}/${t.src}`, title: t.title, artist: t.artist, duration: t.duration })),
     tv: (s.tv || []).map(clip => `${SITE}/${clip}`),  // HIFI TV clips, played on the Echo Show (tv.js)
-    cover: `${SITE}/alexa/covers/${s.id}.png`,
+    cover: `${SITE}/alexa/covers/${s.id}.png?v=${ART}`, background: `${SITE}/alexa/backgrounds/${s.id}.png?v=${ART}`,
   }));
 }
 
