@@ -6,7 +6,9 @@ screenshots, review contact, and (with --submit) the build and review submission
 The app record itself must exist first: Apple's API cannot create apps, so it is
 made once by hand in App Store Connect (bundle ID com.natesoftware.hifi).
 
-Run as: withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--mac] [--submit]
+Run as: withkeys <python with pyjwt> ios/scripts/appstore-listing.py [--mac] [--screenshots] [--submit]
+With --screenshots it replaces only the screenshots (taking a version waiting for review out
+of review first, as Apple requires; add --submit to send it back).
 With --mac it fills the Mac App Store version of the same record (created if missing),
 skipping the app-wide parts (category, age rating, price, territories) the iPhone
 submission already set, and submits the newest processed Mac build.
@@ -121,11 +123,46 @@ def main():
     print("app:", app["id"], app["attributes"]["name"])
     if "--promo" in sys.argv:
         return promo(app)
+    if "--screenshots" in sys.argv:
+        return shots_only(app)
     if MAC:
         version = mac_version(app)
     else:
         version = app_wide(app)
     fill(app, version)
+
+
+def shots_only(app):
+    """--screenshots: replace only the editable version's screenshots, leaving its text alone.
+    Apple refuses screenshots while a version waits for review, so a waiting version is taken
+    out of review first; --submit sends it back."""
+    version = mac_version(app) if MAC else ios_version(app)
+    if version["attributes"]["appStoreState"] == "WAITING_FOR_REVIEW":
+        for s in api("GET", f"/v1/reviewSubmissions?filter[app]={app['id']}&filter[state]=WAITING_FOR_REVIEW")["data"]:
+            if s["attributes"].get("platform") == PLATFORM:
+                patch("reviewSubmissions", s["id"], {"canceled": True})
+                print("taken out of review:", s["id"])
+        for _ in range(60):
+            version = api("GET", f"/v1/appStoreVersions/{version['id']}")["data"]
+            if version["attributes"]["appStoreState"] != "WAITING_FOR_REVIEW":
+                break
+            time.sleep(10)
+        print("version now", version["attributes"]["appStoreState"])
+    loc = api("GET", f"/v1/appStoreVersions/{version['id']}/appStoreVersionLocalizations")["data"][0]
+    screenshots(loc["id"])
+    # Apple processes each upload; a submission with screenshots still processing is refused.
+    for _ in range(60):
+        states = [s["attributes"]["assetDeliveryState"]["state"]
+                  for st in api("GET", f"/v1/appStoreVersionLocalizations/{loc['id']}/appScreenshotSets")["data"]
+                  for s in api("GET", f"/v1/appScreenshotSets/{st['id']}/appScreenshots")["data"]]
+        if "FAILED" in states:
+            sys.exit("a screenshot failed processing: " + str(states))
+        if all(s == "COMPLETE" for s in states):
+            break
+        time.sleep(10)
+    print("screenshots processed:", len(states))
+    if "--submit" in sys.argv:
+        submit(app, version)
 
 
 def app_wide(app):

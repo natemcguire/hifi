@@ -142,13 +142,17 @@ audio and lock-screen controls.
    once, `ios/scripts/mac-screenshots.sh` then `frame-screenshots.py --mac` for the
    2880x1800 screenshots, `withkeys ios/scripts/upload-mac-appstore.sh` for the sandboxed
    build, and `appstore-listing.py --mac [--submit]` for the Mac version.
-8. Story screenshots (a draft for review, not in the listing): five slides that read as one
-   strip, ink drawings on paper, in `ios/Screenshots/story/{iphone,ipad,mac}`. Capture with
+8. Story screenshots (the listing since 2026-11-19, iPhone, iPad and Mac): six slides that read
+   as one strip, ink drawings on paper, in `ios/Screenshots/story/{iphone,ipad,mac}`, copied as
+   `1-free.png` … `6-why-free.png` into `ios/Screenshots/{iphone,ipad,mac}`, which is what the
+   listing uploads (`frame-screenshots.py` writes the older framed set there). Capture with
    `HIFI_SHOTS_RAW=Screenshots/story/raw` in front of `capture-screenshots.sh` and
    `mac-screenshots.sh`, draw with `keys run --only GROK_API_KEY -- python3 -I
    ios/scripts/story-art.py ios/Screenshots/story/art`, then
    `python3 ios/scripts/story-screenshots.py`. To ship them, copy a set into
-   `ios/Screenshots/{iphone,ipad,mac}` before `appstore-listing.py`.
+   `ios/Screenshots/{iphone,ipad,mac}`, then `appstore-listing.py [--mac] --screenshots`
+   replaces only the screenshots; a version waiting for review is taken out of review first
+   (Apple refuses screenshots then), and `--submit` sends it back.
 
 Music and visuals roadmap: `docs/generative-radio.md`.
 
