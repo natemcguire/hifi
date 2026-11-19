@@ -164,8 +164,8 @@ one registered to another Amazon account (a development skill reaches only the d
 account's devices) or one set to a language the skill lacks. The skill carries English for the
 US, UK, Canada, Australia and India, all with the same model (`build-model.mjs` writes one file
 per locale in `skill.json`, and `deploy.sh` pushes each one). The `alexa: in` log line carries
-the request's locale and whether the device plays audio (`audio=yes`).
-can be told from the simulator's (`audio=no`).
+the request's locale and whether the device plays audio (`audio=yes`). A real Echo's request
+carries the player's state (`player=IDLE:…` or `PLAYING:…`); the simulator's has none (`player=-:-`).
 
 | You say | It does |
 |---|---|
