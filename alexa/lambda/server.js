@@ -5,6 +5,7 @@
 const express = require('express');
 const { ExpressAdapter } = require('ask-sdk-express-adapter');
 const { skill } = require('./index');
+const { exitOnSignal } = require('./shutdown');
 
 const app = express();
 app.disable('x-powered-by');
@@ -13,4 +14,6 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 app.post('/alexa', new ExpressAdapter(skill, true, true).getRequestHandlers());
 
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => console.log(`HIFI radio for Alexa listening on ${port}`));
+const server = app.listen(port, () => console.log(`HIFI radio for Alexa listening on ${port}`));
+
+exitOnSignal(server, { name: 'HIFI radio for Alexa' });
