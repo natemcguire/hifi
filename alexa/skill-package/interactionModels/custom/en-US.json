@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "hifi live radio",
+      "invocationName": "hifi radio",
       "modelConfiguration": {
         "fallbackIntentSensitivity": {
           "level": "LOW"
@@ -108,7 +108,13 @@
             "skip this station",
             "change the station",
             "change station",
-            "move along the dial"
+            "move along the dial",
+            "skip",
+            "skip it",
+            "next one",
+            "forward",
+            "go forward",
+            "forward one"
           ]
         },
         {
@@ -119,7 +125,13 @@
             "last station",
             "go back a station",
             "back a station",
-            "the station before"
+            "the station before",
+            "back",
+            "go back",
+            "back one",
+            "go back one",
+            "previous one",
+            "the one before"
           ]
         },
         {

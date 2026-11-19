@@ -408,7 +408,33 @@ const ErrorHandler = {
   },
 };
 
+// One line per request and per answer in the Railway log, so a report like "Alexa, next said
+// what do you want to play" can be checked against what reached the skill and what it sent back.
+// No user or device ids.
+const REQUEST_LOG = {
+  process(handlerInput) {
+    const envelope = handlerInput.requestEnvelope;
+    const type = Alexa.getRequestType(envelope);
+    const name = type === 'IntentRequest' ? ` ${Alexa.getIntentName(envelope)}` : '';
+    const player = envelope.context?.AudioPlayer;
+    const session = envelope.session ? (envelope.session.new ? 'new' : 'open') : 'none';
+    console.log(`alexa: in ${type}${name} player=${player?.playerActivity || '-'}:${parseToken(player?.token)?.id || '-'}`
+      + ` tv=${tv.showing(envelope)?.id || '-'} screen=${hasScreen(envelope) ? 'yes' : 'no'} session=${session}`);
+  },
+};
+const RESPONSE_LOG = {
+  process(handlerInput, response) {
+    const sent = (response?.directives || []).map(d => {
+      const token = d.audioItem?.stream?.token || d.token || '';
+      return token ? `${d.type}(${token.replace(/#.*$/, '')})` : d.type;
+    });
+    console.log(`alexa: out ${sent.join(' ') || 'nothing'} speech=${response?.outputSpeech ? 'yes' : 'no'} end=${response?.shouldEndSession ?? '-'}`);
+  },
+};
+
 const builder = Alexa.SkillBuilders.custom()
+  .addRequestInterceptors(REQUEST_LOG)
+  .addResponseInterceptors(RESPONSE_LOG)
   .addRequestHandlers(
     LaunchRequestHandler, PlayStationIntentHandler, PlayAnythingIntentHandler, NextIntentHandler, PreviousIntentHandler,
     StopIntentHandler, WhatsPlayingIntentHandler, ListStationsIntentHandler, NotForRadioIntentHandler, StartOverIntentHandler,

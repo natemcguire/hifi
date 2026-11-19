@@ -92,7 +92,7 @@ const shared = [...tagCount].filter(([t, n]) => n > 1 && !named.has(t) && !['rad
 const model = {
   interactionModel: {
     languageModel: {
-      invocationName: 'hifi live radio',
+      invocationName: 'hifi radio',
       modelConfiguration: { fallbackIntentSensitivity: { level: 'LOW' } },
       intents: [
         { name: 'PlayStationIntent', slots: [{ name: 'station', type: 'HIFI_STATION' }], samples: [
@@ -111,8 +111,9 @@ const model = {
           'list stations', 'list the stations', 'what stations are there', 'what stations do you have', 'which stations are there', 'what can i listen to', 'what are my options', 'stations',
         ] },
         // Amazon's next and previous can't take extra phrases, so the station-flavoured ones get their own intents.
-        { name: 'NextStationIntent', slots: [], samples: ['next station', 'another station', 'something else', 'skip station', 'skip this station', 'change the station', 'change station', 'move along the dial'] },
-        { name: 'PreviousStationIntent', slots: [], samples: ['previous station', 'last station', 'go back a station', 'back a station', 'the station before'] },
+        // "back" and "skip" are here too: the Echo Show's strip says "Next or Back to change stations".
+        { name: 'NextStationIntent', slots: [], samples: ['next station', 'another station', 'something else', 'skip station', 'skip this station', 'change the station', 'change station', 'move along the dial', 'skip', 'skip it', 'next one', 'forward', 'go forward', 'forward one'] },
+        { name: 'PreviousStationIntent', slots: [], samples: ['previous station', 'last station', 'go back a station', 'back a station', 'the station before', 'back', 'go back', 'back one', 'go back one', 'previous one', 'the one before'] },
         // HIFI TV on the Echo Show: the station's clips on screen, or the plain player.
         { name: 'VideoOffIntent', slots: [], samples: [
           'audio only', 'just audio', 'radio only', 'just the radio', 'no video', 'turn off the video', 'turn the video off', 'stop the video', 'hide the video', 'video off', 'turn off hifi tv',

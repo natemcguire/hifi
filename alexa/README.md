@@ -72,7 +72,9 @@ once). Covers and icons come from the site, so release it (`withkeys npm run rel
 after a cover change. `index.js` also exports a Lambda handler, so the same code can move
 to AWS Lambda or an Alexa-hosted skill later without changes.
 
-Testing: any Echo on the developer account hears the development skill. The ASK CLI's
+Testing: any Echo on the developer account hears the development skill. Every request and answer
+leaves one `alexa: in …` / `alexa: out …` line in the Railway log (type, intent, what the player
+holds, no ids), so "Alexa, next did nothing" can be checked against what reached the skill. The ASK CLI's
 `simulate-skill` runs text turns end to end, and `node --test alexa/lambda/*.test.js` checks what is
 said against the station that should play and what Alexa says back. In the simulator use "ask hifi live radio for …"; it turns
 away "open hifi live radio" and most "to play …" phrases ("did not resolve to any intent",
@@ -99,7 +101,7 @@ resume" go to it without the name.
 | play jazz / play late night jazz / play jazz twenty four | Jazz24 for plain "jazz"; the other two by name |
 | play Z100 / play kiss FM / play KEXP / play one live | a world station by name; "kiss FM" is KIIS FM in Los Angeles |
 | play kiss FM Chicago / play Houston / play Germany | by city or country; the first station there when several fit |
-| next, previous | the next or previous station on the dial |
+| next, previous (also back, go back, skip) | the next or previous station on the dial |
 | what's playing | the song, from the same now-playing feed the app uses |
 | list stations | reads the house stations, counts the world stations and names a few |
 | pause, resume, stop | as expected; track stations resume mid-track |
