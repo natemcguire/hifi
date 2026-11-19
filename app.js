@@ -38,7 +38,7 @@ const ICON = {
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 // "INDIE POP ROCKS!" → "Indie Pop Rocks!", like Swift's .capitalized.
 const capitalized = text => text.toLowerCase().replace(/(^|[^\p{L}\p{N}'’])(\p{L})/gu, (_, gap, letter) => gap + letter.toUpperCase());
-// A station can spell its own name ("101X Chillville"); the rest are title-cased.
+// A station can spell its own name ("Y2K Chill-Out"); the rest are title-cased.
 const stationName = station => station.label || capitalized(station.name);
 const clock = seconds => { const s = Math.max(0, Math.round(seconds)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
@@ -171,24 +171,7 @@ function decorate() {
   wheelRoom.insertAdjacentHTML('beforeend', `<svg class="wreath" viewBox="-76 -76 152 152" aria-hidden="true"><circle class="core" r="${R}"/>`
     + fronds.map((d, i) => `<path class="f${i}" d="${d}"/>`).join('') + trims + bow + '</svg>');
 }
-// Video stations play official YouTube uploads on the screen. They live in
-// catalog.videoStations, which the native apps don't read, and load their
-// song list after the player is up.
-const isVideo = station => station.video === 'youtube';
-async function loadVideoStations() {
-  for (const station of catalog.videoStations || []) {
-    try {
-      const response = await fetch(station.playlist, { signal: AbortSignal.timeout(15000) });
-      const tracks = (await response.json()).filter(track => track.youtube && track.duration > 0);
-      if (!tracks.length || catalog.stations.some(s => s.id === station.id)) continue;
-      const at = catalog.stations.findLastIndex(s => s.band === 'radio') + 1;  // after the live stations, before Synth Sounds
-      catalog.stations.splice(at, 0, { ...station, tracks });
-      if (wanted === station.id && !radio.playing) radio.station = catalog.stations[at];
-      changed();
-    } catch { /* the station just stays off the list */ }
-  }
-}
-// One list under Radio: the live stations, 101X Chillville, then Synth Sounds. (`band` stays in the
+// One list under Radio: the live stations, then Synth Sounds. (`band` stays in the
 // catalog for older native builds, which still show two menus.)
 // World stations carry a `country`: the Radio list shows one row per country after the house
 // stations, and each country opens its own list. A search looks through every station at once.
@@ -281,18 +264,6 @@ function play(index, offset) {
   radio.problem = null;
   const station = radio.station;
   startedAt = Date.now();
-  if (isVideo(station)) {
-    stopPolling();
-    silence();
-    radio.track = station.tracks[index];
-    radio.playing = true;
-    radio.buffering = true;
-    // The video needs the screen, like an iPod playing a movie.
-    if (page() !== 'nowPlaying') push('nowPlaying');
-    void playVideo(radio.track, offset);
-    return changed();
-  }
-  stopVideo();
   if (isLive(station)) {
     radio.track = null; pendingSeek = 0;
     audio.src = station.stream;
@@ -326,79 +297,7 @@ function stop() {
   radio.playing = false;
   radio.buffering = false;
   silence();
-  stopVideo();
   changed();
-}
-
-// MARK: Video stations (YouTube's privacy-enhanced player)
-
-const video = { player: null, api: null, host: null, token: 0, started: false };
-function loadYouTube() {
-  return video.api ??= new Promise((resolve, reject) => {
-    window.onYouTubeIframeAPIReady = resolve;
-    const script = document.createElement('script');
-    script.src = 'https://www.youtube.com/iframe_api';
-    script.onerror = () => { video.api = null; reject(new Error('YouTube did not load')); };
-    document.head.append(script);
-  });
-}
-async function playVideo(track, offset) {
-  const token = ++video.token;
-  try { await loadYouTube(); } catch { return failed(); }
-  if (token !== video.token || !radio.playing) return;
-  if (!video.player) {
-    video.host = document.createElement('div');
-    video.host.className = 'video';
-    const target = document.createElement('div');
-    video.host.append(target);
-    $('pages').append(video.host);
-    video.player = new YT.Player(target, {
-      host: 'https://www.youtube-nocookie.com', width: '100%', height: '100%', videoId: track.youtube,
-      playerVars: { autoplay: 1, start: Math.floor(offset), playsinline: 1, rel: 0, iv_load_policy: 3 },
-      events: {
-        onReady: event => { event.target.setVolume(Math.round(radio.volume * 100)); if (token === video.token && radio.playing) event.target.playVideo(); },
-        onStateChange: videoState, onError: videoError,
-      },
-    });
-  } else {
-    video.player.loadVideoById?.({ videoId: track.youtube, startSeconds: Math.floor(offset) });
-    video.player.setVolume?.(Math.round(radio.volume * 100));
-  }
-  syncVideo();
-}
-function videoState(event) {
-  if (!isVideo(radio.station) || !radio.playing) return;
-  const state = event.data;
-  if (state === YT.PlayerState.PLAYING) { video.started = true; radio.buffering = false; radio.problem = null; }
-  else if (state === YT.PlayerState.BUFFERING) radio.buffering = true;
-  else if (state === YT.PlayerState.ENDED) return nextVideo();
-  // Paused before it ever played: the browser held back autoplay. Leave the video up to tap.
-  else if ((state === YT.PlayerState.PAUSED || state === YT.PlayerState.CUED) && !video.started) { radio.buffering = false; radio.problem = 'Tap the video to start it.'; }
-  // Paused on the video itself after playing: the radio stops, as with the ▶︎❚❚ button.
-  else if (state === YT.PlayerState.PAUSED && Date.now() - startedAt > 1500) return stop();
-  changed();
-}
-// A video that won't play here (removed, blocked in this country) is skipped.
-function videoError() {
-  if (!isVideo(radio.station) || !radio.playing) return;
-  radio.problem = "That one won't play here. Next…";
-  changed();
-  clearTimeout(retryTimer);
-  retryTimer = setTimeout(nextVideo, 1200);
-}
-function nextVideo() {
-  if (!isVideo(radio.station) || !radio.playing) return;
-  const tracks = radio.station.tracks;
-  play((tracks.indexOf(radio.track) + 1) % tracks.length, 0);
-}
-function stopVideo() {
-  video.token++;
-  video.player?.stopVideo?.();
-  syncVideo();
-}
-// The player shows only on Now Playing while a video station plays.
-function syncVideo() {
-  if (video.host) video.host.hidden = !(isVideo(radio.station) && radio.playing && page() === 'nowPlaying');
 }
 
 function failed() {
@@ -501,7 +400,6 @@ const position = () => { const list = stationsIn(radio.station.band); return `${
 function setVolume(value) {
   radio.volume = Math.round(Math.min(1, Math.max(0, value)) * 100) / 100;
   audio.volume = radio.volume;
-  video.player?.setVolume?.(Math.round(radio.volume * 100));
   savePrefs();
 }
 
@@ -1122,7 +1020,6 @@ const makeView = p => p === 'nowPlaying' ? nowPlayingView() : p === 'about' ? ab
 
 function show(forward) {
   const old = ui.view, p = page();
-  if (p !== 'nowPlaying' && isVideo(radio.station) && radio.playing) stop();
   const view = makeView(p);
   ui.view = view;
   $('pages').append(view.el);
@@ -1214,7 +1111,7 @@ function select() {
     if (!station) return;
     if (isCountryRow(station)) return push(`band:country:${station.country}`);
     tune(station);
-    if (page() !== 'nowPlaying') push('nowPlaying');  // a video station already went there
+    if (page() !== 'nowPlaying') push('nowPlaying');
   } else if (p === 'playlists') {
     // Spotify plays its own music: a playlist opens in Spotify.
     const playlist = playlistRows()[index];
@@ -1420,7 +1317,6 @@ function changed() {
     if (state.dataset.icon !== icon) { state.dataset.icon = icon; state.innerHTML = ICON[icon]; }
     state.classList.toggle('buffering', radio.buffering);
     ui.view?.update();
-    syncVideo();
     renderConnect();
     updateMediaSession();
     sendStatus();
@@ -1442,4 +1338,3 @@ changed();
 void loadConfig();
 if (spotify.connected) void refreshPlaylists();
 if (params.get('autoplay') === '1') start();
-void loadVideoStations();

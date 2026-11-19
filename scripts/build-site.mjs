@@ -3,8 +3,8 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../',import.meta.url));
 await rm(root+'dist',{recursive:true,force:true});await mkdir(root+'dist');
-for(const file of ['index.html','landing.html','privacy.html','spotify.html','spotify.js','video.html','video.js','landing.css','landing.js','app.js','styles.css','favicon.svg','stations.json']) await copyFile(root+file,root+'dist/'+file);
-for(const dir of ['engine','tracks','shots','playlists','tv']) await cp(root+dir,root+'dist/'+dir,{recursive:true,filter:async source=>{if((await lstat(source)).isSymbolicLink())throw Error('Symlink not allowed in public assets');return true;}});
+for(const file of ['index.html','landing.html','privacy.html','spotify.html','spotify.js','landing.css','landing.js','app.js','styles.css','favicon.svg','stations.json']) await copyFile(root+file,root+'dist/'+file);
+for(const dir of ['engine','tracks','shots','tv']) await cp(root+dir,root+'dist/'+dir,{recursive:true,filter:async source=>{if((await lstat(source)).isSymbolicLink())throw Error('Symlink not allowed in public assets');return true;}});
 // Cover art and icons for the Alexa skill (alexa/scripts/make-covers.py), at /alexa/.
 await cp(root+'alexa/assets',root+'dist/alexa',{recursive:true});
 // Notes meant to be read in a browser (noindex), at /docs/<name>.html.
@@ -17,8 +17,6 @@ const rewrite=async(file,pairs)=>{let text=await readFile(dist+file,'utf8');for(
 const engine=['scheduler.js','storage.js','windowShortcuts.js'];
 await rewrite('app.js',await Promise.all(engine.map(async name=>[`'./engine/${name}'`,`'./engine/${name}?v=${await hash('engine/'+name)}'`])));
 await rewrite('index.html',[['href="styles.css"',`href="styles.css?v=${await hash('styles.css')}"`],['src="app.js"',`src="app.js?v=${await hash('app.js')}"`]]);
-await rewrite('video.js',await Promise.all(['scheduler.js'].map(async name=>[`'./engine/${name}'`,`'./engine/${name}?v=${await hash('engine/'+name)}'`])));
-await rewrite('video.html',[['src="video.js"',`src="video.js?v=${await hash('video.js')}"`]]);
 await rewrite('spotify.html',[['src="spotify.js"',`src="spotify.js?v=${await hash('spotify.js')}"`]]);
 await rewrite('privacy.html',[['href="/landing.css"',`href="/landing.css?v=${await hash('landing.css')}"`]]);
 await rewrite('landing.html',[['<link rel="stylesheet" href="/landing.css">',`<style>${(await readFile(dist+'landing.css','utf8')).trim()}</style>`],['src="/landing.js"',`src="/landing.js?v=${await hash('landing.js')}"`]]);

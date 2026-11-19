@@ -2952,24 +2952,5 @@
       ]
     }
   ],
-  "webStations": [],
-  "videoStations": [
-    {
-      "id": "101x-chillville",
-      "name": "101X CHILLVILLE",
-      "band": "radio",
-      "frequency": "10",
-      "subtitle": "Downbeat electronic and chill vibes - Sundays",
-      "tagline": "The Chillville playlist from Austin's late, great 101X, played from each song's official video.",
-      "genre": "Chill / Austin, RIP 101X",
-      "tags": ["chill", "chillville", "chill out", "chillout", "mellow", "downtempo", "trip hop", "trip-hop", "acoustic", "ambient pop", "austin", "texas", "101x", "kroq", "alternative", "alt", "90s", "nineties", "2000s", "video", "videos", "music videos", "official videos", "youtube", "watch", "sunday", "sunday morning", "morning", "hangover", "lazy", "coffee", "brunch", "portishead", "massive attack", "zero 7", "radiohead", "air", "beth orton", "moby", "morcheeba", "sneaker pimps", "dido", "rip"],
-      "color": "#9fd8ff",
-      "video": "youtube",
-      "playlist": "playlists/101x-chillville.json",
-      "website": "https://open.spotify.com/playlist/61U0gXCJiZZf1LcdfUZcbJ",
-      "provider": "101X",
-      "providerLabel": "Chillville on Spotify ↗",
-      "label": "101X Chillville"
-    }
-  ]
+  "webStations": []
 }

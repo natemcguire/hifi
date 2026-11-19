@@ -64,7 +64,7 @@ def setup():
     # What testers read in TestFlight.
     locs = api("GET", f"/v1/apps/{APP}/betaAppLocalizations")["data"]
     attrs = {"description": "HIFI is free, listener-supported internet radio on a classic white click wheel: live stations, original synth music, "
-                            "101X Chillville and HIFI TV. Taste Makers get every new build first.",
+                            "and HIFI TV. Taste Makers get every new build first.",
              "feedbackEmail": "nate.mcguire@gmail.com", "marketingUrl": "https://hifi.nates-software.com",
              "privacyPolicyUrl": "https://hifi.nates-software.com/privacy"}
     if locs:
@@ -85,7 +85,7 @@ def setup():
     if build["attributes"].get("usesNonExemptEncryption") is None:
         api("PATCH", f"/v1/builds/{bid}", {"data": {"type": "builds", "id": bid, "attributes": {"usesNonExemptEncryption": False}}})
     notes = api("GET", f"/v1/builds/{bid}/betaBuildLocalizations")["data"]
-    what = {"whatsNew": "HIFI TV: every station has its own old-TV clips. 101X Chillville plays on the screen. Next and back change station."}
+    what = {"whatsNew": "HIFI TV: every station has its own old-TV clips. Next and back change station."}
     if notes:
         api("PATCH", f"/v1/betaBuildLocalizations/{notes[0]['id']}", {"data": {"type": "betaBuildLocalizations", "id": notes[0]["id"], "attributes": what}})
     else:

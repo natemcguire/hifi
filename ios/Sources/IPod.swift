@@ -736,7 +736,7 @@ private extension View {
 #if DEBUG
 // The review tour: the same wheel presses a listener makes, paced for a two-minute
 // recording on a real iPhone. Radio with its live songs, HIFI TV, next station from the
-// wheel, 101X Chillville, a Synth Sounds station with pause and play, Playlists and the
+// wheel, a Synth Sounds station with pause and play, Playlists and the
 // Spotify connect page, Settings, About, and back to Now Playing. Debug builds only.
 extension IPodView {
     fileprivate func tour() async {

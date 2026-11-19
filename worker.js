@@ -275,7 +275,6 @@ export default {
     else if (url.pathname === '/player') url.pathname = '/index.html';
     else if (url.pathname === '/privacy') url.pathname = '/privacy.html';
     else if (url.pathname === '/spotify') url.pathname = '/spotify.html';
-    else if (url.pathname === '/video') url.pathname = '/video.html';
     let response = await env.ASSETS.fetch(new Request(url, request));
     // Browsers asking for a missing page get a readable Win95 dialog, not an empty 404.
     if (response.status === 404 && (request.headers.get('Accept') || '').includes('text/html')) response = new Response(request.method === 'HEAD' ? null : notFoundPage, { status: 404, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
@@ -283,12 +282,12 @@ export default {
     headers.set('X-Content-Type-Options','nosniff');
     if (env.HIFI_TEST) headers.set('X-Robots-Tag','noindex');  // the test copy (wrangler.test.toml) stays out of search
     headers.set('Referrer-Policy','strict-origin-when-cross-origin');
-    headers.set('Content-Security-Policy', `default-src 'self'; script-src 'self' https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' ${MEDIA_HOSTS}; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self' https://www.youtube-nocookie.com; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'`);
+    headers.set('Content-Security-Policy', `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' ${MEDIA_HOSTS}; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; frame-src 'self'; frame-ancestors 'self' https://nates-software.com https://www.nates-software.com https://*.nates-software.pages.dev; object-src 'none'; base-uri 'self'`);
     // HTML is checked every visit; scripts and styles are linked by content hash
     // (scripts/build-site.mjs) so they keep for a year; media and the catalog keep a while.
     if (headers.get('Content-Type')?.includes('text/html')) headers.set('Cache-Control','no-cache');
     else if (response.ok && url.searchParams.has('v') && /\.(js|css)$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=31536000, immutable');
-    else if (response.ok && /^\/(shots|tracks|tv|playlists|alexa)\/|\.svg$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=86400, stale-while-revalidate=604800');
+    else if (response.ok && /^\/(shots|tracks|tv|alexa)\/|\.svg$/.test(url.pathname)) headers.set('Cache-Control','public, max-age=86400, stale-while-revalidate=604800');
     else if (response.ok && url.pathname === '/stations.json') headers.set('Cache-Control','public, max-age=300, stale-while-revalidate=86400');
     // Safari and iMessage only play video and audio that answer byte ranges, and
     // static assets ignore Range, so slice those here.

@@ -1,7 +1,7 @@
 'use strict';
 // The HIFI catalog: the live stations.json first, the copy bundled at deploy time if the
 // site can't be reached. Only stations Alexa can play are kept: live streams and the
-// track-based synth stations. The video stations (HIFI TV only) are left out.
+// track-based synth stations.
 
 const fs = require('fs');
 const path = require('path');

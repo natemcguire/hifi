@@ -58,8 +58,6 @@ The Synth Sounds stations are instrumental music we made for HIFI. They run on a
 
 HIFI TV plays old-TV clips behind Now Playing, with the song and station on a sheet of clear glass over the picture.
 
-101X Chillville keeps the chill playlist from Austin's 101X going: 670 songs, each played from its official video.
-
 Connect Spotify if you want to. The heart next to a live song saves it to your Liked Songs, and your playlists show up on the click wheel, with the Nate's Software HIFI playlist up top. Spotify's own page handles the sign-in; we never see your password.
 
 Also in the box:
@@ -278,9 +276,7 @@ def fill(app, version):
                        "streams of Radio Paradise, SomaFM and Exclusive Radio. The stations listed by country under Radio "
                        "(Z100, KIIS FM, Heart, 1LIVE and the rest) each play that broadcaster's own public stream, "
                        "straight from its servers. Picture in Picture: start a station, then go home. "
-                       "HIFI TV clips are original AI-generated video made for HIFI. 101X Chillville plays each song's official "
-                       "YouTube upload in YouTube's own embedded player (youtube-nocookie.com), shown on screen and only while "
-                       "the app is open; leaving Now Playing stops it. "
+                       "HIFI TV clips are original AI-generated video made for HIFI. "
                        "Spotify is optional: the heart next to a live song and the Playlists menu ask the listener to connect "
                        "their own Spotify account (Spotify's own sign-in page, PKCE, no password reaches us). Everything else "
                        "works without it."}

@@ -38,7 +38,7 @@ next time a device recording is needed.
   is not what Apple asked for. Do not send it as the device recording.
 - What the tour shows, in order: launch to the HIFI menu; Radio with the live song on
   each station; tuning Sonic Universe (HIFI TV behind the song, LIVE bar); the wheel as
-  the volume; next station from the wheel; 101X Chillville playing an official video;
+  the volume; next station from the wheel;
   Synth Sounds, Shareware Summer with pause and play; Playlists and the Connect Spotify
   page (the account flow, up to Spotify's own sign-in sheet); Settings, the clicker off
   and on; About; back to Now Playing. About 100 seconds.
@@ -59,7 +59,6 @@ HOW TO USE: drag a finger around the wheel to move the highlight, press the cent
 
 FEATURES AND WHERE THEY ARE
 - Radio (menu > Radio): one list of every station, with a search field above it that narrows the list as you type. Ten live stations, then the four Synth Sounds stations of our own instrumental music. Choose one and it plays, with the song that is on now and HIFI TV behind it. Everyone hears the same point in a Synth Sounds rotation, like a broadcast.
-- 101X Chillville (menu > Radio, last row): a playlist played from each song's official YouTube upload, in YouTube's own embedded player (youtube-nocookie.com), on screen and only while the app is open. MENU stops it.
 - Heart (Now Playing on a live station): saves the song to the listener's Spotify Liked Songs. Without Spotify connected it opens the Connect Spotify page.
 - Playlists (menu > Playlists): the Nate's Software HIFI playlist, and the listener's own Spotify playlists once connected. Choosing one opens it in Spotify.
 - Settings (menu > Settings): Clicker, Backlight, Spotify connect or disconnect, Mini Shuffle (Picture in Picture) and Shuffle on Home.
@@ -67,11 +66,11 @@ FEATURES AND WHERE THEY ARE
 
 ACCOUNTS: none required. Spotify is optional and uses the listener's own Spotify account through Spotify's sign-in page (ASWebAuthenticationSession, PKCE, no password reaches us). Spotify's development-mode rule limits sign-in to accounts we list in Spotify's dashboard, so a reviewer's own account will see the "Use your own Spotify app" page instead of connecting. If you want to test hearting, reply with the Spotify account email and we add it the same day. Everything else works without Spotify. No demo account is needed.
 
-EXTERNAL SERVICES: hifi.nates-software.com (station list, now-playing relay, our music and HIFI TV clips); stream.radioparadise.com, ice6.somafm.com and streaming.exclusive.radio (live audio, straight from the stations, never rehosted); api.radioparadise.com and somafm.com/songs (song titles, via our relay); www.youtube-nocookie.com and www.youtube.com (the Chillville player); accounts.spotify.com and api.spotify.com (optional Spotify); nates-software.com/api/hifi-spotify (Spotify client ID and the HIFI playlist). No analytics, no tracking SDKs, no third-party advertising.
+EXTERNAL SERVICES: hifi.nates-software.com (station list, now-playing relay, our music and HIFI TV clips); stream.radioparadise.com, ice6.somafm.com and streaming.exclusive.radio (live audio, straight from the stations, never rehosted); api.radioparadise.com and somafm.com/songs (song titles, via our relay); accounts.spotify.com and api.spotify.com (optional Spotify); nates-software.com/api/hifi-spotify (Spotify client ID and the HIFI playlist). No analytics, no tracking SDKs, no third-party advertising.
 
-REGIONAL DIFFERENCES: none in the app. It is available worldwide in English. A broadcaster or YouTube may geo-restrict a stream or a video; Chillville skips to the next song if a video cannot play. Spotify features need Spotify in the listener's country.
+REGIONAL DIFFERENCES: none in the app. It is available worldwide in English. A broadcaster may geo-restrict a stream. Spotify features need Spotify in the listener's country.
 
-RIGHTS: Synth Sounds are original recordings owned by Nate McGuire (Nate's Software), composed by our own scripts plus four owner-supplied AI-generated seed tracks; provenance is in the open-source repository (github.com/natemcguire/hifi, MIT). HIFI TV clips are original AI-generated video made for HIFI. Live stations are the public streams Radio Paradise, SomaFM, Exclusive Radio and RDS publish for any player; HIFI links to them, plays them unaltered, carries no ads, and names the stations with links to support them. Chillville plays only official uploads through the YouTube IFrame Player API under the YouTube API Services Terms; nothing is downloaded or rehosted. Spotify features use the Spotify Web API under the Spotify Developer Terms. Documentation for any of these is available on request.
+RIGHTS: Synth Sounds are original recordings owned by Nate McGuire (Nate's Software), composed by our own scripts plus four owner-supplied AI-generated seed tracks; provenance is in the open-source repository (github.com/natemcguire/hifi, MIT). HIFI TV clips are original AI-generated video made for HIFI. Live stations are the public streams Radio Paradise, SomaFM, Exclusive Radio and RDS publish for any player; HIFI links to them, plays them unaltered, carries no ads, and names the stations with links to support them. Spotify features use the Spotify Web API under the Spotify Developer Terms. Documentation for any of these is available on request.
 
 ## Longer answers, for Nate's reply if Apple asks more
 
@@ -79,7 +78,7 @@ RIGHTS: Synth Sounds are original recordings owned by Nate McGuire (Nate's Softw
 
 HIFI is a radio receiver, not a music library. It plays ten live internet radio stations
 (Radio Paradise, seven SomaFM channels including four holiday ones, Pop Girl Radio from
-Exclusive Radio, and the 101X Chillville video playlist) and four original instrumental stations, on a screen
+Exclusive Radio) and four original instrumental stations, on a screen
 styled like a click-wheel iPod. It is free, has no in-app purchases and no ads. It is
 for people who want music on while they work, cook or drive; nothing in it is aimed at
 children. The age rating was declared with Infrequent/Mild Profanity because live radio
@@ -119,7 +118,6 @@ The app has no accounts of its own. The one sign-in is Spotify, and it is option
 | Song now playing, HIFI TV | automatic on Now Playing |
 | Volume | spin the wheel on Now Playing |
 | Next or previous station | right or left wheel button, or lock screen |
-| 101X Chillville (video) | Menu > Radio > 101X Chillville |
 | Synth Sounds | Menu > Synth Sounds > a station |
 | Pause and play | play/pause button on the wheel, or the center button on Now Playing |
 | Heart a song | heart next to the title on Now Playing (live stations) |
@@ -133,10 +131,9 @@ The app has no accounts of its own. The one sign-in is Spotify, and it is option
 
 | Host | Used for |
 |---|---|
-| hifi.nates-software.com | `stations.json` (catalog), `/api/now-playing` (relay of station song data), `/tracks/*.mp3` (Synth Sounds), `/tv/*.mp4` (HIFI TV clips), `/video` (the Chillville page) |
+| hifi.nates-software.com | `stations.json` (catalog), `/api/now-playing` (relay of station song data), `/tracks/*.mp3` (Synth Sounds), `/tv/*.mp4` (HIFI TV clips) |
 | stream.radioparadise.com, ice6.somafm.com, streaming.exclusive.radio | live audio streams, played directly by AVPlayer |
 | api.radioparadise.com, somafm.com | song titles, fetched by our Worker relay, not by the phone |
-| www.youtube-nocookie.com, www.youtube.com | the Chillville embedded player (IFrame Player API) inside a WKWebView |
 | accounts.spotify.com, api.spotify.com | optional Spotify sign-in, Liked Songs, playlists |
 | nates-software.com/api/hifi-spotify | HIFI's Spotify client ID and the HIFI playlist ID |
 
@@ -147,9 +144,8 @@ https://hifi.nates-software.com/privacy
 ### Regional differences
 
 The app is the same build and the same catalog everywhere and is available in all
-territories, English only. Live streams and YouTube videos are served by their owners,
-who may geo-restrict; the app shows "Lost the signal. Retuning…" or moves to the next
-Chillville video. Spotify features depend on Spotify being available to the listener.
+territories, English only. Live streams are served by their owners, who may
+geo-restrict; the app shows "Lost the signal. Retuning…". Spotify features depend on Spotify being available to the listener.
 
 ### Rights documentation
 
@@ -164,10 +160,6 @@ Chillville video. Spotify features depend on Spotify being available to the list
   a licence letter, Nate must get one from each station (SomaFM asks apps to request
   permission at somafm.com/contact; Radio Paradise lists third-party player terms on
   radioparadise.com).
-- 101X Chillville: official uploads only, played in YouTube's own player through the
-  IFrame Player API on youtube-nocookie.com, with YouTube's ads and controls intact,
-  which is the use the YouTube API Services Terms allow. The track list is
-  `playlists/101x-chillville.json`.
 - Spotify: Spotify Web API under the Spotify Developer Terms, PKCE client, scopes above.
 - Station names are used descriptively. HIFI does not use Apple's iPod name or logos;
   the app is called HIFI and the About page credits Nate's Software.
