@@ -146,7 +146,8 @@ async function stop(handlerInput, speech) {
     // which ends the station playing in it.
     await store.save(requestEnvelope, { ...state, stationId: screen.id });
     if (!speech) return responseBuilder.addDirective(tv.pause(screen.token)).getResponse();
-    return responseBuilder.speak(speech).withShouldEndSession(true).getResponse();
+    // Stop the sound and the picture now, not when the screen times out after the session ends.
+    return responseBuilder.addDirective(tv.pause(screen.token)).speak(speech).withShouldEndSession(true).getResponse();
   }
   const offset = requestEnvelope.context?.AudioPlayer?.offsetInMilliseconds || 0;
   const token = requestEnvelope.context?.AudioPlayer?.token || state.token;
@@ -388,6 +389,17 @@ const SessionEndedRequestHandler = {
   },
 };
 
+// The screen reporting a fault in the HIFI TV document (a clip or image that won't load, a bad
+// value): logged, so a screen that went wrong on someone's Echo Show can be traced afterwards.
+const ScreenErrorHandler = {
+  canHandle: is('Alexa.Presentation.APL.RuntimeError'),
+  handle(handlerInput) {
+    const { token, errors } = handlerInput.requestEnvelope.request;
+    console.log('screen error:', token, JSON.stringify(errors));
+    return handlerInput.responseBuilder.getResponse();
+  },
+};
+
 const ExceptionEncounteredHandler = {
   canHandle: is('System.ExceptionEncountered'),
   handle(handlerInput) {
@@ -439,7 +451,7 @@ const builder = Alexa.SkillBuilders.custom()
     LaunchRequestHandler, PlayStationIntentHandler, PlayAnythingIntentHandler, NextIntentHandler, PreviousIntentHandler,
     StopIntentHandler, WhatsPlayingIntentHandler, ListStationsIntentHandler, NotForRadioIntentHandler, StartOverIntentHandler,
     FallbackIntentHandler, VideoIntentHandler, ScreenEventHandler, PlaybackControllerHandler, AudioPlayerEventHandler,
-    SessionEndedRequestHandler, ExceptionEncounteredHandler,
+    SessionEndedRequestHandler, ExceptionEncounteredHandler, ScreenErrorHandler,
   )
   .addErrorHandlers(ErrorHandler)
   .withCustomUserAgent('hifi-radio/1.0');

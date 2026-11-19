@@ -138,6 +138,8 @@ test('Echo Show: pause and resume hold the screen; what\'s playing answers witho
   r = await echo.intent('AMAZON.StopIntent');
   assert.strictEqual(r.response.shouldEndSession, true);
   assert.match(r.response.outputSpeech.ssml, /Bye/);
+  const stopped = r.directives.find(d => d.type === 'Alexa.Presentation.APL.ExecuteCommands');
+  assert.ok(stopped && stopped.token === token && stopped.commands.every(c => c.command === 'pause'), 'stop silences the screen at once');
 });
 
 test('Echo Show: a stream the screen can\'t play goes to AudioPlayer; audio only and back', async () => {
@@ -153,4 +155,32 @@ test('Echo Show: a stream the screen can\'t play goes to AudioPlayer; audio only
   assert.ok(r.play && !r.render, 'and stays that way');
   r = await echo.intent('VideoOnIntent');
   assert.ok(r.render && !r.play, 'show the video brings HIFI TV back');
+});
+
+// Nate, 2026-11-19: "sometimes the screen goes all black (while continuing to play)". The clip is
+// the only picture HIFI TV had; while it loaded, between clips, or when it failed, the screen was
+// black under the words. The station's still now sits under it, and the clip shows only once it plays.
+test('the screen is never black: the station still sits under the clip, which shows only once it plays', async () => {
+  const doc = tv.document();
+  const items = doc.mainTemplate.item.items;
+  const clipAt = items.findIndex(i => i.item?.id === 'hifi-clip');
+  const still = items.slice(0, clipAt).filter(i => i.type === 'Image' && i.source === '${tv.still}');
+  assert.ok(still.length >= 1, 'a still image under the clip');
+  assert.ok(items.slice(0, clipAt).some(i => i.type === 'Frame' && i.backgroundColor && !/^#0{3,6}$|black/i.test(i.backgroundColor)), 'a base colour that is not black');
+  const clip = items[clipAt].item;
+  assert.strictEqual(clip.opacity, '${clip ? 1 : 0}');
+  assert.ok(clip.onPlay.some(c => c.property === 'clip' && c.value === true));
+  assert.ok(clip.onTrackFail.some(c => c.property === 'clip' && c.value === false), 'a clip that fails leaves the still');
+  const echo = echoShow('still');
+  const { render } = await echo.intent('PlayStationIntent', { station: { name: 'station', value: 'jazz twenty four', confirmationStatus: 'NONE' } });
+  const station = stations.find(s => s.id === render.datasources.tv.id);
+  assert.strictEqual(render.datasources.tv.still, station.cover);
+  assert.match(render.datasources.tv.still, /^https:\/\/hifi\.nates-software\.com\/alexa\/covers\/[a-z0-9-]+\.png/);
+});
+
+test('a fault the screen reports is logged and answered quietly', async () => {
+  const echo = echoShow('fault');
+  await echo.intent('AMAZON.NextIntent');
+  const r = await echo.send({ type: 'Alexa.Presentation.APL.RuntimeError', token: echo.screen, errors: [{ type: 'LINK_ERROR', reason: 'test', message: 'clip would not load' }] });
+  assert.ok(!r.response.outputSpeech && !(r.response.directives || []).length);
 });

@@ -55,6 +55,13 @@ for that listener; "…to show the video" turns HIFI TV on again. The screen rep
 seconds whether the stream plays. A stream it can't play goes to AudioPlayer by itself. A tap
 on the picture pauses and plays. Echo devices without a screen never see any of this.
 
+The screen is never black while a station plays. Under the clip sits the station's cover, blurred
+across the screen with a sharp copy in the middle. It shows while a clip loads, between clips, and
+for good if a clip won't play: the clip is hidden until it starts playing and again if it fails.
+Stop pauses the screen's sound at once rather than leaving it to Alexa's timeout. Faults the screen
+reports (`Alexa.Presentation.APL.RuntimeError`, such as a clip or picture that won't load) go to
+the service log as `screen error:`.
+
 ## Deploying
 
 The endpoint runs on Railway (project `hifi`, service `alexa`, `lambda/server.js`), behind

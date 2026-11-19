@@ -83,6 +83,7 @@ function document() {
         bind: [
           { name: 'paused', value: false }, { name: 'failed', value: false }, { name: 'track', value: 0 },
           { name: 'song', value: '${tv.song}' }, { name: 'singer', value: '${tv.artist}' },
+          { name: 'clip', value: false },   // the clip is playing; until then the still shows
         ],
         // The song comes from the skill every half minute; the first ask, after 8 seconds, also
         // tells the skill whether the stream played. Here, not on the document, so the ask sees
@@ -101,7 +102,21 @@ function document() {
             onTrackUpdate: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'track', value: '${event.trackIndex}' }],
             onTrackFail: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'failed', value: true }],
           },
-          // The picture: the clip, full screen and silent. A tap pauses both, another plays them.
+          // Under the clip, the station's still: its cover blurred across the screen and sharp in
+          // the middle. It is what shows while a clip loads, between clips, and for good if a clip
+          // won't play, so the screen is never black while the station plays.
+          { type: 'Frame', position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: '#14181C' },
+          {
+            type: 'Image', position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh',
+            source: '${tv.still}', scale: 'best-fill', filters: [{ type: 'Blur', radius: 40 }],
+          },
+          { type: 'Frame', position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.35)' },
+          {
+            type: 'Image', position: 'absolute', top: '8vh', left: '30vw', width: '40vw', height: '50vh',
+            source: '${tv.still}', scale: 'best-fit', display: "${clip ? 'invisible' : 'normal'}",
+          },
+          // The picture: the clip, full screen and silent, shown once it plays. A tap pauses both,
+          // another plays them.
           {
             type: 'TouchWrapper', position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh',
             accessibilityLabel: 'Pause or play', role: 'button',
@@ -111,7 +126,9 @@ function document() {
             ],
             item: {
               type: 'Video', id: 'hifi-clip', width: '100vw', height: '100vh', scale: 'best-fill',
-              source: '${tv.clips}', autoplay: true, audioTrack: 'none',
+              source: '${tv.clips}', autoplay: true, audioTrack: 'none', opacity: '${clip ? 1 : 0}',
+              onPlay: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'clip', value: true }],
+              onTrackFail: [{ type: 'SetValue', componentId: 'hifi-tv', property: 'clip', value: false }],
             },
           },
           // A dark fade under the words, the way the app's lower third sits on glass.
@@ -151,7 +168,7 @@ function render(responseBuilder, station, { index = 0, now = null } = {}) {
     datasources: {
       tv: {
         id: station.id, name: station.name, genre: station.genre, color: station.color,
-        song: now?.title || '', artist: now?.artist || '',
+        still: station.cover, song: now?.title || '', artist: now?.artist || '',
         tracks: tracks.map(t => ({ title: t.title, artist: t.artist })), audio, clips,
       },
     },
