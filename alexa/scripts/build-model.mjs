@@ -92,7 +92,9 @@ const shared = [...tagCount].filter(([t, n]) => n > 1 && !named.has(t) && !['rad
 const model = {
   interactionModel: {
     languageModel: {
-      invocationName: 'hifi radio',
+      // Not "hifi radio": Alexa sends that name to another skill (the simulator's consideredIntents is
+      // <IntentForDifferentSkill>), so on 2026-11-19 every Echo answered "not supported on this device".
+      invocationName: 'hifi live radio',
       modelConfiguration: { fallbackIntentSensitivity: { level: 'LOW' } },
       intents: [
         { name: 'PlayStationIntent', slots: [{ name: 'station', type: 'HIFI_STATION' }], samples: [
