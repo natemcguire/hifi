@@ -18,11 +18,12 @@ endpoint=https://alexa-production-80ec.up.railway.app/alexa
 
 node alexa/scripts/build-model.mjs
 
-wait_for() {  # resource name → polls until the build settles, fails on FAILED
+wait_for() {  # resource name [locale] → polls until the build settles, fails on FAILED
   local n=0 state  # not "status": zsh keeps that name read-only
+  sleep 5  # the status still shows the previous build for a moment
   while (( n < 90 )); do
     state=$(ask smapi get-skill-status --skill-id "$skill" --resource "$1" | python3 -c "
-import json,sys; d=json.load(sys.stdin)['$1']; d=d.get('en-US',d)['lastUpdateRequest']; print(d['status']); 
+import json,sys; d=json.load(sys.stdin)['$1']; d=d.get('${2:-}',d)['lastUpdateRequest']; print(d['status']);
 [print(e['message'],file=sys.stderr) for e in d.get('errors',[])]")
     [[ $state == SUCCEEDED ]] && return 0
     [[ $state == FAILED ]] && { echo "$1 build failed" >&2; return 1; }
@@ -44,8 +45,12 @@ PY
   wait_for manifest
 fi
 
-ask smapi set-interaction-model --skill-id "$skill" --stage development --locale en-US \
-  --interaction-model "file:alexa/skill-package/interactionModels/custom/en-US.json" >/dev/null
-wait_for interactionModel
+# One model per English locale in skill.json (build-model.mjs writes them all).
+for model in alexa/skill-package/interactionModels/custom/*.json; do
+  locale=${model:t:r}
+  ask smapi set-interaction-model --skill-id "$skill" --stage development --locale "$locale" \
+    --interaction-model "file:$model" >/dev/null
+  wait_for interactionModel "$locale"
+done
 echo "Deployed skill $skill. Try: \"Alexa, open HIFI radio\"."
 echo "To publish: ask smapi submit-skill-for-certification --skill-id $skill"

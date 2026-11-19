@@ -92,9 +92,10 @@ const shared = [...tagCount].filter(([t, n]) => n > 1 && !named.has(t) && !['rad
 const model = {
   interactionModel: {
     languageModel: {
-      // "hifi radio" (Nate, 2026-11-19). After a name change Alexa can take several minutes to route the
-      // new name; the simulator answers <IntentForDifferentSkill> for both names meanwhile.
-      invocationName: 'hifi radio',
+      // "HIFI radio" (Nate, 2026-11-19), written as it is spoken: Alexa hears "HIFI" as two words,
+      // "hi fi". Written "hifi radio" it never reached the skill (the simulator answered
+      // <IntentForDifferentSkill> and Nate's Echo Shows sent it to SiriusXM).
+      invocationName: 'hi fi radio',
       modelConfiguration: { fallbackIntentSensitivity: { level: 'LOW' } },
       intents: [
         { name: 'PlayStationIntent', slots: [{ name: 'station', type: 'HIFI_STATION' }], samples: [
@@ -134,6 +135,12 @@ const model = {
   },
 };
 
-await writeFile(root + 'alexa/skill-package/interactionModels/custom/en-US.json', JSON.stringify(model, null, 2) + '\n');
+// Every English Echo gets the same model: an Echo set to English (UK, Canada, Australia or India)
+// never reaches a skill that lacks its language, and Alexa hands "HIFI radio" to a music service.
+// The locales are the manifest's (skill.json); deploy.sh pushes one model per locale.
+const { manifest } = JSON.parse(await readFile(root + 'alexa/skill-package/skill.json', 'utf8'));
+for (const locale of Object.keys(manifest.publishingInformation.locales)) {
+  await writeFile(root + `alexa/skill-package/interactionModels/custom/${locale}.json`, JSON.stringify(model, null, 2) + '\n');
+}
 await copyFile(root + 'stations.json', root + 'alexa/lambda/stations.json');
 console.log(`Voice model: ${values.length} stations, ${values.reduce((n, v) => n + v.name.synonyms.length + 1, 0)} spoken forms, ${shared.length} shared words.`);

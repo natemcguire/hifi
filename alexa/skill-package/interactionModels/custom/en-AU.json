@@ -1,0 +1,4994 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "hi fi radio",
+      "modelConfiguration": {
+        "fallbackIntentSensitivity": {
+          "level": "LOW"
+        }
+      },
+      "intents": [
+        {
+          "name": "PlayStationIntent",
+          "slots": [
+            {
+              "name": "station",
+              "type": "HIFI_STATION"
+            }
+          ],
+          "samples": [
+            "play {station}",
+            "play {station} radio",
+            "play the {station} station",
+            "put on {station}",
+            "tune to {station}",
+            "tune in to {station}",
+            "switch to {station}",
+            "change to {station}",
+            "go to {station}",
+            "start {station}",
+            "i want {station}",
+            "i want to hear {station}",
+            "something {station}",
+            "play something {station}",
+            "play some {station}",
+            "listen to {station}",
+            "{station} please",
+            "{station} station",
+            "{station}"
+          ]
+        },
+        {
+          "name": "PlayAnythingIntent",
+          "slots": [],
+          "samples": [
+            "play",
+            "play radio",
+            "play something",
+            "play anything",
+            "start",
+            "start playing",
+            "turn on",
+            "turn on the radio",
+            "resume radio",
+            "keep playing",
+            "play my station",
+            "play where i left off"
+          ]
+        },
+        {
+          "name": "WhatsPlayingIntent",
+          "slots": [],
+          "samples": [
+            "what is playing",
+            "what's playing",
+            "what is this",
+            "what's this",
+            "what song is this",
+            "who is this",
+            "who's this",
+            "who sings this",
+            "what is this song",
+            "what's this song",
+            "what am i listening to",
+            "what station is this",
+            "which station is this",
+            "what is on",
+            "what's on",
+            "what is the song",
+            "what's the song",
+            "song name",
+            "what song is playing",
+            "tell me the song",
+            "now playing"
+          ]
+        },
+        {
+          "name": "ListStationsIntent",
+          "slots": [],
+          "samples": [
+            "list stations",
+            "list the stations",
+            "what stations are there",
+            "what stations do you have",
+            "which stations are there",
+            "what can i listen to",
+            "what are my options",
+            "stations"
+          ]
+        },
+        {
+          "name": "NextStationIntent",
+          "slots": [],
+          "samples": [
+            "next station",
+            "another station",
+            "something else",
+            "skip station",
+            "skip this station",
+            "change the station",
+            "change station",
+            "move along the dial",
+            "skip",
+            "skip it",
+            "next one",
+            "forward",
+            "go forward",
+            "forward one"
+          ]
+        },
+        {
+          "name": "PreviousStationIntent",
+          "slots": [],
+          "samples": [
+            "previous station",
+            "last station",
+            "go back a station",
+            "back a station",
+            "the station before",
+            "back",
+            "go back",
+            "back one",
+            "go back one",
+            "previous one",
+            "the one before"
+          ]
+        },
+        {
+          "name": "VideoOffIntent",
+          "slots": [],
+          "samples": [
+            "audio only",
+            "just audio",
+            "radio only",
+            "just the radio",
+            "no video",
+            "turn off the video",
+            "turn the video off",
+            "stop the video",
+            "hide the video",
+            "video off",
+            "turn off hifi tv"
+          ]
+        },
+        {
+          "name": "VideoOnIntent",
+          "slots": [],
+          "samples": [
+            "show the video",
+            "show video",
+            "show the videos",
+            "turn on the video",
+            "turn the video on",
+            "video on",
+            "hifi tv",
+            "turn on hifi tv",
+            "show hifi tv",
+            "with video"
+          ]
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ResumeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PauseIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StartOverIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.RepeatIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.LoopOnIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.LoopOffIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ShuffleOnIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ShuffleOffIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "name": "HIFI_STATION",
+          "values": [
+            {
+              "id": "radio-paradise",
+              "name": {
+                "value": "radio paradise",
+                "synonyms": [
+                  "paradise",
+                  "variety",
+                  "blues",
+                  "hand picked",
+                  "independent",
+                  "bill goldsmith",
+                  "best of everything",
+                  "discovery",
+                  "old favorites",
+                  "grown up",
+                  "thoughtful",
+                  "free form",
+                  "freeform",
+                  "album rock",
+                  "triple a"
+                ]
+              }
+            },
+            {
+              "id": "boot-liquor",
+              "name": {
+                "value": "boot liquor",
+                "synonyms": [
+                  "americana",
+                  "alt country",
+                  "roots rock",
+                  "bluegrass",
+                  "twang",
+                  "outlaw country",
+                  "classic country",
+                  "honky tonk",
+                  "western",
+                  "cowboy",
+                  "acoustic",
+                  "pedal steel",
+                  "fiddle",
+                  "banjo",
+                  "whiskey",
+                  "bourbon",
+                  "liquor",
+                  "saloon",
+                  "nashville",
+                  "austin",
+                  "johnny cash",
+                  "willie nelson",
+                  "sturgill simpson",
+                  "jason isbell",
+                  "lucinda williams",
+                  "steve earle",
+                  "drinking",
+                  "heartbreak",
+                  "truck",
+                  "porch"
+                ]
+              }
+            },
+            {
+              "id": "sonic-universe",
+              "name": {
+                "value": "sonic universe",
+                "synonyms": [
+                  "chill jazz",
+                  "modern jazz",
+                  "nu jazz",
+                  "nujazz",
+                  "contemporary jazz",
+                  "avant garde",
+                  "experimental",
+                  "cosmic",
+                  "spacey",
+                  "space",
+                  "universe",
+                  "sonic",
+                  "improvisation",
+                  "ecm",
+                  "coltrane",
+                  "sophisticated"
+                ]
+              }
+            },
+            {
+              "id": "indie-pop-rocks",
+              "name": {
+                "value": "indie pop rocks",
+                "synonyms": [
+                  "indie pop",
+                  "alt rock",
+                  "new releases",
+                  "guitar pop",
+                  "college rock",
+                  "twee",
+                  "jangle",
+                  "jangle pop",
+                  "lo fi rock",
+                  "shoegaze",
+                  "dream pop",
+                  "catchy",
+                  "hooks",
+                  "2000s indie",
+                  "pitchfork",
+                  "sxsw",
+                  "s. x. s. w.",
+                  "arcade fire",
+                  "vampire weekend",
+                  "phoenix",
+                  "the strokes",
+                  "death cab",
+                  "modest mouse",
+                  "spoon"
+                ]
+              }
+            },
+            {
+              "id": "pop-girl",
+              "name": {
+                "value": "pop girl radio",
+                "synonyms": [
+                  "pop girl",
+                  "pop music",
+                  "pop hits",
+                  "top40",
+                  "top forty",
+                  "girl pop",
+                  "taylor swift",
+                  "taylor",
+                  "swift",
+                  "swiftie",
+                  "swifties",
+                  "eras",
+                  "ariana grande",
+                  "dua lipa",
+                  "olivia rodrigo",
+                  "sabrina carpenter",
+                  "billie eilish",
+                  "chappell roan",
+                  "lady gaga",
+                  "katy perry",
+                  "beyonce",
+                  "rihanna",
+                  "miley cyrus",
+                  "selena gomez",
+                  "lorde",
+                  "charli xcx",
+                  "charli x. c. x.",
+                  "big choruses",
+                  "bubblegum",
+                  "divas",
+                  "pop princess",
+                  "exclusive radio"
+                ]
+              }
+            },
+            {
+              "id": "working-for-the-weekend",
+              "name": {
+                "value": "working for the weekend",
+                "synonyms": [
+                  "work music",
+                  "concentration",
+                  "productivity",
+                  "desk",
+                  "flow",
+                  "groove",
+                  "grooves",
+                  "relaxed",
+                  "laid back",
+                  "afternoon",
+                  "friday",
+                  "monday",
+                  "no distractions",
+                  "zen",
+                  "groove salad"
+                ]
+              }
+            },
+            {
+              "id": "lofi-beats",
+              "name": {
+                "value": "lo fi beats to work to",
+                "synonyms": [
+                  "lofi beats to work to",
+                  "lo fi",
+                  "lofi beats",
+                  "lofi hip hop",
+                  "instrumental hip hop",
+                  "boom bap",
+                  "liquid",
+                  "liquid beats",
+                  "chillhop",
+                  "jazzhop",
+                  "jazz hop",
+                  "study beats",
+                  "homework",
+                  "vinyl crackle",
+                  "nujabes",
+                  "j dilla",
+                  "lofi girl",
+                  "beat blender"
+                ]
+              }
+            },
+            {
+              "id": "code-all-night",
+              "name": {
+                "value": "code all night",
+                "synonyms": [
+                  "code",
+                  "programming",
+                  "programmer",
+                  "developer",
+                  "dev",
+                  "hacker",
+                  "hacking",
+                  "hackathon",
+                  "software",
+                  "engineering",
+                  "computer",
+                  "terminal",
+                  "keyboard",
+                  "dark",
+                  "dark electronic",
+                  "steady",
+                  "idm",
+                  "glitch",
+                  "industrial",
+                  "cyberpunk",
+                  "matrix",
+                  "all night",
+                  "all nighter",
+                  "night shift",
+                  "caffeine",
+                  "defcon",
+                  "def con"
+                ]
+              }
+            },
+            {
+              "id": "y2k-chill-out",
+              "name": {
+                "value": "y2k chill out",
+                "synonyms": [
+                  "y two k chill out",
+                  "two thousand chill out",
+                  "y2k chill",
+                  "y2k",
+                  "2000",
+                  "two thousand",
+                  "early 2000s",
+                  "millennium",
+                  "classic chillout",
+                  "throwback",
+                  "ibiza",
+                  "cafe del mar",
+                  "buddha bar",
+                  "hotel costes",
+                  "thievery corporation",
+                  "zero 7",
+                  "zero seven",
+                  "air",
+                  "morcheeba",
+                  "massive attack",
+                  "groove armada",
+                  "royksopp",
+                  "kruder dorfmeister",
+                  "boards of canada",
+                  "spa",
+                  "illinois street lounge"
+                ]
+              }
+            },
+            {
+              "id": "soulful-christmas",
+              "name": {
+                "value": "soulful christmas",
+                "synonyms": [
+                  "soulful",
+                  "rhythm and blues",
+                  "stax",
+                  "seventies",
+                  "classic christmas",
+                  "otis redding",
+                  "james brown",
+                  "jackson 5",
+                  "jackson five",
+                  "stevie wonder",
+                  "donny hathaway",
+                  "temptations",
+                  "supremes",
+                  "marvin gaye",
+                  "al green",
+                  "groovy",
+                  "warm",
+                  "jolly ol soul"
+                ]
+              }
+            },
+            {
+              "id": "christmas-at-the-mall",
+              "name": {
+                "value": "christmas at the mall",
+                "synonyms": [
+                  "strings",
+                  "orchestra",
+                  "orchestral",
+                  "symphonic",
+                  "no singing",
+                  "harp",
+                  "bells",
+                  "elevator music",
+                  "muzak",
+                  "department store",
+                  "mall",
+                  "shopping",
+                  "background",
+                  "dinner party",
+                  "office party",
+                  "50s",
+                  "5. 0. s.",
+                  "mantovani",
+                  "percy faith",
+                  "ray conniff",
+                  "classy",
+                  "department store christmas"
+                ]
+              }
+            },
+            {
+              "id": "fireside-christmas",
+              "name": {
+                "value": "fireside christmas",
+                "synonyms": [
+                  "fireside",
+                  "fireplace",
+                  "fire",
+                  "cocoa",
+                  "hot chocolate",
+                  "eggnog",
+                  "cocktail",
+                  "cocktail hour",
+                  "swing",
+                  "jazzy",
+                  "crooners",
+                  "bossa nova",
+                  "exotica",
+                  "tiki",
+                  "snow",
+                  "christmas lounge",
+                  "cocoa lounge"
+                ]
+              }
+            },
+            {
+              "id": "rockin-around-the-tree",
+              "name": {
+                "value": "rockin around the tree",
+                "synonyms": [
+                  "tree",
+                  "christmas tree",
+                  "rockin",
+                  "rocking",
+                  "pop punk",
+                  "guitars",
+                  "loud",
+                  "ugly sweater",
+                  "the ramones",
+                  "the killers",
+                  "weezer",
+                  "she and him",
+                  "low",
+                  "julian casablancas",
+                  "christmas rocks"
+                ]
+              }
+            },
+            {
+              "id": "rds",
+              "name": {
+                "value": "rds",
+                "synonyms": [
+                  "r. d. s.",
+                  "radio dimensione suono",
+                  "dimensione suono",
+                  "100 grandi successi",
+                  "one hundred grandi successi",
+                  "grandi successi",
+                  "italiana",
+                  "rome",
+                  "roma",
+                  "italian radio",
+                  "radio italiana",
+                  "italian pop",
+                  "pop italiano",
+                  "musica italiana",
+                  "italian hits",
+                  "euro pop",
+                  "sanremo",
+                  "estate",
+                  "vacation",
+                  "aperitivo",
+                  "dolce vita",
+                  "espresso"
+                ]
+              }
+            },
+            {
+              "id": "late-night-jazz",
+              "name": {
+                "value": "late night jazz",
+                "synonyms": [
+                  "late night",
+                  "dark academia jazz",
+                  "books",
+                  "tenor sax",
+                  "1950s",
+                  "1960s",
+                  "fifties",
+                  "ben webster",
+                  "dexter gordon",
+                  "stan getz",
+                  "hank mobley",
+                  "keith jarrett",
+                  "oscar peterson",
+                  "candlelight",
+                  "whisky",
+                  "nightcap",
+                  "wind down",
+                  "ella radio"
+                ]
+              }
+            },
+            {
+              "id": "z100",
+              "name": {
+                "value": "z100",
+                "synonyms": [
+                  "z one hundred",
+                  "new york",
+                  "whtz",
+                  "w. h. t. z.",
+                  "nyc",
+                  "new york city",
+                  "manhattan",
+                  "elvis duran",
+                  "jingle ball"
+                ]
+              }
+            },
+            {
+              "id": "kiis-fm",
+              "name": {
+                "value": "kiss fm",
+                "synonyms": [
+                  "kiis fm",
+                  "102.7",
+                  "one oh two point seven",
+                  "one oh two seven",
+                  "l a",
+                  "hollywood",
+                  "ryan seacrest"
+                ]
+              }
+            },
+            {
+              "id": "kiss-fm-chicago",
+              "name": {
+                "value": "103.5 kiss fm",
+                "synonyms": [
+                  "one oh three point five kiss fm",
+                  "one oh three five kiss fm",
+                  "one hundred three point five kiss fm",
+                  "one hundred three five kiss fm",
+                  "kiss fm",
+                  "kiss fm chicago",
+                  "chicago",
+                  "wksc",
+                  "w. k. s. c.",
+                  "103.5",
+                  "one oh three point five",
+                  "one oh three five",
+                  "illinois",
+                  "windy city",
+                  "midwest"
+                ]
+              }
+            },
+            {
+              "id": "kiss-fm-dallas",
+              "name": {
+                "value": "106.1 kiss fm",
+                "synonyms": [
+                  "one oh six point one kiss fm",
+                  "one oh six one kiss fm",
+                  "one hundred six point one kiss fm",
+                  "one hundred six one kiss fm",
+                  "kiss fm",
+                  "kiss fm dallas",
+                  "dallas",
+                  "khks",
+                  "k. h. k. s.",
+                  "106.1",
+                  "one oh six point one",
+                  "one oh six one",
+                  "fort worth",
+                  "dfw",
+                  "d. f. w.",
+                  "kidd kraddick"
+                ]
+              }
+            },
+            {
+              "id": "wild-949",
+              "name": {
+                "value": "wild 94.9",
+                "synonyms": [
+                  "wild ninety four point nine",
+                  "wild ninety four nine",
+                  "wild",
+                  "wild san francisco",
+                  "san francisco",
+                  "kyld",
+                  "94.9",
+                  "ninety four point nine",
+                  "ninety four nine",
+                  "bay area",
+                  "the bay",
+                  "oakland",
+                  "san jose",
+                  "norcal",
+                  "wild 949",
+                  "wild nine forty nine"
+                ]
+              }
+            },
+            {
+              "id": "krbe",
+              "name": {
+                "value": "104.1 krbe",
+                "synonyms": [
+                  "104.1 k. r. b. e.",
+                  "one oh four point one krbe",
+                  "one oh four point one k. r. b. e.",
+                  "one oh four one krbe",
+                  "one oh four one k. r. b. e.",
+                  "one hundred four point one krbe",
+                  "one hundred four point one k. r. b. e.",
+                  "one hundred four one krbe",
+                  "one hundred four one k. r. b. e.",
+                  "krbe",
+                  "k. r. b. e.",
+                  "krbe houston",
+                  "houston",
+                  "104.1",
+                  "one oh four point one",
+                  "one oh four one",
+                  "h town",
+                  "gulf coast"
+                ]
+              }
+            },
+            {
+              "id": "hot-995",
+              "name": {
+                "value": "hot 99.5",
+                "synonyms": [
+                  "hot ninety nine point five",
+                  "hot ninety nine five",
+                  "hot",
+                  "hot washington d c",
+                  "washington d c",
+                  "wiht",
+                  "99.5",
+                  "ninety nine point five",
+                  "ninety nine five",
+                  "dc",
+                  "d. c.",
+                  "d c",
+                  "dmv",
+                  "d. m. v.",
+                  "maryland",
+                  "virginia",
+                  "hot 995",
+                  "hot nine ninety five"
+                ]
+              }
+            },
+            {
+              "id": "power-961",
+              "name": {
+                "value": "power 96.1",
+                "synonyms": [
+                  "power ninety six point one",
+                  "power ninety six one",
+                  "power",
+                  "power atlanta",
+                  "atlanta",
+                  "wwpw",
+                  "w. w. p. w.",
+                  "georgia",
+                  "atl",
+                  "the south",
+                  "power 961",
+                  "power nine sixty one"
+                ]
+              }
+            },
+            {
+              "id": "q102",
+              "name": {
+                "value": "q102",
+                "synonyms": [
+                  "q one oh two",
+                  "q one hundred two",
+                  "q one hundred and two",
+                  "philadelphia",
+                  "wioq",
+                  "q 102",
+                  "102.1",
+                  "one oh two point one",
+                  "one oh two one",
+                  "philly",
+                  "pennsylvania",
+                  "jersey"
+                ]
+              }
+            },
+            {
+              "id": "kiss-108",
+              "name": {
+                "value": "kiss 108",
+                "synonyms": [
+                  "kiss one oh eight",
+                  "kiss one hundred eight",
+                  "kiss one hundred and eight",
+                  "kiss",
+                  "kiss boston",
+                  "boston",
+                  "wxks",
+                  "w. x. k. s.",
+                  "107.9",
+                  "one oh seven point nine",
+                  "one oh seven nine",
+                  "massachusetts",
+                  "new england"
+                ]
+              }
+            },
+            {
+              "id": "jazz24",
+              "name": {
+                "value": "jazz24",
+                "synonyms": [
+                  "jazz twenty four",
+                  "jazz standards",
+                  "great american songbook",
+                  "acoustic jazz",
+                  "straight ahead",
+                  "bebop",
+                  "vocal jazz",
+                  "john coltrane",
+                  "stanley turrentine",
+                  "ella fitzgerald",
+                  "knkx",
+                  "k. n. k. x."
+                ]
+              }
+            },
+            {
+              "id": "heart",
+              "name": {
+                "value": "heart",
+                "synonyms": [
+                  "heart radio",
+                  "heart fm",
+                  "heart uk",
+                  "drive time",
+                  "family",
+                  "kitchen"
+                ]
+              }
+            },
+            {
+              "id": "capital",
+              "name": {
+                "value": "capital",
+                "synonyms": [
+                  "capital radio",
+                  "capital london",
+                  "big top 40",
+                  "big top forty",
+                  "summertime ball",
+                  "jingle bell ball"
+                ]
+              }
+            },
+            {
+              "id": "1live",
+              "name": {
+                "value": "1live",
+                "synonyms": [
+                  "one live",
+                  "einslive",
+                  "eins live",
+                  "1 live",
+                  "wdr",
+                  "w. d. r.",
+                  "wdr 1live",
+                  "wdr one live",
+                  "w. d. r. 1live",
+                  "cologne",
+                  "koln",
+                  "nrw",
+                  "n. r. w.",
+                  "north rhine westphalia",
+                  "ruhr",
+                  "neue musik"
+                ]
+              }
+            },
+            {
+              "id": "swr3",
+              "name": {
+                "value": "swr3",
+                "synonyms": [
+                  "s. w. r. three",
+                  "swr 3",
+                  "swr three",
+                  "s. w. r. 3",
+                  "swr",
+                  "s. w. r.",
+                  "sudwestrundfunk",
+                  "baden baden",
+                  "mainz",
+                  "rheinland pfalz",
+                  "black forest",
+                  "schwarzwald",
+                  "new pop festival",
+                  "elch",
+                  "comedy"
+                ]
+              }
+            },
+            {
+              "id": "nrj",
+              "name": {
+                "value": "nrj",
+                "synonyms": [
+                  "n. r. j.",
+                  "energie",
+                  "nrj france",
+                  "n. r. j. france",
+                  "nrj paris",
+                  "n. r. j. paris",
+                  "francaise",
+                  "french radio",
+                  "radio francaise",
+                  "hit music only",
+                  "french rap",
+                  "nrj music awards",
+                  "n. r. j. music awards",
+                  "riviera"
+                ]
+              }
+            },
+            {
+              "id": "los40",
+              "name": {
+                "value": "los40",
+                "synonyms": [
+                  "los forty",
+                  "los 40",
+                  "40 principales",
+                  "forty principales",
+                  "cuarenta principales",
+                  "spanish radio",
+                  "radio espanola"
+                ]
+              }
+            },
+            {
+              "id": "qmusic",
+              "name": {
+                "value": "qmusic",
+                "synonyms": [
+                  "q music",
+                  "qmusic nl",
+                  "qmusic n. l.",
+                  "qmusic nederland",
+                  "nederlands",
+                  "dutch radio",
+                  "nederlandse radio",
+                  "dutch pop",
+                  "nederpop",
+                  "het foute uur",
+                  "foute uur",
+                  "dpg media",
+                  "d. p. g. media",
+                  "cycling",
+                  "tulips"
+                ]
+              }
+            },
+            {
+              "id": "studio-brussel",
+              "name": {
+                "value": "studio brussel",
+                "synonyms": [
+                  "stubru",
+                  "stu bru",
+                  "studio brussels",
+                  "vrt",
+                  "v. r. t.",
+                  "belgium",
+                  "belgie",
+                  "belgique",
+                  "belgian",
+                  "flanders",
+                  "vlaanderen",
+                  "flemish",
+                  "brussels",
+                  "brussel",
+                  "ghent",
+                  "antwerp",
+                  "belgian radio",
+                  "de afrekening",
+                  "rock werchter",
+                  "pukkelpop"
+                ]
+              }
+            },
+            {
+              "id": "sr-p3",
+              "name": {
+                "value": "sveriges radio p3",
+                "synonyms": [
+                  "sveriges radio p three",
+                  "sveriges p3",
+                  "sveriges radio",
+                  "sr p3",
+                  "sr p three",
+                  "s. r. p3",
+                  "p3",
+                  "p three",
+                  "p3 sweden",
+                  "p three sweden",
+                  "sr",
+                  "s. r.",
+                  "sweden",
+                  "sverige",
+                  "swedish",
+                  "svenska",
+                  "svensk",
+                  "stockholm",
+                  "gothenburg",
+                  "malmo",
+                  "swedish radio",
+                  "svensk radio",
+                  "swedish pop",
+                  "svensk pop",
+                  "ny musik",
+                  "midsummer",
+                  "p3 guld",
+                  "p three guld"
+                ]
+              }
+            },
+            {
+              "id": "nrk-p3",
+              "name": {
+                "value": "nrk p3",
+                "synonyms": [
+                  "nrk p three",
+                  "n. r. k. p3",
+                  "n. r. k. p three",
+                  "nrk",
+                  "n. r. k.",
+                  "p3 norway",
+                  "p three norway",
+                  "p3 norge",
+                  "p three norge",
+                  "p3 no",
+                  "p three no",
+                  "norway",
+                  "norge",
+                  "norwegian",
+                  "norsk",
+                  "oslo",
+                  "bergen",
+                  "trondheim",
+                  "troms",
+                  "norwegian radio",
+                  "norsk radio",
+                  "norwegian pop",
+                  "norsk pop",
+                  "ny musikk",
+                  "ur rt",
+                  "ur r. t.",
+                  "fjords",
+                  "northern lights"
+                ]
+              }
+            },
+            {
+              "id": "nova-denmark",
+              "name": {
+                "value": "nova",
+                "synonyms": [
+                  "nova fm",
+                  "nova denmark",
+                  "nova danmark",
+                  "radio nova",
+                  "denmark",
+                  "danmark",
+                  "danish",
+                  "dansk",
+                  "copenhagen",
+                  "k benhavn",
+                  "kobenhavn",
+                  "aarhus",
+                  "danish radio",
+                  "dansk radio",
+                  "danish pop",
+                  "dansk pop",
+                  "hygge",
+                  "bicycle"
+                ]
+              }
+            },
+            {
+              "id": "ylex",
+              "name": {
+                "value": "ylex",
+                "synonyms": [
+                  "yle x",
+                  "yle",
+                  "yleisradio",
+                  "finland",
+                  "suomi",
+                  "finnish",
+                  "suomalainen",
+                  "suomeksi",
+                  "helsinki",
+                  "tampere",
+                  "turku",
+                  "finnish radio",
+                  "suomalainen radio",
+                  "finnish pop",
+                  "suomipop",
+                  "finnish rock",
+                  "suomirock",
+                  "metal",
+                  "uusi musiikki",
+                  "sauna",
+                  "midnight sun"
+                ]
+              }
+            },
+            {
+              "id": "rte-2fm",
+              "name": {
+                "value": "rte 2fm",
+                "synonyms": [
+                  "rte two fm",
+                  "r. t. e. 2fm",
+                  "r. t. e. two fm",
+                  "2fm",
+                  "two fm",
+                  "2 fm",
+                  "rte",
+                  "r. t. e.",
+                  "rte radio",
+                  "r. t. e. radio",
+                  "ireland",
+                  "eire",
+                  "irish",
+                  "dublin",
+                  "cork",
+                  "galway",
+                  "irish radio",
+                  "irish music",
+                  "new irish music",
+                  "chat",
+                  "craic",
+                  "celtic",
+                  "emerald isle",
+                  "pub"
+                ]
+              }
+            },
+            {
+              "id": "rmf-fm",
+              "name": {
+                "value": "rmf fm",
+                "synonyms": [
+                  "r. m. f. fm",
+                  "rmf",
+                  "r. m. f.",
+                  "radio rmf",
+                  "radio r. m. f.",
+                  "rmf maxxx",
+                  "r. m. f. maxxx",
+                  "poland",
+                  "polska",
+                  "polish",
+                  "polski",
+                  "polskie",
+                  "krakow",
+                  "cracow",
+                  "warsaw",
+                  "warszawa",
+                  "polish radio",
+                  "polskie radio",
+                  "przeboje",
+                  "polish pop",
+                  "polski pop",
+                  "fakty",
+                  "central europe",
+                  "tatra",
+                  "baltic"
+                ]
+              }
+            },
+            {
+              "id": "srf-3",
+              "name": {
+                "value": "radio srf 3",
+                "synonyms": [
+                  "radio srf three",
+                  "radio s. r. f. 3",
+                  "radio s. r. f. three",
+                  "srf 3",
+                  "radio srf",
+                  "radio s. r. f.",
+                  "radio srf zurich",
+                  "srf three",
+                  "s. r. f. 3",
+                  "srf3",
+                  "s. r. f. three",
+                  "srf",
+                  "s. r. f.",
+                  "drs 3",
+                  "drs three",
+                  "d. r. s. 3",
+                  "drs3",
+                  "d. r. s. three",
+                  "srg ssr",
+                  "srg s. s. r.",
+                  "s. r. g. ssr",
+                  "switzerland",
+                  "schweiz",
+                  "suisse",
+                  "svizzera",
+                  "swiss",
+                  "swiss german",
+                  "schweizerdeutsch",
+                  "zurich",
+                  "bern",
+                  "basel",
+                  "swiss radio",
+                  "schweizer radio",
+                  "swiss music",
+                  "mundart",
+                  "alps",
+                  "alpine",
+                  "mountains",
+                  "ski"
+                ]
+              }
+            },
+            {
+              "id": "radio-comercial",
+              "name": {
+                "value": "radio comercial",
+                "synonyms": [
+                  "comercial",
+                  "rc",
+                  "r. c.",
+                  "portugal",
+                  "portuguesa",
+                  "lisbon",
+                  "lisboa",
+                  "porto",
+                  "algarve",
+                  "portuguese radio",
+                  "radio portuguesa",
+                  "portuguese pop",
+                  "pop portugues",
+                  "manhas da comercial",
+                  "tram"
+                ]
+              }
+            },
+            {
+              "id": "power-turk",
+              "name": {
+                "value": "power turk",
+                "synonyms": [
+                  "powerturk",
+                  "power fm",
+                  "turkey",
+                  "turkiye",
+                  "turkish",
+                  "turkce",
+                  "turk",
+                  "istanbul",
+                  "ankara",
+                  "izmir",
+                  "turkish radio",
+                  "turk radyo",
+                  "radyo",
+                  "turkish pop",
+                  "turkce pop",
+                  "turk pop",
+                  "arabesk",
+                  "tarkan",
+                  "sezen aksu",
+                  "bosphorus",
+                  "bogaz",
+                  "aegean",
+                  "anatolia"
+                ]
+              }
+            },
+            {
+              "id": "kexp",
+              "name": {
+                "value": "kexp",
+                "synonyms": [
+                  "k. e. x. p.",
+                  "kexp 90.3",
+                  "kexp ninety point three",
+                  "kexp ninety three",
+                  "kexp seattle",
+                  "k. e. x. p. seattle",
+                  "90.3",
+                  "ninety point three",
+                  "ninety three",
+                  "washington",
+                  "pacific northwest",
+                  "pnw",
+                  "p. n. w.",
+                  "new bands",
+                  "live sessions",
+                  "grunge"
+                ]
+              }
+            },
+            {
+              "id": "kcrw",
+              "name": {
+                "value": "kcrw",
+                "synonyms": [
+                  "k. c. r. w.",
+                  "kcrw 89.9",
+                  "kcrw eighty nine point nine",
+                  "kcrw eighty nine nine",
+                  "89.9",
+                  "eighty nine point nine",
+                  "eighty nine nine",
+                  "santa monica",
+                  "west coast",
+                  "npr",
+                  "n. p. r.",
+                  "morning becomes eclectic",
+                  "palm trees",
+                  "pacific coast highway"
+                ]
+              }
+            },
+            {
+              "id": "cbc-music",
+              "name": {
+                "value": "cbc music",
+                "synonyms": [
+                  "c. b. c. music",
+                  "cbc",
+                  "c. b. c.",
+                  "cbc radio",
+                  "c. b. c. radio",
+                  "cbc radio 2",
+                  "cbc radio two",
+                  "c. b. c. radio 2",
+                  "radio 2",
+                  "radio two",
+                  "cbc toronto",
+                  "c. b. c. toronto",
+                  "canadien",
+                  "vancouver",
+                  "montreal",
+                  "canadian radio",
+                  "canadian music",
+                  "canadian artists",
+                  "cancon",
+                  "classical",
+                  "maple",
+                  "rockies"
+                ]
+              }
+            },
+            {
+              "id": "exa-fm",
+              "name": {
+                "value": "exa fm",
+                "synonyms": [
+                  "exa",
+                  "exa 104.9",
+                  "exa one oh four point nine",
+                  "exa one oh four nine",
+                  "xhexa",
+                  "104.9",
+                  "one oh four point nine",
+                  "one oh four nine",
+                  "mexicano",
+                  "mexicana",
+                  "mexican radio",
+                  "radio mexicana",
+                  "urbano",
+                  "regional",
+                  "mvs",
+                  "m. v. s.",
+                  "latino"
+                ]
+              }
+            },
+            {
+              "id": "antena-1",
+              "name": {
+                "value": "antena 1",
+                "synonyms": [
+                  "antena one",
+                  "antena",
+                  "antena sao paulo",
+                  "antena1",
+                  "antena um",
+                  "antena 1 fm",
+                  "antena one fm",
+                  "94.7",
+                  "ninety four point seven",
+                  "ninety four seven",
+                  "brasileira",
+                  "brazilian radio",
+                  "radio brasileira",
+                  "international pop",
+                  "classics",
+                  "flashback"
+                ]
+              }
+            },
+            {
+              "id": "la-100",
+              "name": {
+                "value": "la 100",
+                "synonyms": [
+                  "la one hundred",
+                  "la100",
+                  "la cien",
+                  "fm 100",
+                  "fm one hundred",
+                  "fm 99.9",
+                  "fm ninety nine point nine",
+                  "fm ninety nine nine",
+                  "cienradios",
+                  "argentina",
+                  "argentine",
+                  "argentinian",
+                  "argentino",
+                  "argentina radio",
+                  "buenos aires",
+                  "porteno",
+                  "radio argentina",
+                  "rock nacional",
+                  "hosts",
+                  "clarin",
+                  "tango",
+                  "pampas"
+                ]
+              }
+            },
+            {
+              "id": "tropicana",
+              "name": {
+                "value": "tropicana",
+                "synonyms": [
+                  "tropicana fm",
+                  "tropicana estereo",
+                  "tropi",
+                  "colombia",
+                  "colombian",
+                  "colombiano",
+                  "colombiana",
+                  "bogota",
+                  "medellin",
+                  "cali",
+                  "cartagena",
+                  "colombian radio",
+                  "radio colombiana",
+                  "salsa",
+                  "merengue",
+                  "vallenato",
+                  "bachata",
+                  "latin",
+                  "latin dance",
+                  "caracol",
+                  "caribbean"
+                ]
+              }
+            },
+            {
+              "id": "rock-and-pop",
+              "name": {
+                "value": "rock and pop",
+                "synonyms": [
+                  "rockandpop",
+                  "rock y pop",
+                  "94.1",
+                  "ninety four point one",
+                  "ninety four one",
+                  "chile",
+                  "chilean",
+                  "chileno",
+                  "chilena",
+                  "santiago",
+                  "santiago de chile",
+                  "valparaiso",
+                  "chilean radio",
+                  "radio chilena",
+                  "rock en espanol",
+                  "rock latino",
+                  "los prisioneros",
+                  "soda stereo",
+                  "andes",
+                  "iberoamericana"
+                ]
+              }
+            },
+            {
+              "id": "triple-j",
+              "name": {
+                "value": "triple j",
+                "synonyms": [
+                  "triplej",
+                  "jjj",
+                  "j. j. j.",
+                  "2jjj",
+                  "two jjj",
+                  "abc triple j",
+                  "abc",
+                  "oz",
+                  "australian radio",
+                  "australian music",
+                  "aussie bands",
+                  "hottest 100",
+                  "hottest one hundred",
+                  "like a version",
+                  "unearthed",
+                  "outback"
+                ]
+              }
+            },
+            {
+              "id": "the-edge",
+              "name": {
+                "value": "the edge",
+                "synonyms": [
+                  "edge",
+                  "the edge nz",
+                  "the edge n. z.",
+                  "edge fm",
+                  "mediaworks",
+                  "rova",
+                  "new zealand",
+                  "nz",
+                  "n. z.",
+                  "aotearoa",
+                  "kiwi",
+                  "auckland",
+                  "wellington",
+                  "christchurch",
+                  "new zealand radio",
+                  "nz radio",
+                  "n. z. radio",
+                  "kiwi music",
+                  "oceania",
+                  "bach"
+                ]
+              }
+            },
+            {
+              "id": "kiss92",
+              "name": {
+                "value": "kiss92",
+                "synonyms": [
+                  "kiss ninety two",
+                  "kiss 92",
+                  "kiss92 fm",
+                  "kiss ninety two fm",
+                  "kiss fm singapore",
+                  "92.0",
+                  "ninety two point zero",
+                  "ninety two zero",
+                  "sph",
+                  "s. p. h.",
+                  "sph radio",
+                  "s. p. h. radio",
+                  "singapore",
+                  "singaporean",
+                  "singapura",
+                  "lion city",
+                  "singapore radio",
+                  "sea",
+                  "hawker",
+                  "marina bay"
+                ]
+              }
+            },
+            {
+              "id": "prambors",
+              "name": {
+                "value": "prambors",
+                "synonyms": [
+                  "prambors fm",
+                  "prambors radio",
+                  "prambors jakarta",
+                  "102.2",
+                  "one oh two point two",
+                  "one oh two two",
+                  "indonesia",
+                  "indonesian",
+                  "bahasa",
+                  "bahasa indonesia",
+                  "jakarta",
+                  "bandung",
+                  "surabaya",
+                  "bali",
+                  "indonesian radio",
+                  "radio indonesia",
+                  "indonesian pop",
+                  "pop indonesia",
+                  "indo pop",
+                  "kawula muda"
+                ]
+              }
+            },
+            {
+              "id": "hitz",
+              "name": {
+                "value": "hitz",
+                "synonyms": [
+                  "hitz fm",
+                  "hitz malaysia",
+                  "astro",
+                  "astro radio",
+                  "syok",
+                  "malaysia",
+                  "malaysian",
+                  "kuala lumpur",
+                  "kl",
+                  "k. l.",
+                  "penang",
+                  "johor",
+                  "malay",
+                  "malaysian radio",
+                  "radio malaysia",
+                  "k pop",
+                  "morning crew",
+                  "twin towers"
+                ]
+              }
+            },
+            {
+              "id": "cool-fahrenheit",
+              "name": {
+                "value": "cool fahrenheit",
+                "synonyms": [
+                  "coolfahrenheit",
+                  "cool fahrenheit 93",
+                  "cool fahrenheit ninety three",
+                  "cool 93",
+                  "cool ninety three",
+                  "coolism",
+                  "93 fm",
+                  "ninety three fm",
+                  "thailand",
+                  "thai",
+                  "bangkok",
+                  "krung thep",
+                  "chiang mai",
+                  "phuket",
+                  "thai radio",
+                  "thai pop",
+                  "t pop",
+                  "string"
+                ]
+              }
+            },
+            {
+              "id": "love-radio",
+              "name": {
+                "value": "love radio",
+                "synonyms": [
+                  "love",
+                  "love radio manila",
+                  "90.7 love radio",
+                  "ninety point seven love radio",
+                  "ninety seven love radio",
+                  "90.7",
+                  "ninety point seven",
+                  "ninety seven",
+                  "dzmb",
+                  "d. z. m. b.",
+                  "mbc",
+                  "m. b. c.",
+                  "manila broadcasting",
+                  "philippines",
+                  "pilipinas",
+                  "filipino",
+                  "pinoy",
+                  "filipina",
+                  "tagalog",
+                  "manila",
+                  "metro manila",
+                  "cebu",
+                  "philippine radio",
+                  "opm",
+                  "pinoy pop",
+                  "p pop",
+                  "filipino pop",
+                  "karaoke",
+                  "masa"
+                ]
+              }
+            },
+            {
+              "id": "galgalatz",
+              "name": {
+                "value": "galgalatz",
+                "synonyms": [
+                  "galgalatz radio",
+                  "glglz",
+                  "galgalatz 91.8",
+                  "galgalatz ninety one point eight",
+                  "galgalatz ninety one eight",
+                  "91.8",
+                  "ninety one point eight",
+                  "ninety one eight",
+                  "galatz",
+                  "glz",
+                  "g. l. z.",
+                  "israel",
+                  "israeli",
+                  "hebrew",
+                  "tel aviv",
+                  "jaffa",
+                  "jerusalem",
+                  "haifa",
+                  "israeli radio",
+                  "israeli pop",
+                  "israeli music",
+                  "hebrew pop",
+                  "mizrahi",
+                  "playlist",
+                  "non stop music",
+                  "mediterranean",
+                  "levant"
+                ]
+              }
+            },
+            {
+              "id": "metro-fm",
+              "name": {
+                "value": "metro fm",
+                "synonyms": [
+                  "metrofm",
+                  "metro fm sa",
+                  "sabc",
+                  "sabc radio",
+                  "south africa",
+                  "south african",
+                  "mzansi",
+                  "johannesburg",
+                  "joburg",
+                  "jozi",
+                  "soweto",
+                  "cape town",
+                  "durban",
+                  "south african radio",
+                  "sa house",
+                  "kwaito",
+                  "gqom",
+                  "afro soul",
+                  "southern africa"
+                ]
+              }
+            },
+            {
+              "id": "cool-fm",
+              "name": {
+                "value": "cool fm",
+                "synonyms": [
+                  "coolfm",
+                  "cool fm lagos",
+                  "cool fm nigeria",
+                  "cool 96.9",
+                  "cool ninety six point nine",
+                  "cool ninety six nine",
+                  "nigeria",
+                  "nigerian",
+                  "naija",
+                  "lagos",
+                  "eko",
+                  "abuja",
+                  "port harcourt",
+                  "pidgin",
+                  "nigerian radio",
+                  "afrobeat",
+                  "afro pop",
+                  "burna boy",
+                  "wizkid",
+                  "davido",
+                  "west africa"
+                ]
+              }
+            },
+            {
+              "id": "capital-fm-kenya",
+              "name": {
+                "value": "capital fm kenya",
+                "synonyms": [
+                  "capital fm",
+                  "capital fm nairobi",
+                  "98.4 capital fm",
+                  "ninety eight point four capital fm",
+                  "ninety eight four capital fm",
+                  "98.4",
+                  "ninety eight point four",
+                  "ninety eight four",
+                  "capital kenya",
+                  "kenya",
+                  "kenyan",
+                  "nairobi",
+                  "mombasa",
+                  "kisumu",
+                  "swahili",
+                  "kiswahili",
+                  "kenyan radio",
+                  "gengetone",
+                  "kenyan music",
+                  "jam",
+                  "east africa",
+                  "safari",
+                  "savannah"
+                ]
+              }
+            },
+            {
+              "id": "hit-radio",
+              "name": {
+                "value": "hit radio",
+                "synonyms": [
+                  "hit",
+                  "hitradio",
+                  "hit radio maroc",
+                  "hit radio morocco",
+                  "100 hits",
+                  "one hundred hits",
+                  "morocco",
+                  "maroc",
+                  "moroccan",
+                  "marocain",
+                  "rabat",
+                  "casablanca",
+                  "marrakech",
+                  "tangier",
+                  "arabic",
+                  "darija",
+                  "moroccan radio",
+                  "radio marocaine",
+                  "moroccan pop",
+                  "moroccan rap",
+                  "rai",
+                  "north africa",
+                  "maghreb"
+                ]
+              }
+            },
+            {
+              "id": "radio-x",
+              "name": {
+                "value": "radio x",
+                "synonyms": [
+                  "xfm",
+                  "x. f. m.",
+                  "britpop",
+                  "oasis",
+                  "arctic monkeys",
+                  "chris moyles"
+                ]
+              }
+            },
+            {
+              "id": "capital-xtra",
+              "name": {
+                "value": "capital xtra",
+                "synonyms": [
+                  "capital extra",
+                  "choice fm",
+                  "dancehall",
+                  "grime"
+                ]
+              }
+            },
+            {
+              "id": "smooth-radio",
+              "name": {
+                "value": "smooth radio",
+                "synonyms": [
+                  "smooth",
+                  "oldies"
+                ]
+              }
+            },
+            {
+              "id": "bayern-3",
+              "name": {
+                "value": "bayern 3",
+                "synonyms": [
+                  "bayern three",
+                  "bayern",
+                  "bayern munich",
+                  "br",
+                  "b. r.",
+                  "bayerischer rundfunk"
+                ]
+              }
+            },
+            {
+              "id": "antenne-bayern",
+              "name": {
+                "value": "antenne bayern",
+                "synonyms": [
+                  "antenne",
+                  "ismaning"
+                ]
+              }
+            },
+            {
+              "id": "ndr-2",
+              "name": {
+                "value": "ndr 2",
+                "synonyms": [
+                  "ndr two",
+                  "n. d. r. 2",
+                  "n. d. r. two",
+                  "ndr",
+                  "n. d. r.",
+                  "ndr hamburg",
+                  "norddeutscher rundfunk",
+                  "north germany",
+                  "norddeutschland",
+                  "hannover",
+                  "kiel",
+                  "bremen"
+                ]
+              }
+            },
+            {
+              "id": "radio-hamburg",
+              "name": {
+                "value": "radio hamburg",
+                "synonyms": [
+                  "hamburg",
+                  "hansestadt",
+                  "alster",
+                  "reeperbahn"
+                ]
+              }
+            },
+            {
+              "id": "rtl-1046",
+              "name": {
+                "value": "104.6 rtl",
+                "synonyms": [
+                  "104.6 r. t. l.",
+                  "one oh four point six rtl",
+                  "one oh four point six r. t. l.",
+                  "one oh four six rtl",
+                  "one oh four six r. t. l.",
+                  "one hundred four point six rtl",
+                  "one hundred four point six r. t. l.",
+                  "one hundred four six rtl",
+                  "one hundred four six r. t. l.",
+                  "rtl",
+                  "r. t. l.",
+                  "rtl berlin",
+                  "104.6",
+                  "one oh four point six",
+                  "one oh four six",
+                  "arno",
+                  "brandenburg",
+                  "rtl 1046",
+                  "rtl ten forty six",
+                  "rtl one oh four six"
+                ]
+              }
+            },
+            {
+              "id": "kiss-fm-berlin",
+              "name": {
+                "value": "98.8 kiss fm",
+                "synonyms": [
+                  "ninety eight point eight kiss fm",
+                  "ninety eight eight kiss fm",
+                  "kiss fm",
+                  "kiss fm berlin",
+                  "98.8",
+                  "ninety eight point eight",
+                  "ninety eight eight"
+                ]
+              }
+            },
+            {
+              "id": "hr3",
+              "name": {
+                "value": "hr3",
+                "synonyms": [
+                  "h. r. three",
+                  "hr",
+                  "h. r.",
+                  "hessischer rundfunk",
+                  "wiesbaden",
+                  "kassel"
+                ]
+              }
+            },
+            {
+              "id": "hit-radio-ffh",
+              "name": {
+                "value": "hit radio ffh",
+                "synonyms": [
+                  "hit radio f. f. h.",
+                  "hit ffh",
+                  "hit radio",
+                  "ffh",
+                  "f. f. h.",
+                  "bad vilbel"
+                ]
+              }
+            },
+            {
+              "id": "bigfm",
+              "name": {
+                "value": "bigfm",
+                "synonyms": [
+                  "big fm",
+                  "mannheim"
+                ]
+              }
+            },
+            {
+              "id": "skyrock",
+              "name": {
+                "value": "skyrock",
+                "synonyms": [
+                  "planete rap",
+                  "difool"
+                ]
+              }
+            },
+            {
+              "id": "fun-radio",
+              "name": {
+                "value": "fun radio",
+                "synonyms": [
+                  "fun",
+                  "david guetta",
+                  "le son dancefloor"
+                ]
+              }
+            },
+            {
+              "id": "rtl2",
+              "name": {
+                "value": "rtl2",
+                "synonyms": [
+                  "r. t. l. two",
+                  "rtl 2",
+                  "rtl two",
+                  "r. t. l. 2"
+                ]
+              }
+            },
+            {
+              "id": "europe-2",
+              "name": {
+                "value": "europe 2",
+                "synonyms": [
+                  "europe two",
+                  "europe",
+                  "europe paris",
+                  "europe2",
+                  "virgin radio",
+                  "nouveautes"
+                ]
+              }
+            },
+            {
+              "id": "rfm",
+              "name": {
+                "value": "rfm",
+                "synonyms": [
+                  "r. f. m.",
+                  "chanson"
+                ]
+              }
+            },
+            {
+              "id": "cadena-100",
+              "name": {
+                "value": "cadena 100",
+                "synonyms": [
+                  "cadena one hundred",
+                  "cadena",
+                  "cadena madrid",
+                  "cadena cien",
+                  "cope"
+                ]
+              }
+            },
+            {
+              "id": "cadena-dial",
+              "name": {
+                "value": "cadena dial",
+                "synonyms": [
+                  "dial",
+                  "en espanol",
+                  "musica en espanol"
+                ]
+              }
+            },
+            {
+              "id": "kiss-fm-spain",
+              "name": {
+                "value": "kiss fm spain",
+                "synonyms": [
+                  "kiss fm",
+                  "kiss espana",
+                  "la mejor musica"
+                ]
+              }
+            },
+            {
+              "id": "flaix-fm",
+              "name": {
+                "value": "flaix fm",
+                "synonyms": [
+                  "flaix",
+                  "flaixbac"
+                ]
+              }
+            },
+            {
+              "id": "rac105",
+              "name": {
+                "value": "rac105",
+                "synonyms": [
+                  "rac one oh five",
+                  "rac one hundred five",
+                  "rac one hundred and five",
+                  "rac 105",
+                  "rac",
+                  "fricando matiner"
+                ]
+              }
+            },
+            {
+              "id": "radio-105",
+              "name": {
+                "value": "radio 105",
+                "synonyms": [
+                  "radio one oh five",
+                  "radio one hundred five",
+                  "radio one hundred and five",
+                  "105",
+                  "one oh five",
+                  "one hundred five",
+                  "centocinque",
+                  "lombardy"
+                ]
+              }
+            },
+            {
+              "id": "radio-kiss-kiss",
+              "name": {
+                "value": "radio kiss kiss",
+                "synonyms": [
+                  "kiss kiss",
+                  "radio kiss",
+                  "naples",
+                  "napoli",
+                  "campania",
+                  "southern italy",
+                  "play everywhere"
+                ]
+              }
+            },
+            {
+              "id": "r101",
+              "name": {
+                "value": "r101",
+                "synonyms": [
+                  "r one oh one",
+                  "r one hundred one",
+                  "r one hundred and one",
+                  "r 101",
+                  "radio 101",
+                  "radio one oh one",
+                  "radio one hundred one"
+                ]
+              }
+            },
+            {
+              "id": "virgin-radio-italy",
+              "name": {
+                "value": "virgin radio italy",
+                "synonyms": [
+                  "virgin italy",
+                  "virgin radio",
+                  "virgin",
+                  "style rock"
+                ]
+              }
+            },
+            {
+              "id": "radio-538",
+              "name": {
+                "value": "radio 538",
+                "synonyms": [
+                  "radio five thirty eight",
+                  "radio fifty three eight",
+                  "radio five three eight",
+                  "538",
+                  "five thirty eight",
+                  "fifty three eight",
+                  "five three eight",
+                  "hilversum"
+                ]
+              }
+            },
+            {
+              "id": "sky-radio",
+              "name": {
+                "value": "sky radio",
+                "synonyms": [
+                  "sky",
+                  "non stop",
+                  "nonstop"
+                ]
+              }
+            },
+            {
+              "id": "slam",
+              "name": {
+                "value": "slam",
+                "synonyms": [
+                  "slam fm",
+                  "hardstyle"
+                ]
+              }
+            },
+            {
+              "id": "kiss-925",
+              "name": {
+                "value": "kiss 92.5",
+                "synonyms": [
+                  "kiss ninety two point five",
+                  "kiss ninety two five",
+                  "kiss",
+                  "kiss toronto",
+                  "ckis",
+                  "92.5",
+                  "ninety two point five",
+                  "ninety two five",
+                  "gta",
+                  "the six",
+                  "rogers",
+                  "kiss 925",
+                  "kiss nine twenty five"
+                ]
+              }
+            },
+            {
+              "id": "kiis-1065",
+              "name": {
+                "value": "kiss 1065",
+                "synonyms": [
+                  "kiss ten sixty five",
+                  "kiss one oh six five",
+                  "kiss one oh six point five",
+                  "kiss",
+                  "kiss sydney",
+                  "kiis 1065",
+                  "kiis ten sixty five",
+                  "kiis one oh six five",
+                  "106.5",
+                  "one oh six point five",
+                  "one oh six five"
+                ]
+              }
+            },
+            {
+              "id": "nova-969",
+              "name": {
+                "value": "nova 96.9",
+                "synonyms": [
+                  "nova ninety six point nine",
+                  "nova ninety six nine",
+                  "nova",
+                  "nova sydney",
+                  "fitzy and wippa",
+                  "nova 969",
+                  "nova nine sixty nine"
+                ]
+              }
+            },
+            {
+              "id": "kiis-1011",
+              "name": {
+                "value": "kiss 101.1",
+                "synonyms": [
+                  "kiss one oh one point one",
+                  "kiss one oh one one",
+                  "kiss one hundred one point one",
+                  "kiss one hundred one one",
+                  "kiss",
+                  "kiss melbourne",
+                  "kiis 101.1",
+                  "kiis one oh one point one",
+                  "kiis one oh one one",
+                  "101.1",
+                  "one oh one point one",
+                  "one oh one one",
+                  "kiis 1011",
+                  "kiis ten eleven"
+                ]
+              }
+            },
+            {
+              "id": "nova-100",
+              "name": {
+                "value": "nova 100",
+                "synonyms": [
+                  "nova one hundred",
+                  "nova",
+                  "nova melbourne"
+                ]
+              }
+            },
+            {
+              "id": "nova-1069",
+              "name": {
+                "value": "nova 106.9",
+                "synonyms": [
+                  "nova one oh six point nine",
+                  "nova one oh six nine",
+                  "nova one hundred six point nine",
+                  "nova one hundred six nine",
+                  "nova",
+                  "nova brisbane",
+                  "106.9",
+                  "one oh six point nine",
+                  "one oh six nine",
+                  "queensland",
+                  "gold coast",
+                  "brissie",
+                  "nova 1069",
+                  "nova ten sixty nine"
+                ]
+              }
+            },
+            {
+              "id": "nova-937",
+              "name": {
+                "value": "nova 93.7",
+                "synonyms": [
+                  "nova ninety three point seven",
+                  "nova ninety three seven",
+                  "nova",
+                  "nova perth",
+                  "perth",
+                  "western australia",
+                  "wa",
+                  "fremantle",
+                  "nova 937",
+                  "nova nine thirty seven"
+                ]
+              }
+            },
+            {
+              "id": "nova-919",
+              "name": {
+                "value": "nova 919",
+                "synonyms": [
+                  "nova nine nineteen",
+                  "nova ninety one nine",
+                  "nova nine one nine",
+                  "nova",
+                  "nova adelaide",
+                  "adelaide",
+                  "91.9",
+                  "ninety one point nine",
+                  "ninety one nine",
+                  "south australia"
+                ]
+              }
+            },
+            {
+              "id": "mix-fm",
+              "name": {
+                "value": "mix fm",
+                "synonyms": [
+                  "106.3",
+                  "one oh six point three",
+                  "one oh six three",
+                  "sampa",
+                  "jovem"
+                ]
+              }
+            },
+            {
+              "id": "89-fm",
+              "name": {
+                "value": "89 fm a radio rock",
+                "synonyms": [
+                  "eighty nine fm a radio rock",
+                  "89 fm a rock",
+                  "89 fm",
+                  "89",
+                  "eighty nine",
+                  "a radio rock",
+                  "radio rock",
+                  "rock brasileiro",
+                  "eighty nine fm"
+                ]
+              }
+            },
+            {
+              "id": "band-fm",
+              "name": {
+                "value": "band fm",
+                "synonyms": [
+                  "pagode",
+                  "band",
+                  "samba",
+                  "forro",
+                  "popular"
+                ]
+              }
+            },
+            {
+              "id": "nativa-fm",
+              "name": {
+                "value": "nativa fm",
+                "synonyms": [
+                  "nativa",
+                  "95.3",
+                  "ninety five point three",
+                  "ninety five three",
+                  "sertanejo universitario",
+                  "modao"
+                ]
+              }
+            },
+            {
+              "id": "jb-fm",
+              "name": {
+                "value": "jb fm",
+                "synonyms": [
+                  "j. b. fm",
+                  "adult hits",
+                  "jb",
+                  "j. b.",
+                  "carioca",
+                  "mpb",
+                  "m. p. b.",
+                  "classic hits",
+                  "ipanema",
+                  "copacabana"
+                ]
+              }
+            },
+            {
+              "id": "los40-mexico",
+              "name": {
+                "value": "los40 mexico",
+                "synonyms": [
+                  "los forty mexico",
+                  "los 40 mexico",
+                  "los cuarenta",
+                  "101.7",
+                  "one oh one point seven",
+                  "one oh one seven"
+                ]
+              }
+            },
+            {
+              "id": "alfa-913",
+              "name": {
+                "value": "alfa 91.3",
+                "synonyms": [
+                  "alfa ninety one point three",
+                  "alfa ninety one three",
+                  "alfa",
+                  "alfa mexico city",
+                  "alfa radio",
+                  "91.3",
+                  "ninety one point three",
+                  "ninety one three",
+                  "english hits",
+                  "alfa 913",
+                  "alfa nine thirteen"
+                ]
+              }
+            },
+            {
+              "id": "la-z",
+              "name": {
+                "value": "la z",
+                "synonyms": [
+                  "la z 107.3",
+                  "la z one oh seven point three",
+                  "la z one oh seven three",
+                  "regional mexican",
+                  "la zeta",
+                  "z 107.3",
+                  "z one oh seven point three",
+                  "z one oh seven three",
+                  "107.3",
+                  "one oh seven point three",
+                  "one oh seven three",
+                  "regional mexicano",
+                  "banda",
+                  "norteno",
+                  "ranchera",
+                  "grupera"
+                ]
+              }
+            },
+            {
+              "id": "stereo-joya",
+              "name": {
+                "value": "stereo joya",
+                "synonyms": [
+                  "spanish ballads",
+                  "joya",
+                  "romantica"
+                ]
+              }
+            },
+            {
+              "id": "beat-1009",
+              "name": {
+                "value": "beat 100.9",
+                "synonyms": [
+                  "beat one hundred point nine",
+                  "beat one hundred nine",
+                  "beat",
+                  "beat mexico city",
+                  "100.9",
+                  "one hundred point nine",
+                  "one hundred nine",
+                  "beat 1009",
+                  "beat ten oh nine"
+                ]
+              }
+            },
+            {
+              "id": "d99",
+              "name": {
+                "value": "d99",
+                "synonyms": [
+                  "d ninety nine",
+                  "monterrey",
+                  "d 99",
+                  "digital 99",
+                  "digital ninety nine",
+                  "98.9",
+                  "ninety eight point nine",
+                  "ninety eight nine",
+                  "nuevo leon",
+                  "northern mexico",
+                  "multimedios"
+                ]
+              }
+            },
+            {
+              "id": "dial-up",
+              "name": {
+                "value": "dial up",
+                "synonyms": [
+                  "soft breaks",
+                  "breaks",
+                  "breakbeat",
+                  "nineties",
+                  "internet",
+                  "modem",
+                  "dialup",
+                  "56k",
+                  "fifty six k",
+                  "aol",
+                  "geocities",
+                  "netscape",
+                  "web 1.0",
+                  "web one point zero",
+                  "web one zero",
+                  "bedroom",
+                  "browsing",
+                  "generative"
+                ]
+              }
+            },
+            {
+              "id": "shareware-summer",
+              "name": {
+                "value": "shareware summer",
+                "synonyms": [
+                  "synth funk",
+                  "funky",
+                  "synthwave",
+                  "retrowave",
+                  "outrun",
+                  "boogie",
+                  "disco",
+                  "sunshine",
+                  "sunny",
+                  "summertime",
+                  "pool",
+                  "happy",
+                  "bright",
+                  "eighties",
+                  "shareware",
+                  "floppy disk",
+                  "trial version",
+                  "demo"
+                ]
+              }
+            },
+            {
+              "id": "night-build",
+              "name": {
+                "value": "night build",
+                "synonyms": [
+                  "dark ambient",
+                  "drone",
+                  "after hours",
+                  "nighttime",
+                  "midnight",
+                  "3am",
+                  "three am",
+                  "sleep",
+                  "sleeping",
+                  "insomnia",
+                  "meditation",
+                  "build",
+                  "compile",
+                  "ci",
+                  "overnight",
+                  "moody",
+                  "cinematic",
+                  "blade runner"
+                ]
+              }
+            },
+            {
+              "id": "pixel-drift",
+              "name": {
+                "value": "pixel drift",
+                "synonyms": [
+                  "chiptune",
+                  "chip",
+                  "chip music",
+                  "8 bit",
+                  "eight bit",
+                  "8bit",
+                  "16 bit",
+                  "sixteen bit",
+                  "arcade",
+                  "video game",
+                  "video games",
+                  "game music",
+                  "vgm",
+                  "v. g. m.",
+                  "retro games",
+                  "retro gaming",
+                  "nintendo",
+                  "nes",
+                  "snes",
+                  "gameboy",
+                  "game boy",
+                  "sega",
+                  "commodore",
+                  "amiga",
+                  "bleeps",
+                  "bloops",
+                  "pixels",
+                  "pixel",
+                  "drift",
+                  "playful"
+                ]
+              }
+            },
+            {
+              "id": "tag-eclectic",
+              "name": {
+                "value": "eclectic",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-mix",
+              "name": {
+                "value": "mix",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rock",
+              "name": {
+                "value": "rock",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-classic-rock",
+              "name": {
+                "value": "classic rock",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-indie",
+              "name": {
+                "value": "indie",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-alternative",
+              "name": {
+                "value": "alternative",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-adult-alternative",
+              "name": {
+                "value": "adult alternative",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-world-music",
+              "name": {
+                "value": "world music",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-folk",
+              "name": {
+                "value": "folk",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-electronic",
+              "name": {
+                "value": "electronic",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-singer-songwriter",
+              "name": {
+                "value": "singer songwriter",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-deep-cuts",
+              "name": {
+                "value": "deep cuts",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-curated",
+              "name": {
+                "value": "curated",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-human-dj",
+              "name": {
+                "value": "human dj",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-commercial-free",
+              "name": {
+                "value": "commercial free",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-no-ads",
+              "name": {
+                "value": "no ads",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-listener-supported",
+              "name": {
+                "value": "listener supported",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-california",
+              "name": {
+                "value": "california",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-new-music",
+              "name": {
+                "value": "new music",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-road-trip",
+              "name": {
+                "value": "road trip",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-dinner",
+              "name": {
+                "value": "dinner",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-evening",
+              "name": {
+                "value": "evening",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-weekend",
+              "name": {
+                "value": "weekend",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-country",
+              "name": {
+                "value": "country",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-roots",
+              "name": {
+                "value": "roots",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-guitar",
+              "name": {
+                "value": "guitar",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-texas",
+              "name": {
+                "value": "texas",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-somafm",
+              "name": {
+                "value": "somafm",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-jazz",
+              "name": {
+                "value": "jazz",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-atmospheric",
+              "name": {
+                "value": "atmospheric",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-cool-jazz",
+              "name": {
+                "value": "cool jazz",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-mellow",
+              "name": {
+                "value": "mellow",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-saxophone",
+              "name": {
+                "value": "saxophone",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sax",
+              "name": {
+                "value": "sax",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-trumpet",
+              "name": {
+                "value": "trumpet",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-piano",
+              "name": {
+                "value": "piano",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-upright-bass",
+              "name": {
+                "value": "upright bass",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-blue-note",
+              "name": {
+                "value": "blue note",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-miles-davis",
+              "name": {
+                "value": "miles davis",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-night",
+              "name": {
+                "value": "night",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-cocktails",
+              "name": {
+                "value": "cocktails",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-wine",
+              "name": {
+                "value": "wine",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-reading",
+              "name": {
+                "value": "reading",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-indie-rock",
+              "name": {
+                "value": "indie rock",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-alt",
+              "name": {
+                "value": "alt",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-college-radio",
+              "name": {
+                "value": "college radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-pop-rock",
+              "name": {
+                "value": "pop rock",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-garage",
+              "name": {
+                "value": "garage",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-bands",
+              "name": {
+                "value": "bands",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-upbeat",
+              "name": {
+                "value": "upbeat",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-2010s",
+              "name": {
+                "value": "2010s",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-pop",
+              "name": {
+                "value": "pop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-top-40",
+              "name": {
+                "value": "top 40",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-hits",
+              "name": {
+                "value": "hits",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-chart",
+              "name": {
+                "value": "chart",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-charts",
+              "name": {
+                "value": "charts",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sing-along",
+              "name": {
+                "value": "sing along",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-dance-pop",
+              "name": {
+                "value": "dance pop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-party",
+              "name": {
+                "value": "party",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-teen",
+              "name": {
+                "value": "teen",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-work",
+              "name": {
+                "value": "work",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-working",
+              "name": {
+                "value": "working",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-focus",
+              "name": {
+                "value": "focus",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-study",
+              "name": {
+                "value": "study",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-studying",
+              "name": {
+                "value": "studying",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-office",
+              "name": {
+                "value": "office",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-deep-work",
+              "name": {
+                "value": "deep work",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-background-music",
+              "name": {
+                "value": "background music",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-downtempo",
+              "name": {
+                "value": "downtempo",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-chill",
+              "name": {
+                "value": "chill",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-chillout",
+              "name": {
+                "value": "chillout",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-chill-out",
+              "name": {
+                "value": "chill out",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-ambient",
+              "name": {
+                "value": "ambient",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-lounge",
+              "name": {
+                "value": "lounge",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-trip-hop",
+              "name": {
+                "value": "trip hop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-instrumental",
+              "name": {
+                "value": "instrumental",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-calm",
+              "name": {
+                "value": "calm",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-headphones",
+              "name": {
+                "value": "headphones",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-lofi",
+              "name": {
+                "value": "lofi",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-beats",
+              "name": {
+                "value": "beats",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-hip-hop",
+              "name": {
+                "value": "hip hop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-coding",
+              "name": {
+                "value": "coding",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-relax",
+              "name": {
+                "value": "relax",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-relaxing",
+              "name": {
+                "value": "relaxing",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rainy-day",
+              "name": {
+                "value": "rainy day",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-cozy",
+              "name": {
+                "value": "cozy",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-no-vocals",
+              "name": {
+                "value": "no vocals",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-electronica",
+              "name": {
+                "value": "electronica",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-driving",
+              "name": {
+                "value": "driving",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-techno",
+              "name": {
+                "value": "techno",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-synth",
+              "name": {
+                "value": "synth",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-energy",
+              "name": {
+                "value": "energy",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-2000s",
+              "name": {
+                "value": "2000s",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-00s",
+              "name": {
+                "value": "00s",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-retro",
+              "name": {
+                "value": "retro",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-nostalgia",
+              "name": {
+                "value": "nostalgia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-nostalgic",
+              "name": {
+                "value": "nostalgic",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sunset",
+              "name": {
+                "value": "sunset",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-beach",
+              "name": {
+                "value": "beach",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-christmas",
+              "name": {
+                "value": "christmas",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-xmas",
+              "name": {
+                "value": "xmas",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-x-mas",
+              "name": {
+                "value": "x mas",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-holiday",
+              "name": {
+                "value": "holiday",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-holidays",
+              "name": {
+                "value": "holidays",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-holiday-music",
+              "name": {
+                "value": "holiday music",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-festive",
+              "name": {
+                "value": "festive",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-seasonal",
+              "name": {
+                "value": "seasonal",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-season",
+              "name": {
+                "value": "season",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-winter",
+              "name": {
+                "value": "winter",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-december",
+              "name": {
+                "value": "december",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-santa",
+              "name": {
+                "value": "santa",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-soul",
+              "name": {
+                "value": "soul",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-r-and-b",
+              "name": {
+                "value": "r and b",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rnb",
+              "name": {
+                "value": "rnb",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-motown",
+              "name": {
+                "value": "motown",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-funk",
+              "name": {
+                "value": "funk",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-gospel",
+              "name": {
+                "value": "gospel",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sixties",
+              "name": {
+                "value": "sixties",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-60s",
+              "name": {
+                "value": "60s",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-70s",
+              "name": {
+                "value": "70s",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-vintage",
+              "name": {
+                "value": "vintage",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-easy-listening",
+              "name": {
+                "value": "easy listening",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-standards",
+              "name": {
+                "value": "standards",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-romantic",
+              "name": {
+                "value": "romantic",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-cabin",
+              "name": {
+                "value": "cabin",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-punk",
+              "name": {
+                "value": "punk",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-italy",
+              "name": {
+                "value": "italy",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-italia",
+              "name": {
+                "value": "italia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-italian",
+              "name": {
+                "value": "italian",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-italiano",
+              "name": {
+                "value": "italiano",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-european",
+              "name": {
+                "value": "european",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-talk",
+              "name": {
+                "value": "talk",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-news",
+              "name": {
+                "value": "news",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-commercial-radio",
+              "name": {
+                "value": "commercial radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-summer",
+              "name": {
+                "value": "summer",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-jazz-ballads",
+              "name": {
+                "value": "jazz ballads",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-ballads",
+              "name": {
+                "value": "ballads",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-dark-academia",
+              "name": {
+                "value": "dark academia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-library",
+              "name": {
+                "value": "library",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-classic-jazz",
+              "name": {
+                "value": "classic jazz",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-piano-trio",
+              "name": {
+                "value": "piano trio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-hard-bop",
+              "name": {
+                "value": "hard bop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-bill-evans",
+              "name": {
+                "value": "bill evans",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-chet-baker",
+              "name": {
+                "value": "chet baker",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-slow",
+              "name": {
+                "value": "slow",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-quiet",
+              "name": {
+                "value": "quiet",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rain",
+              "name": {
+                "value": "rain",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-usa",
+              "name": {
+                "value": "usa",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-us",
+              "name": {
+                "value": "us",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-america",
+              "name": {
+                "value": "america",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-american",
+              "name": {
+                "value": "american",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-united-states",
+              "name": {
+                "value": "united states",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-100-3",
+              "name": {
+                "value": "100.3",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-iheart",
+              "name": {
+                "value": "iheart",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-world-radio",
+              "name": {
+                "value": "world radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-los-angeles",
+              "name": {
+                "value": "los angeles",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-kiis",
+              "name": {
+                "value": "kiis",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-la",
+              "name": {
+                "value": "la",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-socal",
+              "name": {
+                "value": "socal",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-96-1",
+              "name": {
+                "value": "96.1",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-seattle",
+              "name": {
+                "value": "seattle",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-public-radio",
+              "name": {
+                "value": "public radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-uk",
+              "name": {
+                "value": "uk",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-united-kingdom",
+              "name": {
+                "value": "united kingdom",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-britain",
+              "name": {
+                "value": "britain",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-british",
+              "name": {
+                "value": "british",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-england",
+              "name": {
+                "value": "england",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-london",
+              "name": {
+                "value": "london",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-english",
+              "name": {
+                "value": "english",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-british-radio",
+              "name": {
+                "value": "british radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-uk-radio",
+              "name": {
+                "value": "uk radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-feel-good",
+              "name": {
+                "value": "feel good",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-adult-contemporary",
+              "name": {
+                "value": "adult contemporary",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-80s",
+              "name": {
+                "value": "80s",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-90s",
+              "name": {
+                "value": "90s",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-throwbacks",
+              "name": {
+                "value": "throwbacks",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-breakfast-show",
+              "name": {
+                "value": "breakfast show",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-global",
+              "name": {
+                "value": "global",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-hit-music",
+              "name": {
+                "value": "hit music",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-dance",
+              "name": {
+                "value": "dance",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-young",
+              "name": {
+                "value": "young",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-germany",
+              "name": {
+                "value": "germany",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-deutschland",
+              "name": {
+                "value": "deutschland",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-german",
+              "name": {
+                "value": "german",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-deutsch",
+              "name": {
+                "value": "deutsch",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-german-radio",
+              "name": {
+                "value": "german radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-deutsches-radio",
+              "name": {
+                "value": "deutsches radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-ard",
+              "name": {
+                "value": "ard",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-youth",
+              "name": {
+                "value": "youth",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-deutschrap",
+              "name": {
+                "value": "deutschrap",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-festival",
+              "name": {
+                "value": "festival",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-stuttgart",
+              "name": {
+                "value": "stuttgart",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-baden-wurttemberg",
+              "name": {
+                "value": "baden wurttemberg",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-traffic",
+              "name": {
+                "value": "traffic",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-france",
+              "name": {
+                "value": "france",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-french",
+              "name": {
+                "value": "french",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-francais",
+              "name": {
+                "value": "francais",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-paris",
+              "name": {
+                "value": "paris",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-french-pop",
+              "name": {
+                "value": "french pop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-variete",
+              "name": {
+                "value": "variete",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rap-francais",
+              "name": {
+                "value": "rap francais",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-electro",
+              "name": {
+                "value": "electro",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-club",
+              "name": {
+                "value": "club",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-los-40-principales",
+              "name": {
+                "value": "los 40 principales",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-spain",
+              "name": {
+                "value": "spain",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-espana",
+              "name": {
+                "value": "espana",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-spanish",
+              "name": {
+                "value": "spanish",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-espanol",
+              "name": {
+                "value": "espanol",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-madrid",
+              "name": {
+                "value": "madrid",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-barcelona",
+              "name": {
+                "value": "barcelona",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-exitos",
+              "name": {
+                "value": "exitos",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-spanish-pop",
+              "name": {
+                "value": "spanish pop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-pop-espanol",
+              "name": {
+                "value": "pop espanol",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-latin-pop",
+              "name": {
+                "value": "latin pop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-reggaeton",
+              "name": {
+                "value": "reggaeton",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-prisa",
+              "name": {
+                "value": "prisa",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-fiesta",
+              "name": {
+                "value": "fiesta",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-netherlands",
+              "name": {
+                "value": "netherlands",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-nederland",
+              "name": {
+                "value": "nederland",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-holland",
+              "name": {
+                "value": "holland",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-dutch",
+              "name": {
+                "value": "dutch",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-amsterdam",
+              "name": {
+                "value": "amsterdam",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-scandinavia",
+              "name": {
+                "value": "scandinavia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-scandinavian",
+              "name": {
+                "value": "scandinavian",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-nordic",
+              "name": {
+                "value": "nordic",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-bauer",
+              "name": {
+                "value": "bauer",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-lakes",
+              "name": {
+                "value": "lakes",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-atlantic",
+              "name": {
+                "value": "atlantic",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-portuguese",
+              "name": {
+                "value": "portuguese",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-portugues",
+              "name": {
+                "value": "portugues",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-middle-east",
+              "name": {
+                "value": "middle east",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-american-radio",
+              "name": {
+                "value": "american radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-non-commercial",
+              "name": {
+                "value": "non commercial",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-canada",
+              "name": {
+                "value": "canada",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-canadian",
+              "name": {
+                "value": "canadian",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-toronto",
+              "name": {
+                "value": "toronto",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-ontario",
+              "name": {
+                "value": "ontario",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-north-america",
+              "name": {
+                "value": "north america",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-mexico",
+              "name": {
+                "value": "mexico",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-mexican",
+              "name": {
+                "value": "mexican",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-mexico-city",
+              "name": {
+                "value": "mexico city",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-cdmx",
+              "name": {
+                "value": "cdmx",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-ciudad-de-mexico",
+              "name": {
+                "value": "ciudad de mexico",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-pop-en-espanol",
+              "name": {
+                "value": "pop en espanol",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-latin-america",
+              "name": {
+                "value": "latin america",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-brazil",
+              "name": {
+                "value": "brazil",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-brasil",
+              "name": {
+                "value": "brasil",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-brazilian",
+              "name": {
+                "value": "brazilian",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-brasileiro",
+              "name": {
+                "value": "brasileiro",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sao-paulo",
+              "name": {
+                "value": "sao paulo",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rio-de-janeiro",
+              "name": {
+                "value": "rio de janeiro",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rio",
+              "name": {
+                "value": "rio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-soft-hits",
+              "name": {
+                "value": "soft hits",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-love-songs",
+              "name": {
+                "value": "love songs",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-south-america",
+              "name": {
+                "value": "south america",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-99-9",
+              "name": {
+                "value": "99.9",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-tropical",
+              "name": {
+                "value": "tropical",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-cumbia",
+              "name": {
+                "value": "cumbia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-pacific",
+              "name": {
+                "value": "pacific",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-australia",
+              "name": {
+                "value": "australia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-australian",
+              "name": {
+                "value": "australian",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-aussie",
+              "name": {
+                "value": "aussie",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sydney",
+              "name": {
+                "value": "sydney",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-melbourne",
+              "name": {
+                "value": "melbourne",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-brisbane",
+              "name": {
+                "value": "brisbane",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-surf",
+              "name": {
+                "value": "surf",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-asia",
+              "name": {
+                "value": "asia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-southeast-asia",
+              "name": {
+                "value": "southeast asia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-asean",
+              "name": {
+                "value": "asean",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-city",
+              "name": {
+                "value": "city",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-island",
+              "name": {
+                "value": "island",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-soft-pop",
+              "name": {
+                "value": "soft pop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sa",
+              "name": {
+                "value": "sa",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-urban",
+              "name": {
+                "value": "urban",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-house",
+              "name": {
+                "value": "house",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-amapiano",
+              "name": {
+                "value": "amapiano",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-africa",
+              "name": {
+                "value": "africa",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-african",
+              "name": {
+                "value": "african",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-96-9",
+              "name": {
+                "value": "96.9",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-afrobeats",
+              "name": {
+                "value": "afrobeats",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-afropop",
+              "name": {
+                "value": "afropop",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-rap",
+              "name": {
+                "value": "rap",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-easy-hits",
+              "name": {
+                "value": "easy hits",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-soft",
+              "name": {
+                "value": "soft",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-munich",
+              "name": {
+                "value": "munich",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-bavaria",
+              "name": {
+                "value": "bavaria",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-munchen",
+              "name": {
+                "value": "munchen",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-private-radio",
+              "name": {
+                "value": "private radio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-berlin",
+              "name": {
+                "value": "berlin",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-frankfurt",
+              "name": {
+                "value": "frankfurt",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-hessen",
+              "name": {
+                "value": "hessen",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-hesse",
+              "name": {
+                "value": "hesse",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-frankfurt-am-main",
+              "name": {
+                "value": "frankfurt am main",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-edm",
+              "name": {
+                "value": "edm",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-80s-to-now",
+              "name": {
+                "value": "80s to now",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-baladas",
+              "name": {
+                "value": "baladas",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-catalan",
+              "name": {
+                "value": "catalan",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-catala",
+              "name": {
+                "value": "catala",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-catalunya",
+              "name": {
+                "value": "catalunya",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-catalonia",
+              "name": {
+                "value": "catalonia",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-milan",
+              "name": {
+                "value": "milan",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-milano",
+              "name": {
+                "value": "milano",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-mediaset",
+              "name": {
+                "value": "mediaset",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-talpa",
+              "name": {
+                "value": "talpa",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-nsw",
+              "name": {
+                "value": "nsw",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-new-south-wales",
+              "name": {
+                "value": "new south wales",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-arn",
+              "name": {
+                "value": "arn",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-nova-entertainment",
+              "name": {
+                "value": "nova entertainment",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-victoria",
+              "name": {
+                "value": "victoria",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-93-7",
+              "name": {
+                "value": "93.7",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-sertanejo",
+              "name": {
+                "value": "sertanejo",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-bandeirantes",
+              "name": {
+                "value": "bandeirantes",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-radio-centro",
+              "name": {
+                "value": "radio centro",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-synth-sounds",
+              "name": {
+                "value": "synth sounds",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-synthesized",
+              "name": {
+                "value": "synthesized",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-no-words",
+              "name": {
+                "value": "no words",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-hifi-studio",
+              "name": {
+                "value": "hifi studio",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-original",
+              "name": {
+                "value": "original",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-original-music",
+              "name": {
+                "value": "original music",
+                "synonyms": []
+              }
+            },
+            {
+              "id": "tag-made-here",
+              "name": {
+                "value": "made here",
+                "synonyms": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

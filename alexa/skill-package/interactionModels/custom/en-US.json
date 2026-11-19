@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "hifi radio",
+      "invocationName": "hi fi radio",
       "modelConfiguration": {
         "fallbackIntentSensitivity": {
           "level": "LOW"

@@ -122,9 +122,10 @@ Testing: any Echo on the developer account hears the development skill. Every re
 leaves one `alexa: in …` / `alexa: out …` line in the Railway log (type, intent, what the player
 holds, no ids), so "Alexa, next did nothing" can be checked against what reached the skill. The ASK CLI's
 `simulate-skill` runs text turns end to end, and `node --test alexa/lambda/*.test.js` checks what is
-said against the station that should play and what Alexa says back. In the simulator use "ask hifi radio for …"; it turns
-away "open hifi radio" and most "to play …" phrases ("did not resolve to any intent",
-considered an intent for a different skill) whatever the skill does. It writes numbers its own
+said against the station that should play and what Alexa says back. Don't trust the simulator's verdict. On 2026-11-19 it
+answered FAILED (`<IntentForDifferentSkill>`) for "open hi fi radio" while the Railway log showed
+that LaunchRequest arriving and playing. Check the log for the `alexa: in` line about ten seconds
+after the simulation. For a few minutes after a model build, any phrase may miss the skill. It writes numbers its own
 way before the skill sees them ("z one hundred" arrives as "Z1 hundred", "one oh three point
 five" as "10 3.5"), and the voice model answers with up to five loose matches, not one. Publishing is
 `ask smapi submit-skill-for-certification --skill-id $(cat alexa/skill.id)` and a few days
@@ -132,13 +133,31 @@ of Amazon's certification.
 
 ## Saying things
 
-The invocation name is "hifi radio", both words (it was "hifi live radio" until 2026-11-19): "Alexa, open HIFI jazz" and "Alexa, ask
+The invocation name is "hi fi radio", written as Alexa hears "HIFI radio" (it was "hifi live radio"
+and then "hifi radio" on 2026-11-19, and the spoken name is the same). "Alexa, open HIFI jazz" and "Alexa, ask
 HIFI to play jazz" do not reach the skill. In one sentence from silence, say "Alexa, ask HIFI
 radio for jazz" (or "to tune to", "to put on"). "…to play jazz" is the same request to the
 skill, but Alexa often hands a sentence with "play" and a music name to its own music service
 instead: on 2026-11-18 the simulator did that for most "to play" phrases and for none of the
 "for" ones. Once HIFI is playing, "Alexa, next", "Alexa, previous", "Alexa, pause" and "Alexa,
 resume" go to it without the name.
+
+"Alexa, play HIFI radio" (and "play HIFI live radio") never reaches the skill. Alexa reads
+"play … radio" as a station for the account's music service. On Nate's account that is SiriusXM,
+which answers "to listen to SiriusXM you'll need to re-link your account" (2026-11-19). Only
+"open", "ask", "start" and "launch" reach a skill by name. Taking over "play HIFI radio" needs
+skill launch phrases (name-free interaction), and Amazon offers those only to skills that are
+already live and certified. The same SiriusXM answer comes for every phrase on an Echo that
+can't see the skill: one registered to another Amazon account (a development skill reaches only
+the developer account's devices) or one set to a language the skill lacks. The skill carries
+English for the US, UK, Canada, Australia and India, all with the same model (`build-model.mjs`
+writes one file per locale in `skill.json`, and `deploy.sh` pushes each one).
+
+Write the name as it is spoken, and don't change it again. Written "hifi radio", the name never
+reached the skill: the simulator sent "open hifi radio" and "ask hifi radio for jazz" to another
+skill for half an hour, and Nate's Echo Shows sent "HIFI radio" to SiriusXM. Written "hi fi radio",
+"open hi fi radio" and "ask hi fi radio for jazz" reach it and play. Each rename also costs a few
+minutes in which Alexa routes neither name.
 
 | You say | It does |
 |---|---|
