@@ -1,6 +1,6 @@
 # HIFI Live for Alexa
 
-The HIFI dial on Echo speakers. "Alexa, open HIFI live" picks up where you left off;
+The HIFI dial on Echo speakers. "Alexa, ask HIFI live" picks up where you left off;
 "Alexa, ask HIFI live for pop girl" tunes a station; "next" and "previous" move along
 the dial like the click wheel; "what's playing" names the song. Whenever a station starts by voice (open, resume, by name,
 next, previous) Alexa says "Now listening to live radio on HIFI:" and the station's name.
@@ -135,8 +135,23 @@ of Amazon's certification.
 
 The invocation name is "hifi live" and the skill's name is "HIFI Live" (Nate, 2026-11-19 12:21 ET:
 "take radio out of the command and just say open hifi live"). Say "Alexa, ask HIFI live for jazz"
-(or any station; also "to tune to", "to put on"), or "Alexa, open HIFI live". Once HIFI is playing, "Alexa, next", "Alexa, previous", "Alexa, pause" and "Alexa,
+(or any station; also "to tune to", "to put on"), or "Alexa, ask HIFI live" to resume the last station. Once HIFI is playing, "Alexa, next", "Alexa, previous", "Alexa, pause" and "Alexa,
 resume" go to it without the name.
+
+"Alexa, open HIFI live" mostly doesn't reach the skill. Alexa sends the bare launch phrase somewhere
+else. Tested on 2026-11-19, 13:36–14:10 ET (en-US, judged by the Railway log, since the simulator said
+FAILED to almost everything): "ask hifi live", "ask hifi live for jazz", "ask hifi live to play",
+"tell hifi live to start", "open the hifi live skill" and "open hifi live skill" reached the skill
+every time. "open hifi live" reached it 3 times between 13:44 and 13:46 ET (as did "alexa open hifi
+live", "start", "use" and "begin hifi live" in those minutes) and missed on all 17 other tries, before
+and after that window, as on about 20 tries the hour before. "resume", "talk to" and the typed "hi fi
+live" missed too. A real launch, sent to the endpoint by Amazon
+(`ask smapi invoke-skill-end-point` with a LaunchRequest), plays the last station, so the skill and
+the endpoint are fine. The only other skill on the developer account is TinyCam ("a feed"), so
+whatever takes "open hifi live" is outside the account. The simulator gives no name for it, so this
+doesn't prove the name is taken. The model can't fix it: Alexa picks the skill before the model sees
+the request. Say "ask HIFI live" instead. In other locales the simulator reached
+the skill with nothing, not even "ask … for jazz", so only en-US results count.
 
 "HIFI radio" can't be the name. An Echo writes the spoken "HIFI radio" as "hifi radio" or "hi-fi
 radio", and Alexa gives both to another skill. On 2026-11-19 the simulator answered
@@ -169,7 +184,7 @@ carries the player's state (`player=IDLE:…` or `PLAYING:…`); the simulator's
 
 | You say | It does |
 |---|---|
-| open HIFI live | resumes the last station (Radio Paradise the first time) |
+| ask HIFI live (also "open the HIFI live skill") | resumes the last station (Radio Paradise the first time) |
 | play lo-fi beats / play Taylor Swift / play something for work | ranks names, tags, genre and lines; plays the best fit |
 | play jazz / play late night jazz / play jazz twenty four | Jazz24 for plain "jazz"; the other two by name |
 | play Z100 / play kiss FM / play KEXP / play one live | a world station by name; "kiss FM" is KIIS FM in Los Angeles |
