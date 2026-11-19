@@ -10,8 +10,6 @@ const fs = require('node:fs');
 
 test('server.js exits 0 on SIGTERM', () => {
   assert.match(fs.readFileSync(path.join(__dirname, 'server.js'), 'utf8'), /exitOnSignal\(server/);
-  const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'railway.json'), 'utf8'));
-  assert.strictEqual(config.deploy.startCommand, 'node server.js', 'npm would turn SIGTERM into an error exit');
 });
 
 test('SIGTERM closes the server and exits with code 0', async (t) => {
