@@ -28,7 +28,7 @@ const newer = (a, b) => {           // '2023.1' >= '2022.2'
 };
 
 // A screen that runs APL new enough and says it can play video. The listener can switch it off
-// ("Alexa, ask HIFI radio for audio only"), which keeps the plain Now Playing screen.
+// ("Alexa, ask HIFI live radio for audio only"), which keeps the plain Now Playing screen.
 function canShow(envelope) {
   const apl = envelope.context?.System?.device?.supportedInterfaces?.['Alexa.Presentation.APL'];
   const codecs = envelope.context?.Viewport?.video?.codecs;

@@ -83,9 +83,9 @@ test('next, previous, back and skip while a station plays move one station each 
 
 // An Echo whose language the skill lacks never reaches it: Alexa hands "HIFI radio" to a music
 // service (SiriusXM on Nate's account, 2026-11-19). Every English locale in the manifest gets the
-// same voice model. The name is written as Alexa hears it, "hi fi radio": written "hifi radio" it
-// never reached the skill.
-test('every English locale in the manifest has the same voice model, invoked as "hi fi radio"', () => {
+// same voice model. The name is "hifi live radio": an Echo writes the spoken "HIFI radio" as
+// "hifi radio" or "hi-fi radio", which another skill owns, and says "not supported on this device".
+test('every English locale in the manifest has the same voice model, invoked as "hifi live radio"', () => {
   const fs = require('node:fs');
   const path = require('node:path');
   const { manifest } = require('../skill-package/skill.json');
@@ -95,11 +95,12 @@ test('every English locale in the manifest has the same voice model, invoked as 
   const dir = path.join(__dirname, '../skill-package/interactionModels/custom');
   assert.deepStrictEqual(fs.readdirSync(dir).map(f => f.replace(/\.json$/, '')).sort(), locales);
   const us = fs.readFileSync(path.join(dir, 'en-US.json'), 'utf8');
-  assert.strictEqual(JSON.parse(us).interactionModel.languageModel.invocationName, 'hi fi radio');
+  assert.strictEqual(JSON.parse(us).interactionModel.languageModel.invocationName, 'hifi live radio');
   for (const locale of locales) {
     assert.strictEqual(fs.readFileSync(path.join(dir, `${locale}.json`), 'utf8'), us, locale);
     for (const phrase of manifest.publishingInformation.locales[locale].examplePhrases) {
-      assert.match(phrase, /^Alexa, (open|ask) hi fi radio\b/, `${locale}: ${phrase}`);
+      assert.match(phrase, /^Alexa, (open|ask) hifi live radio\b/, `${locale}: ${phrase}`);
     }
+    assert.strictEqual(manifest.publishingInformation.locales[locale].name, 'HIFI Live Radio', locale);
   }
 });

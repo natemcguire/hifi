@@ -1,6 +1,6 @@
 'use strict';
-// HIFI radio for Alexa. "Alexa, open HIFI radio" plays where you left off; "Alexa, ask HIFI
-// radio to play Pop Girl" tunes a station; next and previous move along the dial, like the
+// HIFI radio for Alexa. "Alexa, open HIFI live radio" plays where you left off; "Alexa, ask HIFI
+// live radio for Pop Girl" tunes a station; next and previous move along the dial, like the
 // click wheel. Live stations stream straight from the catalog; the synth stations play their
 // tracks one after another and queue the next before each one ends.
 
@@ -438,7 +438,8 @@ const REQUEST_LOG = {
     const player = envelope.context?.AudioPlayer;
     const session = envelope.session ? (envelope.session.new ? 'new' : 'open') : 'none';
     log('info', `alexa: in ${type}${name} player=${player?.playerActivity || '-'}:${parseToken(player?.token)?.id || '-'}`
-      + ` tv=${tv.showing(envelope)?.id || '-'} screen=${hasScreen(envelope) ? 'yes' : 'no'} session=${session}`);
+      + ` tv=${tv.showing(envelope)?.id || '-'} screen=${hasScreen(envelope) ? 'yes' : 'no'} session=${session}`
+      + ` locale=${envelope.request?.locale || '-'} audio=${envelope.context?.System?.device?.supportedInterfaces?.AudioPlayer ? 'yes' : 'no'}`);
   },
 };
 const RESPONSE_LOG = {

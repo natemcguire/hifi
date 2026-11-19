@@ -92,10 +92,12 @@ const shared = [...tagCount].filter(([t, n]) => n > 1 && !named.has(t) && !['rad
 const model = {
   interactionModel: {
     languageModel: {
-      // "HIFI radio" (Nate, 2026-11-19), written as it is spoken: Alexa hears "HIFI" as two words,
-      // "hi fi". Written "hifi radio" it never reached the skill (the simulator answered
-      // <IntentForDifferentSkill> and Nate's Echo Shows sent it to SiriusXM).
-      invocationName: 'hi fi radio',
+      // "HIFI live radio". "HIFI radio" can't be the name: an Echo writes the spoken "HIFI radio"
+      // as "hifi radio" or "hi-fi radio", and both belong to another skill (the simulator answered
+      // <IntentForDifferentSkill> for each on 2026-11-19, and Nate's Echos said "Sorry, HIFI radio
+      // is not supported on this device" without a request reaching the endpoint). Only the typed
+      // "hi fi radio" reached HIFI. "hifi live radio" reached it from Nate's Echo Show that morning.
+      invocationName: 'hifi live radio',
       modelConfiguration: { fallbackIntentSensitivity: { level: 'LOW' } },
       intents: [
         { name: 'PlayStationIntent', slots: [{ name: 'station', type: 'HIFI_STATION' }], samples: [
