@@ -1,12 +1,14 @@
 #!/bin/zsh
 # Captures the raw App Store screenshots in the simulators on the MacBook Air (never
 # the mini): a Debug build opened on each page with `-screenshot <page>`, a 9:41 status
-# bar, then Screenshots/raw/{iphone,ipad}. Frame them with scripts/frame-screenshots.py.
-# Run as: ios/scripts/capture-screenshots.sh
+# bar, then Screenshots/raw/{iphone,ipad} (or HIFI_SHOTS_RAW/{iphone,ipad}). Frame them with
+# scripts/frame-screenshots.py or scripts/story-screenshots.py.
+# Run as: [HIFI_SHOTS_RAW=dir] ios/scripts/capture-screenshots.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 [[ -f scripts/devices.local ]] && source scripts/devices.local
 host=${HIFI_BUILD_HOST:-${HIFI_RELAY_HOST:?set HIFI_BUILD_HOST in scripts/devices.local}}
+raw=${HIFI_SHOTS_RAW:-Screenshots/raw}
 # name: the screenshot page each raw file shows
 pages=(1-main:home 2-tv:tv 3-radio:radio 4-live:live 5-synth:synthTV 6-connect:connect)
 devices=("iphone:iPhone 17 Pro Max" "ipad:iPad Pro 13-inch (M5)")
@@ -24,13 +26,13 @@ for entry in $devices; do
   ssh $host "xcrun simctl boot $udid 2>/dev/null || true; xcrun simctl bootstatus $udid -b >/dev/null; \
     xcrun simctl status_bar $udid override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4; \
     xcrun simctl install $udid $app"
-  mkdir -p Screenshots/raw/$kind
+  mkdir -p $raw/$kind
   for pair in $pages; do
     name=${pair%%:*} page=${pair#*:}
     ssh $host "xcrun simctl terminate $udid com.natesoftware.hifi 2>/dev/null || true; \
       xcrun simctl launch $udid com.natesoftware.hifi -screenshot $page >/dev/null; sleep 14; \
       xcrun simctl io $udid screenshot --type=png /tmp/hifi-shot.png >/dev/null 2>&1"
-    scp -q $host:/tmp/hifi-shot.png Screenshots/raw/$kind/$name.png
+    scp -q $host:/tmp/hifi-shot.png $raw/$kind/$name.png
     echo "captured $kind $name ($page)"
   done
   ssh $host "xcrun simctl terminate $udid com.natesoftware.hifi 2>/dev/null || true; xcrun simctl shutdown $udid"

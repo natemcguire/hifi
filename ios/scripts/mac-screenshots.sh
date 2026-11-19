@@ -6,7 +6,8 @@
 # and a logged-in display; the shell doing this must be allowed to record the screen.
 # The compile runs unsigned on HIFI_BUILD_HOST (default the relay Mac from devices.local)
 # so this Mac stays quiet; HIFI_BUILD_HOST=local compiles here. Signing happens here.
-# Run as: ios/scripts/mac-screenshots.sh [--reuse]   (--reuse skips the build)
+# Run as: [HIFI_SHOTS_RAW=dir] ios/scripts/mac-screenshots.sh [--reuse]   (--reuse skips the build;
+# HIFI_SHOTS_RAW puts the captures in dir/mac instead of Screenshots/raw/mac)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 [[ -f scripts/devices.local ]] && source scripts/devices.local
@@ -14,6 +15,7 @@ signing=$HOME/.config/hifi-signing
 keychain=$HOME/Library/Keychains/hifi-build.keychain-db
 host=${HIFI_BUILD_HOST:-${HIFI_RELAY_HOST:-local}}
 app=build/mac-shot/HIFI.app
+raw=${HIFI_SHOTS_RAW:-Screenshots/raw}
 pages=(1-main:home 2-tv:tv 3-radio:radio 4-live:live 5-synth:synthTV 6-connect:connect)
 
 if [[ ${1:-} != --reuse ]]; then
@@ -47,7 +49,7 @@ for w in list where (w["kCGWindowOwnerName"] as? String) == "HIFI" && (w["kCGWin
 SWIFT
 [[ build/mac-shot/winid -nt build/mac-shot/winid.swift ]] || swiftc -O -o build/mac-shot/winid build/mac-shot/winid.swift 2>/dev/null
 
-mkdir -p Screenshots/raw/mac
+mkdir -p $raw/mac
 for pair in $pages; do
   name=${pair%%:*} page=${pair#*:}
   pkill -x HIFI 2>/dev/null || true
@@ -58,8 +60,8 @@ for pair in $pages; do
   sleep 1
   id=$(build/mac-shot/winid)
   [[ -n $id ]] || { echo "no HIFI window for $page"; exit 1; }
-  screencapture -x -o -l $id Screenshots/raw/mac/$name.png
-  echo "captured $name ($page): $(sips -g pixelWidth -g pixelHeight Screenshots/raw/mac/$name.png | awk '/pixel/{printf "%s ", $2}')"
+  screencapture -x -o -l $id $raw/mac/$name.png
+  echo "captured $name ($page): $(sips -g pixelWidth -g pixelHeight $raw/mac/$name.png | awk '/pixel/{printf "%s ", $2}')"
 done
 pkill -x HIFI 2>/dev/null || true
 echo "raw Mac screenshots in Screenshots/raw/mac; frame them: /opt/homebrew/bin/python3.14 scripts/frame-screenshots.py --mac"
