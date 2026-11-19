@@ -10,6 +10,7 @@ const { rank, meaningful } = require('./search');
 const store = require('./store');
 const tv = require('./tv');
 const about = require('./about');
+const { log, errorFields } = require('./log');
 
 const DEFAULT_STATION = 'radio-paradise';
 
@@ -335,7 +336,7 @@ const AudioPlayerEventHandler = {
         play(responseBuilder, station, { index, behavior: type === 'AudioPlayer.PlaybackFailed' ? 'REPLACE_ALL' : 'ENQUEUE', previous: token });
       }
     } else if (type === 'AudioPlayer.PlaybackFailed') {
-      console.log('playback failed:', JSON.stringify(requestEnvelope.request.error));
+      log('warn', 'playback failed', { event: 'playback_failed', playbackError: requestEnvelope.request.error });
     }
     return responseBuilder.getResponse();
   },
@@ -390,7 +391,7 @@ const SessionEndedRequestHandler = {
   canHandle: is('SessionEndedRequest'),
   handle(handlerInput) {
     const { reason, error } = handlerInput.requestEnvelope.request;
-    if (reason === 'ERROR') console.log('session ended with error:', JSON.stringify(error));
+    if (reason === 'ERROR') log('warn', 'session ended with error', { event: 'session_error', sessionError: error });
     return handlerInput.responseBuilder.getResponse();
   },
 };
@@ -401,7 +402,7 @@ const ScreenErrorHandler = {
   canHandle: is('Alexa.Presentation.APL.RuntimeError'),
   handle(handlerInput) {
     const { token, errors } = handlerInput.requestEnvelope.request;
-    console.log('screen error:', token, JSON.stringify(errors));
+    log('warn', 'screen error', { event: 'screen_error', token, screenErrors: errors });
     return handlerInput.responseBuilder.getResponse();
   },
 };
@@ -409,7 +410,7 @@ const ScreenErrorHandler = {
 const ExceptionEncounteredHandler = {
   canHandle: is('System.ExceptionEncountered'),
   handle(handlerInput) {
-    console.log('system exception:', JSON.stringify(handlerInput.requestEnvelope.request));
+    log('error', 'Alexa reported an exception', { event: 'alexa_exception', request: handlerInput.requestEnvelope.request });
     return handlerInput.responseBuilder.getResponse();
   },
 };
@@ -417,7 +418,7 @@ const ExceptionEncounteredHandler = {
 const ErrorHandler = {
   canHandle: () => true,
   handle(handlerInput, error) {
-    console.log('error:', error.stack || error);
+    log('error', `skill error: ${error?.message ?? error}`, { event: 'skill_error', requestType: Alexa.getRequestType(handlerInput.requestEnvelope), ...errorFields(error) });
     const type = Alexa.getRequestType(handlerInput.requestEnvelope);
     if (type === 'IntentRequest' || type === 'LaunchRequest') {
       return handlerInput.responseBuilder.speak("Sorry, HIFI radio hit a snag. Try again in a moment.").getResponse();
@@ -436,7 +437,7 @@ const REQUEST_LOG = {
     const name = type === 'IntentRequest' ? ` ${Alexa.getIntentName(envelope)}` : '';
     const player = envelope.context?.AudioPlayer;
     const session = envelope.session ? (envelope.session.new ? 'new' : 'open') : 'none';
-    console.log(`alexa: in ${type}${name} player=${player?.playerActivity || '-'}:${parseToken(player?.token)?.id || '-'}`
+    log('info', `alexa: in ${type}${name} player=${player?.playerActivity || '-'}:${parseToken(player?.token)?.id || '-'}`
       + ` tv=${tv.showing(envelope)?.id || '-'} screen=${hasScreen(envelope) ? 'yes' : 'no'} session=${session}`);
   },
 };
@@ -446,7 +447,7 @@ const RESPONSE_LOG = {
       const token = d.audioItem?.stream?.token || d.token || '';
       return token ? `${d.type}(${token.replace(/#.*$/, '')})` : d.type;
     });
-    console.log(`alexa: out ${sent.join(' ') || 'nothing'} speech=${response?.outputSpeech ? 'yes' : 'no'} end=${response?.shouldEndSession ?? '-'}`);
+    log('info', `alexa: out ${sent.join(' ') || 'nothing'} speech=${response?.outputSpeech ? 'yes' : 'no'} end=${response?.shouldEndSession ?? '-'}`);
   },
 };
 
