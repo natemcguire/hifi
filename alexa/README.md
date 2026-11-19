@@ -2,7 +2,8 @@
 
 The HIFI dial on Echo speakers. "Alexa, open HIFI live radio" picks up where you left off;
 "Alexa, ask HIFI live radio for pop girl" tunes a station; "next" and "previous" move along
-the dial like the click wheel; "what's playing" names the song.
+the dial like the click wheel; "what's playing" names the song. Whenever a station starts by voice (open, resume, by name,
+next, previous) Alexa says "Now listening to live radio on HIFI:" and the station's name.
 
 - `lambda/` — the skill code (Node, ASK SDK v2). `index.js` handles the requests,
   `search.js` ranks what was said against the stations (the same scheme as the app's
@@ -43,8 +44,8 @@ after a cover change. `index.js` also exports a Lambda handler, so the same code
 to AWS Lambda or an Alexa-hosted skill later without changes.
 
 Testing: any Echo on the developer account hears the development skill. The ASK CLI's
-`simulate-skill` runs text turns end to end, and `node --test alexa/lambda` checks what is said
-against the station that should play. In the simulator use "ask hifi live radio for …"; it turns
+`simulate-skill` runs text turns end to end, and `node --test alexa/lambda/*.test.js` checks what is
+said against the station that should play and what Alexa says back. In the simulator use "ask hifi live radio for …"; it turns
 away "open hifi live radio" and most "to play …" phrases ("did not resolve to any intent",
 considered an intent for a different skill) whatever the skill does. It writes numbers its own
 way before the skill sees them ("z one hundred" arrives as "Z1 hundred", "one oh three point

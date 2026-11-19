@@ -25,6 +25,9 @@ function parseToken(token) {
 const spoken = station => station.say
   || (station.country && station.label ? station.label.replace(/&/g, 'and').replace(/!+$/, '')
     : station.name.toLowerCase().replace(/!+$/, '').replace(/\blo-fi\b/g, 'lo fi').replace(/\by2k\b/g, 'Y 2 K'));
+// What Alexa says whenever a station starts by voice: open, resume, a station by name, next and
+// previous all say the same line, so the listener always hears where they are.
+const announce = station => `Now listening to live radio on HIFI: ${spoken(station)}.`;
 const and = names => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
 
 // ----- playback -----
@@ -56,7 +59,7 @@ async function tune(handlerInput, station, { speech, index, offset = 0 } = {}) {
   await store.save(requestEnvelope, { ...state, stationId: station.id, token: tokenFor(station, start), index: start, offset });
   play(responseBuilder, station, { index: start, offset });
   if (speech !== null) {
-    responseBuilder.speak(speech ?? spoken(station)).withSimpleCard(station.name, station.tagline || station.genre);
+    responseBuilder.speak(speech ?? announce(station)).withSimpleCard(station.name, station.tagline || station.genre);
   }
   return responseBuilder.getResponse();
 }
@@ -67,7 +70,7 @@ async function neighbour(handlerInput, step, speak) {
   const here = await currentStation(handlerInput.requestEnvelope, state);
   const at = stations.findIndex(s => s.id === here.id);
   const next = stations[(at + step + stations.length) % stations.length];
-  return tune(handlerInput, next, { speech: speak ? spoken(next) : null });
+  return tune(handlerInput, next, { speech: speak ? announce(next) : null });
 }
 
 async function resume(handlerInput, speak) {
@@ -78,7 +81,7 @@ async function resume(handlerInput, speak) {
   const sameStation = held && held.id === station.id;
   const index = sameStation && held.kind === 'track' ? held.index : undefined;
   const offset = sameStation && held.kind === 'track' ? state.offset || 0 : 0;
-  return tune(handlerInput, station, { speech: speak ? spoken(station) : null, index, offset });
+  return tune(handlerInput, station, { speech: speak ? announce(station) : null, index, offset });
 }
 
 async function stop(handlerInput, speech) {
@@ -118,8 +121,8 @@ const LaunchRequestHandler = {
     const station = await currentStation(handlerInput.requestEnvelope, state);
     const first = !state.stationId;
     const speech = first
-      ? `Welcome to HIFI radio. Here's ${spoken(station)}. Say next for another station, or ask for one by name.`
-      : `${spoken(station)}.`;
+      ? `Welcome. ${announce(station)} Say next for another station, or ask for one by name.`
+      : announce(station);
     const held = parseToken(state.token);
     const index = !first && held?.kind === 'track' && held.id === station.id ? held.index : undefined;
     return tune(handlerInput, station, { speech, index, offset: index === undefined ? 0 : state.offset || 0 });
@@ -306,3 +309,4 @@ const builder = Alexa.SkillBuilders.custom()
 
 exports.skill = builder.create();   // for server.js (Railway)
 exports.handler = builder.lambda(); // for AWS Lambda / Alexa-hosted
+exports.announce = announce;
